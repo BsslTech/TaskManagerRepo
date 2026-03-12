@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BSSLTaskManagement/BSSLTaskManagement.csproj" />
+  <Project Path="TaskManagement/TaskManagement.csproj" />
+</Solution>
