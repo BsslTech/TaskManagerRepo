@@ -24,4 +24,9 @@
     <ProjectReference Include="..\TaskManagement\TaskManagement.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Setup\" />
+    <Folder Include="Pages\SystemPage\" />
+  </ItemGroup>
+
 </Project>
