@@ -62,7 +62,7 @@ namespace BSSLTaskManagement.Pages.SystemPage
             {
                 // Don't persist the uploaded file to disk yet. Only update the in-memory text file
                 if (helperFile == null || helperFile.Length == 0)
-                    return new JsonResult("NoFile");
+                    return new JsonResult(new { status = "Error", statusDescription = "NoFile" });
 
                 if (helperFile != null && helperFile.Length > 0)
                 {
@@ -119,7 +119,7 @@ namespace BSSLTaskManagement.Pages.SystemPage
             }
             catch (Exception ex)
             {
-                return new JsonResult(ex.Message);
+                return new JsonResult(new { status = "Error", statusDescription = ex.Message });
             }
         }
           
@@ -137,7 +137,7 @@ namespace BSSLTaskManagement.Pages.SystemPage
             var todo = request.Todo;
             var value = request.Value;
 
-            var result = new JsonResult("failed");
+            var result = new JsonResult(new { status = "failed", statusDescription = "An error has occurred, please try again." });
 
             try
             {
@@ -206,12 +206,12 @@ namespace BSSLTaskManagement.Pages.SystemPage
 
                     await CreateTextFile(systemTypes);
 
-                    result = new JsonResult("Success");
+                    result = new JsonResult(new { status = "Success", statusDescription = "Updated successfully" });
                 }
             }
             catch (Exception ex)
             {
-                return new JsonResult(ex.Message);
+                return new JsonResult(new { status = "Error", statusDescription = ex.Message });
             }
 
             return result;

@@ -10,3 +10,25 @@
 .dataTables_wrapper .dataTables_paginate {
     margin-top: 10px;
 }
+
+
+.loadingDiv-parent {
+    position: fixed;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    z-index: 999998;
+    background-color: rgba(78, 76, 76, 0.2);
+}
+
+.loadingDiv {
+    position: fixed;
+    text-align: center;
+    top: 35%;
+    left: 50%;
+    z-index: 999999;
+}
+
+.loadingText {
+    color: blue;
+}
