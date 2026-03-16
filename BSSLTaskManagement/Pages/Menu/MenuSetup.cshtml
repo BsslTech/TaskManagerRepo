@@ -1,0 +1,160 @@
+﻿@page
+@model BSSLTaskManagement.Pages.Menu.MenuSetupModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<div class="card card-primary card-outline mb-4">
+    <!--begin::Header-->
+    <div class="card-header">
+        <div class="card-title">Menu</div>
+    </div>
+    <!--end::Header-->
+    <!--begin::Form-->
+    <form>
+        <!--begin::Body-->
+        <div class="card-body">
+            <div class="mb-3 col-6">
+                <label for="inputSystemTypeName" class="form-label">System Type Name</label>
+                <select class="form-control" id="inputSystemTypeName">
+                    <option value="">--Select--</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="mb-3 col-6">
+                    <label for="inputModuleName" class="form-label">Module Name:</label>
+                    <select class="form-control" id="inputModuleName">
+                        <option value="">--Select--</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-6">
+                    <label for="inputMainMenu" class="form-label">Main-Menu</label>
+                    <select class="form-control" id="inputMainMenu">
+                        <option value="">--Select--</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-6">
+                    <label for="inputMenuName" class="form-label">Menu Name</label>
+                    <input type="text" class="form-control" id="inputMenuName">
+                </div>
+
+                <div class="mb-3 col-2">
+                    <label for="inputOrderNumber" class="form-label">Order Number</label>
+                    <input type="number" class="form-control" id="inputOrderNumber" min="1">
+                </div>
+
+                <div class="mb-3 col-6">
+                    <label for="inputIconImageName" class="form-label">Icon Image Name</label>
+                    <input type="text" class="form-control" id="inputIconImageName">
+                </div>
+
+                <div class="mb-3 col-3">
+                    <label for="inputUploadImageIcon" class="form-label">Upload Image Icon</label>
+                    <input type="file" class="form-control" id="inputUploadImageIcon">
+                </div>
+
+            </div>
+        </div>
+        <!--end::Body-->
+        <!--begin::Footer-->
+        <div class="card-footer">
+            <button type="reset" class="btn btn-warning">Cancel Record</button>
+            <button type="submit" class="btn btn-success">Save</button>
+        </div>
+
+        <!--end::Footer-->
+    </form>
+    <!--end::Form-->
+</div>
+
+    <!--begin::Table-->
+
+<div class="col-12 grid-margin">
+    <div class="card">
+        <div class="card-body">
+            <div class="scroll">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table id="tabId" class="table ">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Module Name</th>
+                                        <th>Main Menu</th>
+                                        <th>Name</th>
+                                        <th>Order No</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="Tablist">
+                                    <tr>
+                                        <td>1</td>
+                                        <td class="modulename 0">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="iconImagename 0" value="advance.png">
+                                        </td>
+                                        <td class="moduleid 0" style="display:none">2</td>
+                                        <td class="mainmenu 0">Transactions</td>
+                                        <td class="mainmenuid 0" style="display:none">4</td>
+                                        <td class="name 0">PPE Investment</td>
+                                        <td style="width:5%;" class="orderNo 0">3</td>
+                                        <td style="width:15%;">
+                                            <input type="hidden" class="systemtype 0" value="1">
+                                            <input type="hidden" class="readid 0" value="11">
+                                            <a id="myEdit" addreedit="0" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
+                                            <a id="Delete" attrdel="0" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td class="modulename 1">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="iconImagename 1" value="advance.png">
+                                        </td>
+                                        <td class="moduleid 1" style="display:none">2</td>
+                                        <td class="mainmenu 1">Transactions</td>
+                                        <td class="mainmenuid 1" style="display:none">4</td>
+                                        <td class="name 1">Accounts Payable Integrity Reports</td>
+                                        <td style="width:5%;" class="orderNo 1"></td>
+                                        <td style="width:15%;">
+                                            <input type="hidden" class="systemtype 1" value="1">
+                                            <input type="hidden" class="readid 1" value="14">
+                                            <a id="myEdit" addreedit="1" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
+                                            <a id="Delete" attrdel="1" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td class="modulename 2">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="iconImagename 2" value="advance.png">
+                                        </td>
+                                        <td class="moduleid 2" style="display:none">2</td>
+                                        <td class="mainmenu 2">Transactions</td>
+                                        <td class="mainmenuid 2" style="display:none">4</td>
+                                        <td class="name 2">Utilities</td>
+                                        <td style="width:5%;" class="orderNo 2"></td>
+                                        <td style="width:15%;">
+                                            <input type="hidden" class="systemtype 2" value="1">
+                                            <input type="hidden" class="readid 2" value="15">
+                                            <a id="myEdit" addreedit="2" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
+                                            <a id="Delete" attrdel="2" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
