@@ -45,7 +45,7 @@ $(document).ready(function () {
             { orderable: false, targets: 0 }
         ]
     });
-
+    //hideLoading();
 });
 $(document).on('click', '.removeRow', async function () {
     const el = this; // the clicked button
@@ -68,7 +68,11 @@ $(document).on('click', '#btnSubmitForm', function () {
 
         if (systemCode && systemCode.toString().trim() !== '') {
             if (!systemDescription || systemDescription.toString().trim() === '') {
-                alert(`System description is required for system code ${systemCode}.`);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `System description is required for system code ${systemCode}.`,
+                });
                 valid = false;
                 break;
             }
@@ -126,6 +130,8 @@ async function UpdateTextFile(element,option, todo) {
 
         // Check for duplicates in the table (ignore the current row)
         try {
+            //showLoading();
+            $(".loadingDiv-parent").fadeIn('fast');
             if (option === 1 && systemCode) {
                 let duplicate = false;
                 table.rows().every(function () {
@@ -138,7 +144,12 @@ async function UpdateTextFile(element,option, todo) {
                     }
                 });
                 if (duplicate) {
-                    alert('System Code already exists in the table.');
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `System code '${systemCode}' already exists in the table.`,
+                    });
                     return;
                 }
             }
@@ -156,14 +167,25 @@ async function UpdateTextFile(element,option, todo) {
                     }
                 });
                 if (duplicate) {
-                    alert('System Description already exists in the table.');
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `System description '${systemDescription}' already exists in the table.`,
+                    });
                     return;
                 }
             }
         }
         catch (e) {
             // ignore duplicate-check errors and continue
-            console.log('Duplicate check error', e);
+            $(".loadingDiv-parent").fadeOut('slow');
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `Duplicate check error, ${e}.`,
+            });
+            return;
         }
 
         // If uploading a file, send multipart/form-data to a dedicated handler
@@ -172,7 +194,15 @@ async function UpdateTextFile(element,option, todo) {
             const fileInput = $(element)[0];
             const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
             if (!file) {
+                $(".loadingDiv-parent").fadeOut('slow');
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `No file selected.`,
+                });
+                return;
                 alert('No file selected');
+                //hideLoading();
                 return;
             }
 
@@ -211,7 +241,12 @@ async function UpdateTextFile(element,option, todo) {
 
         if (!response.ok) {
             const text = await response.text();
-            console.error('UpdateTextFile failed', response.status, text);
+            $(".loadingDiv-parent").fadeOut('slow');
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile failed:, ${response.status}, ${text}.`,
+            });
             return;
         }
 
@@ -219,17 +254,44 @@ async function UpdateTextFile(element,option, todo) {
         const contentType = response.headers.get('content-type') || '';
         if (contentType.indexOf('application/json') !== -1) {
             const result = await response.json();
+
+            // Normalize result: handler may return a string or an object { status, statusDescription }
+            if (typeof result === 'string') {
+                if (result !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: result });
+                    return;
+                }
+            }
+            else if (result && result.status) {
+                if (result.status !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    const msg = result.statusDescription || result.message || 'Operation failed';
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
+                    return;
+                }
+            }
+
             if (uniqno === '')
                 row.find(".code").val(systemCode);
-            //console.log(result);
+            $(".loadingDiv-parent").fadeOut('slow');
         }
         else {
             const text = await response.text();
-            console.log('UpdateTextFile response:', text);
+            $(".loadingDiv-parent").fadeOut('slow');
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile response:, ${text}.`,
+            });
+            return;
+            //hideLoading();
         }
 
 }
 catch (e) {
-    console.log(e);
+        console.log(e);
+        $(".loadingDiv-parent").fadeOut('slow');
+        //hideLoading();
 }
 }

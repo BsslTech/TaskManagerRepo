@@ -70,6 +70,15 @@
 <body>
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
+        <div id="loader" class="justify-content-center loadingDiv-parent modal-backdrop fade show">
+            <div class="loadingDiv" style="margin-top:230px; margin-left:600px">
+                <div class="card-body">
+                    <img style="height:50px; width:50px;" src="~/images/chasing.gif" />
+                    <div class="loadingText" style="color:red;">Please wait...</div>
+                    <span id="panelclose_btn"></span>
+                </div>
+            </div>
+        </div>
         <!--begin::Header-->
         <nav class="app-header navbar navbar-expand bg-body">
             <!--begin::Container-->
@@ -665,10 +674,12 @@
     </script> *@
     <!--end::Script-->
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/dataTable.js" asp-append-version="true"></script>
+    <script src="~/js/loader.js" asp-append-version="true"></script>
 
 
 
