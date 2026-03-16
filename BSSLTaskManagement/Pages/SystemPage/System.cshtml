@@ -35,6 +35,8 @@
                                 <label style="color:red;margin-bottom:1%">(Note: Accepts .doc, .docx, .pdf files only.)</label>
                                 <div style="margin-bottom:2%">
                                     <button type="submit" id="postForm" style="display:none"></button>
+                                    <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+                                    <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
                                     <button type="button" id="btnSubmitForm" class="btn btn-success">Submit</button>
                                     <button type="button" onclick="AddSystemTypeRow()" class="btn btn-primary">Add New System Type</button>
                                     <a href="./System" class="btn btn-warning">Refresh</a>

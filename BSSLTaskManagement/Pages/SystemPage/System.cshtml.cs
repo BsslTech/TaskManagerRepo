@@ -14,7 +14,13 @@ namespace BSSLTaskManagement.Pages.SystemPage
 
         [BindProperty]
         public List<SystemTypeVM> SystemTypes { get; set; } = [];
+        public ResponseVM ResponseMessage { get; set; } = new ResponseVM();
         public async Task<IActionResult> OnGetAsync()
+        {
+            await OnPageLoadAsync();
+            return Page();
+        }
+        public async Task OnPageLoadAsync()
         {
             SystemTypes = await system.GetSystemTypesAsync();
             if (SystemTypes.Count == 0)
@@ -34,7 +40,6 @@ namespace BSSLTaskManagement.Pages.SystemPage
             }
             else
                 await CreateTextFile(SystemTypes);
-            return Page();
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -44,16 +49,14 @@ namespace BSSLTaskManagement.Pages.SystemPage
                 {
                     var systemTypes = await ReadTextFile("SystemTypes.txt", 0);
                     if (systemTypes.Count > 0)
-                    {
-                        var saveUpdateSystems = await system.SaveSystemTypesAsync(systemTypes);
-                    }
+                        ResponseMessage = await system.SaveSystemTypesAsync(systemTypes);
                 }
                 catch (Exception ex)
                 {
                     _ = ex.Message.ToString();
                 }
             }
-            
+            await OnPageLoadAsync();
             return Page();
         }
         public async Task<IActionResult> OnPostUploadHelperFileAsync(IFormFile helperFile, string uniqno)
