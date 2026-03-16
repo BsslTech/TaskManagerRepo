@@ -5,136 +5,280 @@
 <div class="container mt-4">
     <div class="col-md-12">
         <div class="card card-primary card-outline mb-4">
-            <!--begin::Header-->
             <div class="card-header">
                 <div class="card-title">System Defined Menu Setup</div>
             </div>
-            <!--end::Header-->
-            <!--begin::Form-->
             <form>
-                <!--begin::Body-->
                 <div class="card-body">
-                    <div class="row g-3  ">
+                    <div class="row g-3">
                         <div class="col-sm-6">
-                            <label for="clientName" class="form-label">System Menu</label>
-                            <select class="form-select" id="Licensetype">
+                            <label for="SystemMenu" class="form-label">System Menu</label>
+                            <select class="form-select" id="SystemMenu">
                                 <option selected>-Select-</option>
-
                             </select>
                         </div>
                         <div class="col-sm-6">
-                            <label for="clientName" class="form-label">System Sub-Menu</label>
-                            <select class="form-select" id="Licensetype">
+                            <label for="SystemSubMenu" class="form-label">System Sub-Menu</label>
+                            <select class="form-select" id="SystemSubMenu">
                                 <option selected>-Select-</option>
-
                             </select>
                         </div>
                     </div>
                 </div>
             </form>
-            <!--end::Form-->
         </div>
     </div>
-
 </div>
 
-<div class="container mt-4">
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-12">
+                    <div class="card-body">
+                        <div style="margin-bottom:2%">
+                            <button type="button" class="btn btn-success" onclick="submitTable()">Submit</button>
+                            <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
+                            <button type="button" class="btn btn-warning">Cancel</button>
+                        </div>
 
+                        <table class="table table-bordered display nowrap" id="dropdownDataTable" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/No.</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Dropdown Code</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Dropdown Name</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Order Number</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Related to</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr id="0" role="row">
+                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">1</td>
+                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:100px" type="text" class="form-control border-primary dropdownCode" />
+                                    </td>
+                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:250px" type="text" class="form-control border-primary dropdownName" />
+                                    </td>
+                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:100px" type="text" class="form-control border-primary orderNumber" />
+                                    </td>
+                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <select class="form-select border-primary relatedTo">
+                                            <option>--Select--</option>
+                                        </select>
+                                    </td>
+                                    <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                        <button type="button" class="btn btn-danger removeRow">
+                                            <i class="fa fa-trash"></i> Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-    <div class="card-body p-0">
-        <table class="table table-bordered mb-0 text-center align-middle">
-            <thead>
-                <tr>
-                    <th class="py-3">S/No.</th>
-                    <th class="py-3">Dropdown Code</th>
-                    <th class="py-3">Dropdown Name</th>
-                    <th class="py-3">Order Number</th>
-                    <th class="py-3">Related to</th>
-                    <th class="py-3">Action</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr>
-                    <td class="py-3">1</td>
-                    <td class="py-3"><input type="text" class="form-control" value="3" /></td>
-                    <td class="py-3"><input type="text" class="form-control" value="IFRS" /></td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3">
-                        <select class="form-select">
-                            <option>--Select--</option>
-                        </select>
-                    </td>
-                    <td class="py-3"><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
-                </tr>
-                <tr>
-                    <td class="py-3">2</td>
-                    <td class="py-3"><input type="text" class="form-control" value="2" /></td>
-                    <td class="py-3"><input type="text" class="form-control" value="IPSAS" /></td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3">
-                        <select class="form-select">
-                            <option>--Select--</option>
-                        </select>
-                    </td>
-                    <td class="py-3"><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
-                </tr>
-                <tr>
-                    <td class="py-3">3</td>
-                    <td class="py-3"><input type="text" class="form-control" value="1" /></td>
-                    <td class="py-3"><input type="text" class="form-control" value="GAAP" /></td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3">
-                        <select class="form-select">
-                            <option>--Select--</option>
-                        </select>
-                    </td>
-                    <td class="py-3"><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                        <!-- Hidden template row — cloned when Add New Row is clicked -->
+                        <table style="display:none">
+                            <tr id="rowTemplate" style="display:none">
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;" class="sn"></td>
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <input style="width:100px" type="text" class="form-control border-primary dropdownCode" />
+                                </td>
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <input style="width:250px" type="text" class="form-control border-primary dropdownName" />
+                                </td>
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <input style="width:100px" type="text" class="form-control border-primary orderNumber" />
+                                </td>
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <select class="form-select border-primary relatedTo">
+                                        <option>--Select--</option>
+                                    </select>
+                                </td>
+                                <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                    <button type="button" class="btn btn-danger removeRow">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
 
-    <!-- Action Buttons -->
-    <div class="mt-3 d-flex gap-2">
-        <button type="button" class="btn btn-success" onclick="submitTable()">Submit</button>
-        <button type="button" class="btn btn-success" onclick="addNewRow()">Add New Row</button>
-        <button type="button" class="btn btn-danger">Cancel</button>
+                        <div class="card-footer" style="margin-top:1%">
+                            <button type="button" class="btn btn-success" onclick="submitTable()">Submit</button>
+                            <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
+                            <button type="button" class="btn btn-warning">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 
+
+@* @section Scripts {
     <script>
-        let rowCount = 3;
+                // ── SystemTypes page ──────────────────────────────
+        let systemTable;
+        $(document).ready(function () {
+            systemTable = new DataTableManager('systemDataTable').init().bindSearchSync();
+        });
 
-        function addNewRow() {
-            rowCount++;
-            const tbody = document.getElementById('tableBody');
-            const newRow = `
-                <tr>
-                    <td class="py-3">${rowCount}</td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3"><input type="text" class="form-control" /></td>
-                    <td class="py-3">
-                        <select class="form-select">
-                            <option>--Select--</option>
-                        </select>
-                    </td>
-                    <td class="py-3"><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
-                </tr>`;
-            tbody.insertAdjacentHTML('beforeend', newRow);
+        function AddSystemTypeRow() {
+            systemTable.addRow('rowTemplate', 'SystemTypes');
         }
 
-        function removeRow(btn) {
-            const row = btn.closest('tr');
-            row.remove();
-            document.querySelectorAll('#tableBody tr').forEach((tr, i) => {
-                tr.querySelector('td:first-child').textContent = i + 1;
-            });
-            rowCount = document.querySelectorAll('#tableBody tr').length;
+        $('#btnSubmitForm').on('click', function () {
+            const valid = systemTable.validate([
+                { selector: '.systemCode',        label: 'System Code',        required: true },
+                { selector: '.systemDescription', label: 'System Description', required: true, maxLength: 100 }
+            ]);
+            if (valid) document.getElementById('postForm').click();
+        });
+
+
+        // ── Dropdown page ─────────────────────────────────
+        let dropdownTable;
+        $(document).ready(function () {
+            dropdownTable = new DataTableManager('dropdownDataTable', { pageLength: 5 }).init().bindSearchSync();
+        });
+
+        function AddDropdownRow() {
+            dropdownTable.addRow('dropdownTemplate', 'Dropdowns');
         }
 
-        function submitTable() {
-            alert('Table submitted!');
-        }
+
+        // ── SubMenu page (read-only, no bindSearchSync needed) ──
+        let subMenuTable;
+        $(document).ready(function () {
+            subMenuTable = new DataTableManager('subMenuDataTable').init();
+        });
     </script>
+} *@
+
+
+ @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+        // Hold the DataTable instance globally so all functions can access it
+        let table;
+
+        $(document).ready(function () {
+
+            // Initialize DataTables on the dropdown table
+            // This gives us pagination, search, and responsive layout automatically
+            table = $('#dropdownDataTable').DataTable({
+                responsive: true,
+                pageLength: 10,   // show 10 rows per page
+                order: [],        // don't auto-sort on load
+                columnDefs: [
+                    { orderable: false, targets: [0, 5] } // S/No. and Action columns are not sortable
+                ]
+            });
+
+        });
+
+
+        // ─── ADD NEW ROW ───────────────────────────────────────────────
+        function AddDropdownRow() {
+
+            // Count how many rows exist before adding
+            let rowCount = table.rows().count();
+
+            // Clone the hidden template row and remove its id so there's no duplicate
+            let newRow = $("#rowTemplate").clone().removeAttr("id");
+
+            // Make the cloned row visible
+            newRow.show();
+
+            // Set the S/No. serial number for the new row
+            newRow.find(".sn").text(rowCount + 1);
+
+            // Clear all input values in the new row (template may have leftover data)
+            newRow.find("input").val("");
+
+            // Add the new row to DataTables (not just the DOM) and redraw
+            // draw(false) = redraw without jumping back to page 1
+            table.row.add(newRow).draw(false);
+
+            // ── Jump to the page that contains the newly added row ──
+            let pageLength  = table.page.len();              // rows per page (10)
+            let newRowIndex = table.rows().count() - 1;      // index of the last (new) row
+            let newPage     = Math.floor(newRowIndex / pageLength); // which page it's on
+
+            table.page(newPage).draw(false); // navigate to that page
+
+            // Recalculate column widths for responsive layout
+            table.columns.adjust().responsive.recalc();
+        }
+
+
+        // ─── REMOVE ROW ────────────────────────────────────────────────
+        // Delegated click — works on both existing rows and newly added ones
+        $(document).on('click', '.removeRow', function () {
+
+            // Remove the row from DataTables (not just the DOM)
+            // draw(false) = stay on current page, don't jump to page 1
+            table.row($(this).closest('tr')).remove().draw(false);
+
+            // Re-number all S/No. values so they stay sequential after deletion
+            ReIndexRows();
+
+            table.columns.adjust().responsive.recalc();
+        });
+
+
+        // ─── REINDEX ROWS ──────────────────────────────────────────────
+        // After a row is removed, loop through all rows and fix their serial numbers
+        function ReIndexRows() {
+            table.rows().every(function (rowIdx) {
+                let row = this.node();
+
+                // Update the row's id attribute to match its new position
+                $(row).attr("id", rowIdx);
+
+                // Update the S/No. cell (first td) to show the correct number
+                $(row).find("td:first").text(rowIdx + 1);
+            });
+        }
+
+
+        // ─── SUBMIT ────────────────────────────────────────────────────
+        function submitTable() {
+
+            let valid = true;
+
+            // Loop through every row in the DataTable (including rows on other pages)
+            const nodes = table.rows().nodes().toArray();
+
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                const dropdownCode = $(node).find('.dropdownCode').val();
+                const dropdownName = $(node).find('.dropdownName').val();
+
+                // If a code is filled in, a name must also be filled in
+                if (dropdownCode && dropdownCode.trim() !== '') {
+                    if (!dropdownName || dropdownName.trim() === '') {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: `Dropdown Name is required for Dropdown Code: ${dropdownCode}`
+                        });
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!valid) return;
+
+            // All good — trigger your actual form submission here
+            alert('Table submitted successfully!');
+        }
+
+    </script>
+} 
