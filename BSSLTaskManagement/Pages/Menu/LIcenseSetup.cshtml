@@ -1,0 +1,136 @@
+﻿@page
+@model BSSLTaskManagement.Pages.Menu.LIcenseSetupModel
+@{
+}
+
+<div class="container mt-4">
+<div class="col-md-12">
+    <div class="card card-primary card-outline mb-4">
+        <!--begin::Header-->
+        <div class="card-header">
+            <div class="card-title">License setup</div>
+        </div>
+        <!--end::Header-->
+        <!--begin::Form-->
+        <form>
+            <!--begin::Body-->
+            <div class="card-body">
+                    <div class="row g-3 mb-3 ">
+                        <div class="col-sm-6">
+                            <label for="clientName" class="form-label">Client Name</label>
+                            @* <input type="text" class="form-control" placeholder="Client Name" aria-label="clientName" id="clientName"> *@
+                            <select class="form-select" id="clientName">
+                                <option selected>-Select Client Name-</option>
+                                <option value="1">ITF</option>
+                                <option value="2">WAEC</option>
+                                <option value="3">Kogi State Revenue</option>
+                                <option value="3">PCN</option>
+                                <option value="3">NCS</option>
+                            </select>
+                        </div>
+                        <div class="col-sm">
+                            <label class="form-label" for="specificSizeSelect">Preference</label>
+                            <select class="form-select" id="specificSizeSelect">
+                                <option selected>-Select System Type-</option>
+                                <option value="1">Financial System</option>
+                                <option value="2">HRM System</option>
+                                <option value="3">E-Collection Sytem</option>
+                                <option value="3">SIWES System</option>
+                                <option value="3">Reimbusrsment System</option>
+                                <option value="3">Procurement System</option>
+                                <option value="3">Self-Service System</option>
+
+                            </select>
+                        </div>
+                        <div class="col-sm mt-3 ">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="deactivate">
+                                <label class="form-check-label" for="deactivate">
+                                    Deactivate
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                <div class="mb-3">
+                        <div class="row g-3 my-3 ">
+                            <div class="col-sm-6">
+                                <label for="clientName" class="form-label">License Type </label>
+                                <select class="form-select" id="Licensetype">
+                                    <option selected>-Select License Type-</option>
+                                    <option value="1">One(1) Year License</option>
+                                    <option value="2">Two(2) year License</option>
+                                    <option value="3">Perpetual License</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label" for="NumberOfLicence">Number of License</label>
+                                <input type="number" class="form-control" id="NumberOfLicence" />
+                            </div>
+                           
+                        </div>
+                </div>
+                <div class="mb-3">
+                        <div class="row g-3 my-3 ">
+                            <div class="col-sm-3">
+                                <label class="form-label" for="specificSizeSelect">Date From</label>
+                                <input type="date" class="form-control" id="inputGroupFile02" />
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label" for="specificSizeSelect">Date To</label>
+                                <input type="date" class="form-control" id="inputGroupFile02" />
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label" for="GraceDays">Grace Days(s)</label>
+                                <input type="number" class="form-control" id="GraceDays" />
+                            </div>
+                           
+                        </div>
+                </div>
+            </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer mt-2">
+                <button type="submit" class="btn btn-warning text-light">Cancel Record</button>
+                 <button type="submit" class="btn btn-success">Submit</button>
+
+            </div>
+            <!--end::Footer-->
+        </form>
+        <!--end::Form-->
+    </div>
+</div>
+
+    <div class="card mb-4">
+        
+        <!-- /.card-header -->
+        <div class="card-body  p-0">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 100px">S/N</th>
+                        <th>Client Name</th>
+                        <th>System Type</th>
+                        <th>Grace Days</th>
+                        <th>Date From</th>
+                        <th>Date To</th>
+                        <th style="width: 80px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="align-middle">
+                        <td>1</td>
+                        <td>PCN</td>
+                        <td>E-Collection System</td>
+                        <td>7</td>
+                        <td>01/01/2024</td>
+                        <td>31/12/2024</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- /.card-body -->
+    </div>
+</div>
