@@ -3,91 +3,94 @@
 @{
     ViewData["Title"] = "System Menu Setup";
 }
-
-<div class="container mt-4">
-    <div class="col-md-12">
-        <div class="card card-primary card-outline mb-4">
-            <!--begin::Header-->
-            <div class="card-header">
-                <div class="card-title">System Menu Setup</div>
-            </div>
-            <!--end::Header-->
-            <!--begin::Form-->
-            <form>
-                <!--begin::Body-->
-                <div class="card-body">
-                    <div class="row g-3">
-        
-                        <div class="col-sm-3">
-                            <label class="form-label">Menu Code</label>
-                            <input hidden class="form-control" type="text" name="SysteMenu.Id" value="" />
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="SystemMenu.Code" />
-                            </div>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label class="form-label" for="inputMenuName">Menu Name</label>
-                            <input type="text" class="form-control" id="FormID" />
-                        </div>
+<form method="post">
+    <main class="app-main">
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">System Menu Setup</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">System Menu Setup</li>
+                        </ol>
                     </div>
                 </div>
+                <!--end::Row-->
+            </div>
+        </div>
+        <div class="app-content">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-12">
+                            <div class="card-body">
 
 
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label class="form-label">Menu Code</label>
+                                        <input hidden class="form-control" type="text" name="SysteMenu.Id" value="" />
+                                        <div class="input-group">
+                                            <input type="text" class="form-control border-primary" name="SystemMenu.Code" />
+                                        </div>
+                                    </div>
 
+                                    <div class="col-sm-8">
+                                        <label class="form-label" for="inputMenuName">Menu Name</label>
+                                        <input type="text" class="form-control border-primary" id="FormID" />
+                                    </div>
+                                </div>
                 <!--end::Body-->
                 <!--begin::Footer-->
-
-                <div class="mt-3">
-                    <div class="card-footer ">
-                        <button type="submit" class="btn btn-success" id="btnSubmitForm">Submit</button>
-                        <button type="submit" class="btn btn-danger text-light">Cancel</button>
-                    </div>
+                <div style="margin-bottom:2%;margin-top:2%">
+                    <button type="submit" class="btn btn-success" id="btnSubmitForm">Submit</button>
+                    <a href="./SystemMenuSetup" class="btn btn-warning">Refresh</a>
                 </div>
+                    <table class="table table-bordered display nowrap" id="menuDataTable" style="width:100px">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Code</th>
+                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="menuDataTable" id="tableBody">
+                            <tr id="0" role="row">
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <button class="btn btn-primary btn-sm" type="button" onclick="editRow(this)">Select</button>
+                                </td>
+                                <td style="text-align:center;padding:10px;border:1px solid lightgrey;" scope="row">1</td>
 
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <input style="width:100px" readonly type="text" class="form-control border-primary menuCode" />
+                                </td>
+
+                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                    <input style="width:600px" readonly type="text" class="form-control border-primary menuName" />
+                                </td>
+                        </tbody>
+                    </table>
+                </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            </div>
+            </main>
                 <!--end::Footer-->
             </form>
             <!--end::Form-->
-        </div>
-    </div>
-
-
-
-    <div class="card mb-4">
-
-        <!-- /.card-header -->
-
-        <div class="card-body p-0">
-            <table class="table table-bordered display nowrap" id="menuDataTable" style="width:100px">
-                <thead>
-                    <tr>
-                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
-                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
-                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Code</th>
-                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Name</th>
-                    </tr>
-                </thead>
-                <tbody class="menuDataTable" id="tableBody">
-                    <tr id="0" role="row">
-                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                            <button class="btn btn-primary btn-sm" type="button" onclick="editRow(this)">Select</button>
-                        </td>
-                        <td style="text-align:center;padding:10px;border:1px solid lightgrey;" scope="row">1</td>
-
-                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                            <input style="width:100px" type="text" class="form-control border-primary menuCode" />
-                        </td>
-
-                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                            <input style="width:250px" type="text" class="form-control border-primary menuName" />
-                        </td>
-                </tbody>
-            </table>
-        </div>
-        <!-- /.card-body -->
-    </div>
-</div>
-
+   
+@section Scripts {
 <partial name="_ValidationScriptsPartial" />
 
     <script src="~/js/submenu.js" asp-append-version="true"></script>
@@ -190,3 +193,4 @@
        // All good — trigger your actual form submission here
        alert('Form submitted successfully!');
 }</script>
+}
