@@ -40,7 +40,7 @@
 
                 <div class="mt-3">
                     <div class="card-footer ">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-success" id="btnSubmitForm">Submit</button>
                         <button type="submit" class="btn btn-danger text-light">Cancel</button>
                     </div>
                 </div>
@@ -58,28 +58,135 @@
         <!-- /.card-header -->
 
         <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0 text-center">
+            <table class="table table-bordered display nowrap" id="menuDataTable" style="width:100px">
                 <thead>
                     <tr>
-                        <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Action</th>
-                        <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">S/N</th>
-                        <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Menu Code</th>
-                        <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Menu Name</th>
+                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Code</th>
+                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Name</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="align-middle">
-                        <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
-                        <button type="button" class="btn btn-primary searchControl">
-                            Select</button>
+                <tbody class="menuDataTable" id="tableBody">
+                    <tr id="0" role="row">
+                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                            <button class="btn btn-primary btn-sm" type="button" onclick="editRow(this)">Select</button>
                         </td>
-                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">1</td>
-                        <td class="text-start">CH</td>
-                        <td class="text-start">Chart of Account</td>
-                    </tr>
+                        <td style="text-align:center;padding:10px;border:1px solid lightgrey;" scope="row">1</td>
+
+                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                            <input style="width:100px" type="text" class="form-control border-primary menuCode" />
+                        </td>
+
+                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                            <input style="width:250px" type="text" class="form-control border-primary menuName" />
+                        </td>
                 </tbody>
             </table>
         </div>
         <!-- /.card-body -->
     </div>
 </div>
+
+<partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/submenu.js" asp-append-version="true"></script>
+<script>
+// Hold the DataTable instance globally so all functions can access it
+   
+   // ─── ADD NEW ROW ───────────────────────────────────────────────
+   // function AddMenuRow() {
+
+   //     Count how many rows exist before adding
+   //     let rowCount = table.rows().count();
+
+   //     Clone the hidden template row and remove its id so there's no duplicate
+   //     let newRow = $("#rowTemplate").clone().removeAttr("id");
+
+   //     Make the cloned row visible
+   //     newRow.show();
+
+   //     Set the S/No. serial number for the new row
+   //     newRow.find(".sn").text(rowCount + 1);
+
+   //     Clear all input values in the new row (template may have leftover data)
+   //     newRow.find("input").val("");
+
+   //     Add the new row to DataTables (not just the DOM) and redraw
+   //     draw(false) = redraw without jumping back to page 1
+   //     table.row.add(newRow).draw(false);
+
+   //     ── Jump to the page that contains the newly added row ──
+   //     let pageLength  = table.page.len();              rows per page (10)
+   //     let newRowIndex = table.rows().count() - 1;      index of the last (new) row
+   //     let newPage     = Math.floor(newRowIndex / pageLength); which page it's on
+
+   //     table.page(newPage).draw(false); navigate to that page
+
+   //     Recalculate column widths for responsive layout
+   //     table.columns.adjust().responsive.recalc();
+   // }
+
+
+   // ─── REMOVE ROW ────────────────────────────────────────────────
+   // Delegated click — works on both existing rows and newly added ones
+   // $(document).on('click', '.removeRow', function () {
+
+   //     Remove the row from DataTables (not just the DOM)
+   //     draw(false) = stay on current page, don't jump to page 1
+   //     table.row($(this).closest('tr')).remove().draw(false);
+
+   //     Re-number all S/No. values so they stay sequential after deletion
+   //     ReIndexRows();
+
+   //     table.columns.adjust().responsive.recalc();
+   // });
+
+
+   // ─── REINDEX ROWS ──────────────────────────────────────────────
+   // After a row is removed, loop through all rows and fix their serial numbers
+   // function ReIndexRows() {
+   //     table.rows().every(function (rowIdx) {
+   //         let row = this.node();
+
+   //         Update the row's id attribute to match its new position
+   //         $(row).attr("id", rowIdx);
+
+   //         Update the S/No. cell (first td) to show the correct number
+   //         $(row).find("td:first").text(rowIdx + 1);
+   //     });
+   // }
+
+
+   // ─── SUBMIT ────────────────────────────────────────────────────
+   function submitTable() {
+
+       let valid = true;
+
+       // Loop through every row in the DataTable (including rows on other pages)
+       const nodes = table.rows().nodes().toArray();
+
+       for (let i = 0; i < nodes.length; i++) {
+           const node = nodes[i];
+           const menuCode = $(node).find('.menuCode').val();
+           const menuName = $(node).find('.menuName').val();
+
+           // If a code is filled in, a name must also be filled in
+           if (menuCode && menuCode.trim() !== '') {
+               if (!menuName || menuName.trim() === '') {
+                   Swal.fire({
+                       icon: "error",
+                       title: "Oops...",
+                       text: `Menu Name is required for Menu Code: ${menuCode}`
+                   });
+                   valid = false;
+                   break;
+               }
+           }
+       }
+
+       if (!valid) return;
+
+       // All good — trigger your actual form submission here
+       alert('Form submitted successfully!');
+}</script>
