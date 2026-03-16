@@ -1,0 +1,139 @@
+﻿@page
+@model BSSLTaskManagement.Pages.Menu.MainMenuSetupModel
+@{
+    ViewData["Title"] = "Main-Menu";
+}
+
+    <div class="card card-primary card-outline mb-4">
+        <!--begin::Header-->
+        <div class="card-header">
+            <div class="card-title">Main-Menu</div>
+        </div>
+        <!--end::Header-->
+        <!--begin::Form-->
+        <form>
+            <!--begin::Body-->
+            <div class="card-body">
+                <div class="mb-3 col-4">
+                <label for="inputSystemTypeName" class="form-label">System Type Name</label>
+                <select class="form-control" id="inputSystemTypeName">
+                    <option value="">--Select--</option>
+                </select>
+                </div>
+
+            <div class="row">
+                <div class="mb-3 col-4">
+                    <label for="inputModuleName" class="form-label">Module Name:</label>
+                    <select class="form-control" id="inputModuleName">
+                        <option value="">--Select--</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-6">
+                    <label for="inputMainMenuDescription" class="form-label">Main Menu Description:</label>
+                    <input type="text" class="form-control" id="inputMainMenuDescription">
+                </div>
+
+                <div class="mb-3 col-2">
+                    <label for="inputOrderNumber" class="form-label">Order Number</label>
+                    <input type="number" class="form-control" id="inputOrderNumber" min="1">
+                </div>
+
+            </div>
+        </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+        <div class="card-footer">
+            <button type="reset" class="btn btn-warning">Cancel Record</button>
+            <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+
+            <!--end::Footer-->
+        </form>
+        <!--end::Form-->
+
+    </div>
+
+     <!--begin::Table-->   
+
+<div class="col-12 grid-margin">
+    <div class="card">
+        <div class="card-body">
+            <div class="scroll">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table id="mainmenutab" class="table ">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Module Name</th>
+                                        <th>Main Menu Description</th>
+                                        <th style="width:120px;">Order No</th>
+                                        <th style="width:150px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="Tablist">
+                                    <tr>
+                                        <td>1</td>
+                                        <td hidden="" class="idtd 0">3</td>
+                                        <td class="moduledescr 0">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="menuid2" id="hddmodid" value="2">
+                                            <input type="hidden" class="systemtype 0" value="1">
+                                            <input type="hidden" class="modd 0" value="2">
+                                        </td>
+                                        <td class="moduleid 0" style="display:none">2</td>
+                                        <td class="descr 0">Settings</td>
+                                        <td class="orderNo 0">1</td>
+                                        <td>
+                                            <input type="hidden" class="readid 0" value="3">
+                                            <a id="Edit" addreedit="0" class="btn btn-outline-primary btn-sm" href="/Setup/MainMenu?id=3">Edit</a>
+                                            <a id="Delete" attrdel="0" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td hidden="" class="idtd 1">4</td>
+                                        <td class="moduledescr 1">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="menuid2" id="hddmodid" value="2">
+                                            <input type="hidden" class="systemtype 1" value="1">
+                                            <input type="hidden" class="modd 1" value="2">
+                                        </td>
+                                        <td class="moduleid 1" style="display:none">2</td>
+                                        <td class="descr 1">Transactions</td>
+                                        <td class="orderNo 1">2</td>
+                                        <td>
+                                            <input type="hidden" class="readid 1" value="4">
+                                            <a id="Edit" addreedit="1" class="btn btn-outline-primary btn-sm" href="/Setup/MainMenu?id=4">Edit</a>
+                                            <a id="Delete" attrdel="1" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td hidden="" class="idtd 2">5</td>
+                                        <td class="moduledescr 2">
+                                            Financial - PAYABLE/CREDITORS
+                                            <input type="hidden" class="menuid2" id="hddmodid" value="2">
+                                            <input type="hidden" class="systemtype 2" value="1">
+                                            <input type="hidden" class="modd 2" value="2">
+                                        </td>
+                                        <td class="moduleid 2" style="display:none">2</td>
+                                        <td class="descr 2">Posting to G/L</td>
+                                        <td class="orderNo 2"></td>
+                                        <td>
+                                            <input type="hidden" class="readid 2" value="5">
+                                            <a id="Edit" addreedit="2" class="btn btn-outline-primary btn-sm" href="/Setup/MainMenu?id=5">Edit</a>
+                                            <a id="Delete" attrdel="2" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
