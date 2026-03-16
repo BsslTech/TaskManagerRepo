@@ -1,0 +1,12 @@
+﻿.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 12px;
+}
+
+.dataTables_wrapper .dataTables_info {
+    margin-top: 10px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 10px;
+}

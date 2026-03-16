@@ -1,4 +1,5 @@
 
+using BSSLTaskManagement.ServicesInterfaces;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement;
 using static TaskManagement.IdentityLib;
@@ -40,6 +41,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddScoped<ISystemSerivces, SystemSerivces>();
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/"); // protect everything

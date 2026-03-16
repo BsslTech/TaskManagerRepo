@@ -1,0 +1,181 @@
+﻿@page
+@model BSSLTaskManagement.Pages.SystemPage.SystemModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "System Type Setup";
+}
+<form method="post" enctype="multipart/form-data" asp-antiforgery="true">
+    <main class="app-main">
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">System Types Setup</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">System Types Setup</li>
+                        </ol>
+                    </div>
+                </div>
+                <!--end::Row-->
+            </div>
+        </div>
+        <div class="app-content">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-12">
+                            <div class="card-body">
+                                <label style="color:red;margin-bottom:1%">(Note: Accepts .doc, .docx, .pdf files only.)</label>
+                                <div style="margin-bottom:2%">
+                                    <button type="submit" id="postForm" style="display:none"></button>
+                                    <button type="button" id="btnSubmitForm" class="btn btn-success">Submit</button>
+                                    <button type="button" onclick="AddSystemTypeRow()" class="btn btn-primary">Add New System Type</button>
+                                    <a href="./System" class="btn btn-warning">Refresh</a>
+                                </div>
+                                <table class="table table-bordered display nowrap" id="systemDataTable" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">S/No.</th>
+                                            <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">System Code</th>
+                                            <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">System Description</th>
+                                            <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">System File</th>
+                                            <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="systemTableBody" id="systemTableBody">
+
+                                        @for (int i = 0; i < Model.SystemTypes.Count; i++)
+                                        {
+                                            var system = Model.SystemTypes[i];
+
+                                            <tr id="@i" role="row">
+                                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl @i">
+                                                    @(i + 1)
+                                                </td>
+
+                                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl @i"
+                                                    data-search="@system.SystemCode">
+                                                    <input class="code @i" type="hidden" asp-for="SystemTypes[i].Code" />
+                                                    <input style="width:100px"
+                                                           type="text" onchange="UpdateTextFile(this,1, 1)"
+                                                           asp-for="SystemTypes[i].SystemCode"
+                                                           class="form-control leavePage border-primary searchControl systemCode @i" />
+                                                </td>
+
+                                                <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl @i"
+                                                    data-search="@system.SystemDescription">
+
+                                                    <input style="width:250px"
+                                                           type="text" onchange="UpdateTextFile(this,2, 1)"
+                                                           asp-for="SystemTypes[i].SystemDescription"
+                                                           class="form-control leavePage border-primary searchControl systemDescription @i" />
+                                                </td>
+
+                                                <td>
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <input id="formFile" asp-for="SystemTypes[i].HelperFile" accept=".doc, .pdf, .docx" type="file" onchange="UpdateTextFile(this,3, 1)" class="form-control border-primary" />
+                                                            @if (!string.IsNullOrWhiteSpace(system.HelperFileName))
+                                                            {
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-btn" style="height:15%">
+                                                                        <button type="button" onclick="ClickImport(9)" class="btn btn-primary">
+                                                                            <i class="fa fa-upload"></i> Download File
+                                                                        </button>
+                                                                    </span>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <td style="text-align:center;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl @i">
+
+                                                    <button type="button"
+                                                            class="btn btn-danger removeRow searchControl">
+                                                        <i class="fa fa-trash"></i> Remove
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+
+
+                                    </tbody>
+                                </table>
+                                <table style="display:none">
+
+                                    <!-- TEMPLATE ROW -->
+                                    <tr id="rowTemplate" style="display:none">
+
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                            class="sn">
+                                        </td>
+
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                            data-search="">
+                                            <input class="code" type="hidden" name="SystemTypes[0].Code" />
+                                            <input style="width:100px"
+                                                   type="text" onchange="UpdateTextFile(this,1,1)"
+                                                   class="form-control leavePage border-primary systemCode"
+                                                   name="SystemTypes[0].SystemCode"
+                                                   id="SystemTypes_0__SystemCode" />
+                                        </td>
+
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                            data-search="">
+
+                                            <input style="width:250px"
+                                                   type="text" onchange="UpdateTextFile(this,2,1)"
+                                                   class="form-control leavePage border-primary systemDescription"
+                                                   name="SystemTypes[0].SystemDescription"
+                                                   id="SystemTypes_0__SystemDescription" />
+                                        </td>
+
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="file" onchange="UpdateTextFile(this,3,1)"
+                                                           class="form-control border-primary"
+                                                           name="SystemTypes[0].HelperFile"
+                                                           accept=".xls" />
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                            <button type="button"
+                                                    class="btn btn-danger removeRow">
+                                                <i class="fa fa-trash"></i> Remove
+                                            </button>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                                <div class="card-footer" style="margin-top:1%">
+                                    <button type="button" id="btnSubmitForm" class="btn btn-success">Submit</button>
+                                    <button type="button" onclick="AddSystemTypeRow()" class="btn btn-primary">Add New System Type</button>
+                                    <a href="./System" class="btn btn-warning">Refresh</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/systemType.js" asp-append-version="true"></script>
+}

@@ -28,9 +28,9 @@ namespace TaskManagement
 
         public  DbSet<MenuAccessTab> MenuAccessTabs { get; set; }
 
-        public  DbSet<MenusetupTab> MenusetupTabs { get; set; }
+        public  DbSet<MenusetupTab> MenusetupTab { get; set; }
 
-        public  DbSet<ModuleSetup> ModuleSetups { get; set; }
+        public  DbSet<ModuleSetup> ModuleSetup { get; set; }
 
         public  DbSet<OtpDetail> OtpDetails { get; set; }
 
@@ -48,9 +48,9 @@ namespace TaskManagement
 
         public  DbSet<SystemMenuTab> SystemMenuTabs { get; set; }
 
-        public  DbSet<SystemSubMenuTab> SystemSubMenuTabs { get; set; }
+        public  DbSet<SystemSubMenuTab> SystemSubMenuTab { get; set; }
 
-        public  DbSet<SystemTypeTab> SystemTypeTabs { get; set; }
+        public  DbSet<SystemTypeTab> SystemTypeTab { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
