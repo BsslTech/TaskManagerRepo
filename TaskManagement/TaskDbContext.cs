@@ -24,9 +24,9 @@ namespace TaskManagement
 
         public  DbSet<LicenseTab> LicenseTabs { get; set; }
 
-        public  DbSet<MainMenu> MainMenus { get; set; }
+        public  DbSet<MainMenu> MainMenu { get; set; }
 
-        public  DbSet<MenuAccessTab> MenuAccessTabs { get; set; }
+        public  DbSet<MenuAccessTab> MenuAccessTab { get; set; }
 
         public  DbSet<MenusetupTab> MenusetupTab { get; set; }
 
@@ -40,13 +40,13 @@ namespace TaskManagement
 
         public  DbSet<StaffTab> StaffTabs { get; set; }
 
-        public  DbSet<SubMenusetupTab> SubMenusetupTabs { get; set; }
+        public  DbSet<SubMenusetupTab> SubMenusetupTab { get; set; }
 
         public  DbSet<SubMenusetupTabBack> SubMenusetupTabBacks { get; set; }
 
-        public  DbSet<SystemDefTab> SystemDefTabs { get; set; }
+        public  DbSet<SystemDefTab> SystemDefTab { get; set; }
 
-        public  DbSet<SystemMenuTab> SystemMenuTabs { get; set; }
+        public  DbSet<SystemMenuTab> SystemMenuTab { get; set; }
 
         public  DbSet<SystemSubMenuTab> SystemSubMenuTab { get; set; }
 
