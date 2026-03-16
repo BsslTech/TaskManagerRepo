@@ -5,23 +5,18 @@
 <div class="container mt-4">
     <div class="col-md-12">
         <div class="card card-primary card-outline mb-4">
-            <!--begin::Header-->
             <div class="card-header">
                 <div class="card-title">System Defined Menu Setup</div>
             </div>
-            <!--end::Header-->
-            <!--begin::Form-->
             <form>
-                <!--begin::Body-->
                 <div class="card-body">
-                           <div class="row g-3  ">
-                                <div class="col-sm-4">
-                                    <label for="clientName" class="form-label">Menu Name </label>
-                                    <select class="form-select" id="Licensetype">
-                                        <option selected>-Select-</option>
-                                        
-                                    </select>
-                                </div>
+                    <div class="row g-3">
+                        <div class="col-sm-4">
+                            <label for="Licensetype" class="form-label">Menu Name</label>
+                            <select class="form-select" id="Licensetype">
+                                <option selected>-Select-</option>
+                            </select>
+                        </div>
 
                         <div class="col-sm-3">
                             <label class="form-label">Sub-Menu Code</label>
@@ -32,61 +27,110 @@
                             </div>
                         </div>
 
-                                <div class="col-sm-5">
-                                    <label class="form-label" for="GraceDays">Sub-Menu Name</label>
-                                    <input type="number" class="form-control" id="FormID" />
-                                </div>
-                           </div>
-                </div>
-
-
-
-                <!--end::Body-->
-                <!--begin::Footer-->
-
-                <div class="mt-3">
-                    <div class="card-footer ">
-                        <button type="submit" class="btn btn-success">Submit</button>
-                        <button type="submit" class="btn btn-danger text-light">Cancel</button>
+                        <div class="col-sm-5">
+                            <label class="form-label" for="FormID">Sub-Menu Name</label>
+                            <input type="text" class="form-control" id="FormID" />
+                        </div>
                     </div>
                 </div>
 
-                <!--end::Footer-->
+                <div class="mt-3">
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-danger text-light" onclick="clearForm()">Cancel</button>
+                    </div>
+                </div>
             </form>
-            <!--end::Form-->
         </div>
     </div>
-
 </div>
 
 <div class="container mt-4">
-
-
-<div class="card mb-4">
-
-    <!-- /.card-header -->
-    <div class="card-body p-0">
-        <table class="table table-sm table-bordered mb-0 text-center">
-            <thead>
-                <tr>
-                    <th>Action</th>
-                    <th>S/N</th>
-                    <th>Menu Name</th>
-                    <th>Sub-Menu Name</th>
-                    <th>Sub-Menu Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="align-middle">
-                    <td><button type="button" class="btn btn-primary">Select</button></td>
-                    <td>1</td>
-                    <td class="text-start">Chart of Account</td>
-                    <td class="text-start">CH-01</td>
-                    <td class="text-start">Account Code</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card mb-12">
+                        <div class="card-body p-0">
+                            <table class="table table-bordered display nowrap" id="subMenuDataTable" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Name</th>
+                                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Sub-Menu Name</th>
+                                        <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Sub-Menu Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subMenuTableBody">
+                                    <tr role="row"
+                                        data-id="1"
+                                        data-menuname="Chart of Account"
+                                        data-submenuname="Account Code"
+                                        data-mcode="CH"
+                                        data-code="01">
+                                        <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                            <button type="button" class="btn btn-primary" onclick="selectRow(this)">Select</button>
+                                        </td>
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">1</td>
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">Chart of Account</td>
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">Account Code</td>
+                                        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">CH-01</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.card-body -->
 </div>
-</div>
+
+<script>
+    function selectRow(btn) {
+        const row = btn.closest('tr');
+
+        const id         = row.dataset.id;
+        const menuName   = row.dataset.menuname;
+        const subName    = row.dataset.submenuname;
+        const mcode      = row.dataset.mcode;
+        const code       = row.dataset.code;
+
+        // Fill hidden ID
+        document.getElementById('myid').value = id;
+
+        // Fill Sub-Menu Code fields
+        document.getElementById('mcode').value = mcode;
+        document.getElementById('code').value  = code;
+
+        // Fill Sub-Menu Name
+        document.getElementById('FormID').value = subName;
+
+        // Fill Menu Name dropdown — select matching option or add dynamically
+        const dropdown = document.getElementById('Licensetype');
+        let found = false;
+        for (let opt of dropdown.options) {
+            if (opt.text === menuName) {
+                opt.selected = true;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            const newOpt = new Option(menuName, menuName, true, true);
+            dropdown.add(newOpt);
+        }
+
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearForm() {
+        document.getElementById('myid').value    = '0';
+        document.getElementById('mcode').value   = '';
+        document.getElementById('code').value    = '';
+        document.getElementById('FormID').value  = '';
+        document.getElementById('Licensetype').selectedIndex = 0;
+    }
+</script>
