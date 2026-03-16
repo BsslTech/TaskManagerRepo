@@ -7,7 +7,7 @@
     newRow.show();
 
     // set serial number
-    newRow.find(".sn").text(rowCount+1);
+    newRow.find(".sn").text(rowCount + 1);
 
     newRow.find("input").each(function () {
 
@@ -45,7 +45,25 @@ $(document).ready(function () {
             { orderable: false, targets: 0 }
         ]
     });
-    //hideLoading();
+    const status = document.getElementById('status').value;
+    const statusDescription = document.getElementById('statusDescription').value;
+    if (status) {
+        if (status.toString().trim().toLowerCase() === 'success') {
+            Swal.fire({
+                title: "Success!",
+                text: statusDescription,
+                icon: "success"
+            });
+            return;
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: statusDescription,
+            });
+            return;
+        }
+    }
 });
 $(document).on('click', '.removeRow', async function () {
     const el = this; // the clicked button
@@ -106,14 +124,14 @@ function ReIndexRows() {
     });
 
 }
-async function UpdateTextFile(element,option, todo) {
+async function UpdateTextFile(element, option, todo) {
 
     try {
 
         let row = $(element).closest("tr");
         let uniqno = row.find(".code").val();
         let systemCode = row.find(".systemCode").val();
-        
+
         let systemDescription = row.find(".systemDescription").val();
 
         let value = [];
@@ -288,10 +306,10 @@ async function UpdateTextFile(element,option, todo) {
             //hideLoading();
         }
 
-}
-catch (e) {
+    }
+    catch (e) {
         console.log(e);
         $(".loadingDiv-parent").fadeOut('slow');
         //hideLoading();
-}
+    }
 }

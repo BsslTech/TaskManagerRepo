@@ -1,4 +1,34 @@
-﻿<!DOCTYPE html>
+﻿@inject TaskManagement.TaskDbContext _taskContext
+@using Microsoft.AspNetCore.Http
+@using Microsoft.EntityFrameworkCore
+@using static TaskManagement.IdentityLib
+@inject SignInManager<TaskIdentityUser> SignInManager
+@inject UserManager<TaskIdentityUser> UserManager
+@inject RoleManager<TaskIdentityRole> roleManager
+@{
+
+    var getUseRrole = "";
+    var curUser = new TaskIdentityUser(); IList<string> currole = [];
+    var getCurUser = new TaskIdentityUser();
+    if (SignInManager.IsSignedIn(User))
+    {
+        curUser = await UserManager.GetUserAsync(User);
+        currole = await UserManager.GetRolesAsync(curUser);
+        getCurUser = await _taskContext.TaskIdentityUsers.FirstOrDefaultAsync(m => m.UserName == User.Identity.Name);
+
+        if (currole != null)
+        {
+            var rolem = await roleManager.FindByNameAsync(currole[0]);
+
+            if (currole != null)
+            {
+                getUseRrole = rolem.Id.ToString();
+            }
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -294,215 +324,34 @@
                         aria-label="Main navigation"
                         data-accordion="false"
                         id="navigation">
-                        <li class="nav-item menu-open">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon bi bi-speedometer"></i>
-                                <p>
-                                    Dashboard
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/index.html" class="nav-link active">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Dashboard v1</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/index2.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Dashboard v2</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/index3.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Dashboard v3</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="~/dist/generate/theme.html" class="nav-link">
-                                <i class="nav-icon bi bi-palette"></i>
-                                <p>Theme Generate</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-box-seam-fill"></i>
-                                <p>
-                                    Widgets
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/widgets/small-box.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Small Box</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/widgets/info-box.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>info Box</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/widgets/cards.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Cards</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-clipboard-fill"></i>
-                                <p>
-                                    Layout Options
-                                    <span class="nav-badge badge text-bg-secondary me-3">7</span>
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/unfixed-sidebar.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Default Sidebar</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/fixed-sidebar.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Fixed Sidebar</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/fixed-header.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Fixed Header</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/fixed-footer.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Fixed Footer</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/fixed-complete.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Fixed Complete</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/layout-custom-area.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Layout <small>+ Custom Area </small></p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/sidebar-mini.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Sidebar Mini</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Sidebar Mini <small>+ Collapsed</small></p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/collapsed-sidebar-without-hover.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Sidebar Mini <small>+ Collapsed + No Hover</small></p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/logo-switch.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Sidebar Mini <small>+ Logo Switch</small></p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/layout/layout-rtl.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Layout RTL</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-tree-fill"></i>
-                                <p>
-                                    UI Elements
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/UI/general.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>General</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/UI/icons.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Icons</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/dist/UI/timeline.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Timeline</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-pencil-square"></i>
-                                <p>
-                                    Forms
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/forms/general.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>General Elements</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-table"></i>
-                                <p>
-                                    Tables
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="~/dist/tables/simple.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Simple Tables</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
 
-                       
-                      
-
+                        @if (currole != null)
+                        {
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon bi bi-box-seam-fill"></i>
+                                    <p>
+                                        Access Point
+                                        <i class="nav-arrow bi bi-chevron-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/SystemPage/System" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p> System Type Setup</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/SystemPage/Module" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p>Module Setup</p>
+                                        </a>
+                                    </li>
+                                   
+                                </ul>
+                            </li>
+                        }
                     </ul>
                     <!--end::Sidebar Menu-->
                 </nav>
@@ -581,100 +430,7 @@
             integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
             crossorigin="anonymous"></script>
 
-    <!-- jsvectormap -->
-@*     <script>
-        // World map by jsVectorMap
-        new jsVectorMap({
-          selector: '#world-map',
-          map: 'world',
-        });
-
-        // Sparkline charts
-        const option_sparkline1 = {
-          series: [
-            {
-              data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021],
-            },
-          ],
-          chart: {
-            type: 'area',
-            height: 50,
-            sparkline: {
-              enabled: true,
-            },
-          },
-          stroke: {
-            curve: 'straight',
-          },
-          fill: {
-            opacity: 0.3,
-          },
-          yaxis: {
-            min: 0,
-          },
-          colors: ['#DCE6EC'],
-        };
-
-        const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
-        sparkline1.render();
-
-        const option_sparkline2 = {
-          series: [
-            {
-              data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
-            },
-          ],
-          chart: {
-            type: 'area',
-            height: 50,
-            sparkline: {
-              enabled: true,
-            },
-          },
-          stroke: {
-            curve: 'straight',
-          },
-          fill: {
-            opacity: 0.3,
-          },
-          yaxis: {
-            min: 0,
-          },
-          colors: ['#DCE6EC'],
-        };
-
-        const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
-        sparkline2.render();
-
-        const option_sparkline3 = {
-          series: [
-            {
-              data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
-            },
-          ],
-          chart: {
-            type: 'area',
-            height: 50,
-            sparkline: {
-              enabled: true,
-            },
-          },
-          stroke: {
-            curve: 'straight',
-          },
-          fill: {
-            opacity: 0.3,
-          },
-          yaxis: {
-            min: 0,
-          },
-          colors: ['#DCE6EC'],
-        };
-
-        const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
-        sparkline3.render();
-    </script> *@
-    <!--end::Script-->
+ 
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
