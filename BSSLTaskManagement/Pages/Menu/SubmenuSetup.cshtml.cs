@@ -128,7 +128,7 @@ namespace BSSLTaskManagement.Pages.Menu
         // Returns all submenus matching the selected module + main menu + menu
         // These populate the results table (S/N, SubMenu Code, SubMenu Name, Page URL)
         // URL pattern: ?handler=SubMenuList&moduleId=1&mainMenuId=2&menuId=3
-        public async Task<IActionResult> OnGetSubMenuListAsync(int moduleId, int mainMenuId, int menuId)
+        public async Task<IActionResult> OnGetSubMenuListAsync(int moduleId, int mainMenuId, string menuId)
         {
             var list = await _mainMenuServices.GetSubMenuSetupListAsync(moduleId, mainMenuId, menuId);
 
