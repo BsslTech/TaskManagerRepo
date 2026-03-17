@@ -1,256 +1,223 @@
 ﻿@page
-@model BSSLTaskManagement.Pages.Menu.SubmenuSetupModel
+@model BSSLTaskManagement.Pages.Menu.SubMenuSetupModel
 @{
 }
 
 <div class="container mt-4">
+    <h2>SubMenu Setup</h2>
+</div>
+
+<div class="container mt-4">
     <div class="col-md-12">
         <div class="card card-primary card-outline mb-4">
-        <!--begin::Header-->
-        <div class="card-header">
-            <div class="card-title">SubMenu </div>
-        </div>
-        <!--end::Header-->
-        <!--begin::Form-->
-        <form>
-            <!--begin::Body-->
-            <div class="card-body">
-                <div class="row g-4 mb-2 ">
-                    <div class="col-sm-3">
-                        <label for="clientName" class="form-label">System Type Name</label>
-                        @* <input type="text" class="form-control" placeholder="Client Name" aria-label="clientName" id="clientName"> *@
-                        <select class="form-select" id="clientName">
-                            <option selected>-Select-</option>
-                            <option value="1">ITF</option>
-                            <option value="2">WAEC</option>
-                            <option value="3">Kogi State Revenue</option>
-                            <option value="3">PCN</option>
-                            <option value="3">NCS</option>
-                        </select>
-                    </div>
+            <!--begin::Header-->
+            <div class="card-header">
+                <div class="card-title">
+                    <button type="button" class="btn btn-success text-light" id="cancelBtn">Save</button>
+                    <button type="submit" class="btn btn-warning">refresh</button>
+                    <button type="submit" class="btn btn-primary">View list</button>
+                </div>
+            </div>
+            <!--end::Header-->
+            <!--begin::Form-->
+            <form>
+                <div class="card-body">
 
-                    <div class="col-sm-3">
-                                <label for="clientNamoduleNameme" class="form-label">Module Name </label>
-                              <select class="form-select" id="moduleName">
-                                <option selected>-Select-</option>
-                                <option value="1">One(1) Year License</option>
-                                <option value="2">Two(2) year License</option>
-                                <option value="3">Perpetual License</option>
-                              </select>
-                    </div>
+                    <!-- ROW 1: The 4 cascade dropdowns -->
+                    <div class="row g-4 mb-2">
 
+                        <!-- DROPDOWN 1: System Type — loaded on page load from Model.SystemTypeList -->
                         <div class="col-sm-3">
-                                <label for="menuName" class="form-label">Main Menu Name </label>
-                                <select class="form-select" id="menuName">
-                                    <option selected>-Select-</option>
-                                    <option value="1">One(1) Year License</option>
-                                    <option value="2">Two(2) year License</option>
-                                    <option value="3">Perpetual License</option>
+                            <label for="systemTypeId" class="form-label">System Type Name</label>
+                            <select class="form-select" id="systemTypeId" name="systemTypeId">
+                                <option value="">-Select-</option>
+                                @foreach (var item in Model.SystemTypeList)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- DROPDOWN 2: Module Name — populated via AJAX when System Type is picked -->
+                        <div class="col-sm-3">
+                            <label for="moduleName" class="form-label">Module Name</label>
+                            <select class="form-select" id="moduleName" name="moduleName" disabled>
+                                <option value="">-Select-</option>
+                            </select>
+                        </div>
+
+                        <!-- DROPDOWN 3: Main Menu Name — populated via AJAX when Module is picked -->
+                        <div class="col-sm-3">
+                            <label for="mainMenuName" class="form-label">Main Menu Name</label>
+                            <select class="form-select" id="mainMenuName" name="mainMenuName" disabled>
+                                <option value="">-Select-</option>
+                            </select>
+                        </div>
+
+                        <!-- DROPDOWN 4: Menu Name — populated via AJAX when Main Menu is picked -->
+                        <div class="col-sm-3">
+                            <label for="menuName" class="form-label">Menu Name</label>
+                            <select class="form-select" id="menuName" name="menuName" disabled>
+                                <option value="">-Select-</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- ROW 2: SubMenu Code, SubMenu Name, Form Header -->
+                    <div class="mb-3">
+                        <div class="row g-3 my-3">
+                            <div class="col-sm-4">
+                                <label class="form-label" for="subMenuCode">SubMenu Code / FormID</label>
+                                <input type="text" class="form-control" id="subMenuCode" name="subMenuCode" />
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label" for="subMenuName">SubMenu Name</label>
+                                <input type="text" class="form-control" id="subMenuName" name="subMenuName" />
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label" for="formHeader">Form Header Name</label>
+                                <input type="text" class="form-control" id="formHeader" name="formHeader" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 3: Page URL, Report Page URL, Icon Image Name -->
+                    <div class="mb-3">
+                        <div class="row g-3 my-3">
+                            <div class="col-sm-4">
+                                <label class="form-label" for="pageUrl">Page URL</label>
+                                <input type="text" class="form-control" id="pageUrl" name="pageUrl" />
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label" for="reportPageUrl">Report Page URL</label>
+                                <input type="text" class="form-control" id="reportPageUrl" name="reportPageUrl" />
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label" for="iconImageName">Icon Image Name</label>
+                                <input type="text" class="form-control" id="iconImageName" name="iconImageName" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 4: Upload Icon Image, Upload Help File -->
+                    <div class="mb-3">
+                        <div class="row g-2 my-3">
+                            <div class="col-sm-6">
+                                <label for="iconImage" class="col-auto col-form-label">Upload Icon Image</label>
+                                <div class="col-auto">
+                                    <input type="file" class="form-control" id="iconImage" name="iconImage" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="helpFile" class="col-auto col-form-label">Upload Help File</label>
+                                <div class="col-auto">
+                                    <input type="file" class="form-control" id="helpFile" name="helpFile" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROW 5: User Access, Order Number, YouTube Video Hash -->
+                    <div class="mb-3">
+                        <div class="row g-3 my-3">
+                            <div class="col-sm-6">
+                                <label for="userAccess" class="form-label">Assign from User Access</label>
+                                <select class="form-select" id="userAccess" name="userAccess">
+                                    <option value="">-Select-</option>
+                                    <option value="1">Read Only</option>
+                                    <option value="2">Read & Write</option>
+                                    <option value="3">Full Access</option>
                                 </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <label class="form-label" for="orderNumber">Order Number</label>
+                                <input type="number" class="form-control" id="orderNumber" name="orderNumber" />
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label" for="videoHash">Youtube Video Hash</label>
+                                <input type="text" class="form-control" id="videoHash" name="videoHash" />
+                            </div>
                         </div>
-
-                        <div class="col-sm-3">
-                                    <label for="clientName" class="form-label">Menu Name </label>
-                                    <select class="form-select" id="Licensetype">
-                                        <option selected>-Select-</option>
-                                        <option value="1">One(1) Year License</option>
-                                        <option value="2">Two(2) year License</option>
-                                        <option value="3">Perpetual License</option>
-                                    </select>
-                                </div>
                     </div>
-                <div class="mb-3">
-                    <div class="row g-3 my-3 ">
-                        
 
-                    </div>
-                <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="NumberOfLicence">SubMenu Code</label>
-                                    <input type="text" class="form-control" id="SubMenu" />
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="GraceDays">Form ID</label>
-                                    <input type="number" class="form-control" id="FormID" />
-                                </div>
-
-                            </div>
-                </div>
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="SubMenuName">SubMenu Name</label>
-                                    <input type="text" class="form-control" id="SubMenuName" />
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="FormHeader">Form Header Name</label>
-                                    <input type="number" class="form-control" id="FormHeader" />
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="PageURL">Page URL</label>
-                                    <input type="text" class="form-control" id="PageURL" />
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="ReportPage">Report Page URL</label>
-                                    <input type="number" class="form-control" id="ReportPage" />
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-
-                                <div class="col-sm-6">
-                                    <label class="form-label" for="IconImage">Icon Image Name</label>
-                                    <input type="text" class="form-control" id="IconImage" />
-
-                                </div>
-                                <div class="col-sm-6">
-                                        <label for="iconImage" class="col-auto col-form-label">Upload Icon Image</label>
-                                        <div class="col-auto">
-                                            <input type="file" class="form-control form-control" id="iconImage">
-                                        </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                <div class="col-sm-6">
-                                    <label for="UserAccess" class="form-label">Assign from User Access </label>
-                                    <select class="form-select" id="UserAccess">
-                                        <option selected>-Select-</option>
-                                        <option value="1">One(1) Year License</option>
-                                        <option value="2">Two(2) year License</option>
-                                        <option value="3">Perpetual License</option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label class="form-label" for="OrderNumber">Order Number</label>
-                                    <input type="number" class="form-control" id="OrderNumber" />
-
-                                </div>
-                                <div class="col-sm-4">
-                                    <label class="form-label" for="VideoHash">Youtube Video Hash</label>
-                                    <input type="number" class="form-control" id="VideoHash" />
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="Dashboardenu">
-                                        <label class="form-check-label" for="Dashboardenu">
-                                            Set as Dashboard Main Menu
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="IconDashboard">
-                                        <label class="form-check-label" for="IconDashboard">
-                                            Show icon on dashboard
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="Report">
-                                        <label class="form-check-label" for="Report">
-                                            Is a report
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="deactivate">
-                                        <label class="form-check-label" for="deactivate">
-                                            Deactivate
-                                        </label>
-                                    </div>
+                    <!-- ROW 6: Checkboxes row 1 -->
+                    <div class="mb-3">
+                        <div class="row g-3 my-3">
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="makeDashboardMain" name="makeDashboardMain" />
+                                    <label class="form-check-label" for="makeDashboardMain">Set as Dashboard Main Menu</label>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="ApprovalForm">
-                                        <label class="form-check-label" for="ApprovalForm">
-                                            Is approval form
-                                        </label>
-                                    </div>
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showOnDashboard" name="showOnDashboard" />
+                                    <label class="form-check-label" for="showOnDashboard">Show icon on dashboard</label>
                                 </div>
-                                <div class="col-sm mt-3 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="Approval">
-                                        <label class="form-check-label" for="Approval">
-                                            Pass Through Approval Process
-                                        </label>
-                                    </div>
+                            </div>
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isReport" name="isReport" />
+                                    <label class="form-check-label" for="isReport">Is a report</label>
                                 </div>
-                                <div class="col-sm-6">
-                                    <label for="HelpFIle" class="col-auto col-form-label">Upload Help File</label>
-                                    <div class="col-auto">
-                                        <input type="file" class="form-control form-control" id="HelpFIle">
-                                    </div>
+                            </div>
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="deactivate" name="deactivate" />
+                                    <label class="form-check-label" for="deactivate">Deactivate</label>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- ROW 7: Checkboxes row 2 -->
+                    <div class="mb-3">
+                        <div class="row g-3 my-3">
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isApprovalForm" name="isApprovalForm" />
+                                    <label class="form-check-label" for="isApprovalForm">Is approval form</label>
+                                </div>
+                            </div>
+                            <div class="col-lg mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="approval" name="approval" />
+                                    <label class="form-check-label" for="approval">Pass Through Approval Process</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-
-
-            <!--end::Body-->
-            <!--begin::Footer-->
-            
-                         <div class="mt-3">
-                            <div class="card-footer ">
-                                <button type="submit" class="btn btn-warning text-light">Cancel Record</button>
-                                <button type="submit" class="btn btn-success">Submit</button>
-                            </div>
-                         </div>
-            
-            <!--end::Footer-->
-        </form>
-        <!--end::Form-->
+                <!-- FORM BUTTONS -->
+                <div class="mt-3">
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-success text-light" id="cancelBtn">Save</button>
+                        <button type="submit" class="btn btn-warning">refresh</button>
+                        <button type="submit" class="btn btn-primary">View list</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-    </div>
-
 </div>
-<div class="card mb-4">
 
-    <!-- /.card-header -->
-    <div class="card-body  p-0">
+<!-- RESULTS TABLE -->
+<div class="card mb-4">
+    <div class="card-body p-0">
         <table class="table table-sm mb-0">
             <thead>
                 <tr>
                     <th style="width: 100px">S/N</th>
                     <th>Menu Name</th>
-                    <th>SubMenuCode</th>
-                    <th>SubMenuName</th>
-                    <th>PageUrl</th>
+                    <th>SubMenu Code</th>
+                    <th>SubMenu Name</th>
+                    <th>Page URL</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="subMenuTableBody">
                 <tr class="align-middle">
                     <td>1</td>
                     <td>HRM</td>
@@ -261,5 +228,109 @@
             </tbody>
         </table>
     </div>
-    <!-- /.card-body -->
 </div>
+
+@section Scripts {
+    <script>
+
+        // ─── HELPER ──────────────────────────────────────────────────────────────────
+        // Resets a dropdown back to "-Select-" and disables it
+        // Called whenever a parent dropdown changes, to clear all children below it
+        function resetDropdown(selectEl) {
+            selectEl.innerHTML = '<option value="">-Select-</option>';
+            selectEl.disabled = true;
+        }
+
+        // ─── REFERENCES ──────────────────────────────────────────────────────────────
+        const systemTypeSelect  = document.getElementById('systemTypeId');
+        const moduleSelect      = document.getElementById('moduleName');
+        const mainMenuSelect    = document.getElementById('mainMenuName');
+        const menuSelect        = document.getElementById('menuName');
+
+        // ─── CASCADE STEP 1 ──────────────────────────────────────────────────────────
+        // When System Type changes → fetch Modules for that system
+        systemTypeSelect.addEventListener('change', async function () {
+            const systemId = this.value;
+
+            // Reset all downstream dropdowns whenever system type changes
+            resetDropdown(moduleSelect);
+            resetDropdown(mainMenuSelect);
+            resetDropdown(menuSelect);
+
+            if (!systemId) return; // user selected "-Select-", nothing to fetch
+
+            try {
+                const response = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
+                const data = await response.json();
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    moduleSelect.appendChild(option);
+                });
+
+                moduleSelect.disabled = false; // enable now that it has options
+            } catch (err) {
+                console.error('Failed to load modules:', err);
+            }
+        });
+
+        // ─── CASCADE STEP 2 ──────────────────────────────────────────────────────────
+        // When Module changes → fetch Main Menus for that system + module combination
+        moduleSelect.addEventListener('change', async function () {
+            const moduleId  = this.value;
+            const systemId  = systemTypeSelect.value; // still need systemId for the filter
+
+            // Reset downstream dropdowns
+            resetDropdown(mainMenuSelect);
+            resetDropdown(menuSelect);
+
+            if (!moduleId) return;
+
+            try {
+                const response = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
+                const data = await response.json();
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    mainMenuSelect.appendChild(option);
+                });
+
+                mainMenuSelect.disabled = false;
+            } catch (err) {
+                console.error('Failed to load main menus:', err);
+            }
+        });
+
+        // ─── CASCADE STEP 3 ──────────────────────────────────────────────────────────
+        // When Main Menu changes → fetch Menus under that main menu
+        mainMenuSelect.addEventListener('change', async function () {
+            const mainMenuId = this.value;
+
+            // Reset downstream dropdown
+            resetDropdown(menuSelect);
+
+            if (!mainMenuId) return;
+
+            try {
+                const response = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
+                const data = await response.json();
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    menuSelect.appendChild(option);
+                });
+
+                menuSelect.disabled = false;
+            } catch (err) {
+                console.error('Failed to load menus:', err);
+            }
+        });
+
+    </script>
+}
