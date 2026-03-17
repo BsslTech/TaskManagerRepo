@@ -65,27 +65,9 @@ namespace BSSLTaskManagement.Pages.Menu
                 return Page();
             }
 
-            // ✅ Fixed: Save each menu individually if service expects single item
-            var results = new List<ResponseVM>();
-
-            foreach (var menu in SystemMenuList.Where(m => !string.IsNullOrEmpty(m.Code)))
-            {
-                var result = await system.SaveSystemMenusAsync(menu);
-                results.Add(result);
-            }
-
-            // Check if any failed
-            var failedCount = results.Count(r => r.Status == "Error" || r.Status == "Failed");
-
-            ResponseMessage = new ResponseVM
-            {
-                Status = failedCount == 0 ? "Success" : "Partial",
-                StatusDescription = failedCount == 0
-                    ? "All menus saved successfully"
-                    : $"{failedCount} menu(s) failed to save"
-            };
-
-            return RedirectToPage("./Success");
+            ResponseMessage = await system.SaveSystemMenusAsync(SystemMenu);
+            await LoadSystemMenusAsync();
+            return Page();
         }
 
         // Alternative: POST handler to save all menus in the table

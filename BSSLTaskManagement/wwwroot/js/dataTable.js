@@ -11,7 +11,7 @@
         ]
     });
 
-    $('#listTableWrapper').DataTable({
+    $('#listTableMenu').DataTable({
         responsive: true,
         pageLength: 10,
         order: [],

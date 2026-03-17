@@ -5,6 +5,8 @@
 }
 <form method="post" id="menuForm">
     <main class="app-main">
+        <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+        <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
         <!--begin::App Content Header-->
         <div class="app-content-header">
             <div class="container-fluid">
@@ -124,6 +126,7 @@
                     </div> 
             </div> 
         </div> 
+        </div>
     </main>
 </form>
 
