@@ -1,0 +1,34 @@
+Id: 1, Code: CH, Description: Chart of Account
+Id: 2, Code: Comp, Description: Company Setup
+Id: 3, Code: ACTCLASS, Description: Account Class
+Id: 4, Code: CUST, Description: Customer
+Id: 5, Code: SRTBON, Description: Send Revenue To Bank Online
+Id: 6, Code: SRTBOF, Description: Send Revenue To Bank Offline
+Id: 7, Code: PAYTYPE, Description: Single Receipt
+Id: 8, Code: EPAY, Description: Epayment Schedule
+Id: 9, Code: BKPV, Description: Bank Voucher
+Id: 10, Code: BACR, Description: Bank And Cash Report
+Id: 11, Code: Gen001, Description: Generate Opening Balance
+Id: 12, Code: LedgerPost001, Description: Posting of General Ledger
+Id: 13, Code: bankpost, Description: Posting of Bank And Cash
+Id: 14, Code: Genstock01, Description: Generate Stock to Gl
+Id: 15, Code: pstgl, Description: Posted Journal Voucher Reports
+Id: 16, Code: FINSTMT, Description: Financial Statement  
+Id: 17, Code: CON001, Description: Consolidated Trial Balance
+Id: 18, Code: Temp01, Description: Downloading Of Templates
+Id: 19, Code: LOGIN, Description: Login page
+Id: 20, Code: PayVouc, Description: Print Pay Voucher
+Id: 21, Code: REVREPRT, Description: Revenue Reports
+Id: 24, Code: UPTV, Description: Unposted Transaction Report
+Id: 25, Code: AJPOST, Description: Advance Journal Posting
+Id: 26, Code: RNTI, Description: Record Number Track Inquiry
+Id: 30, Code: HEADEF, Description: Head Definition
+Id: 31, Code: BUDPAYTYPE, Description: Budget Payment Type
+Id: 32, Code: JVADJUST, Description: Adjust Posted JV
+Id: 33, Code: AuditEnq, Description: Audit Enquiry Update
+Id: 34, Code: SAISS096, Description: Store Analysis And Issue
+Id: 35, Code: SUPPLY, Description: Supply Type
+Id: 36, Code: SWO662, Description: Stock Write Off
+Id: 37, Code: RETSTO, Description: Return to Store
+Id: 42, Code: OnlineProc, Description: 0725
+Id: 43, Code: OnlineProc, Description: Online Payment
