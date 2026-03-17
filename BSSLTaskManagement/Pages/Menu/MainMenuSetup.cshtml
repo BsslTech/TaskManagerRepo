@@ -19,7 +19,11 @@
                 <label for="inputSystemTypeName" class="form-label">System Type Name</label>
                 <select class="form-control" id="inputSystemTypeName">
                     <option value="">--Select--</option>
-                </select>
+                        @foreach (var item in Model.SystemTypeList)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                        </select>
                 </div>
 
                 <div class="mb-3 col-4">
@@ -34,6 +38,8 @@
             <!--end::Body-->
             <!--begin::Footer-->
         <div class="card-footer">
+            <button type="submit" class="btn btn-success">Save</button>
+            <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
             <button type="reset" class="btn btn-warning">Refresh</button>
             </div>
 
@@ -105,8 +111,9 @@
 </table>
 
     <div class="card-footer">
-        <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
         <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
+        <button type="reset" class="btn btn-warning">Refresh</button>
     </div>
 </div>
 
