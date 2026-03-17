@@ -33,15 +33,32 @@
 
         gtag('config', 'UA-119386393-1');
     </script>
+    <style>
+        /* On small screens make the login box overlay the image and stay on top */
+        @@media (max-width: 767.98px) {
+            .login-wrap .container { position: relative; }
+            .login-wrap .login-box {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                z-index: 20;
+                background: rgba(255,255,255,0.98);
+                box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            }
+            /* slightly dim the image behind when overlaid */
+            .login-wrap img { opacity: 0.4; }
+        }
+    </style>
 </head>
 <body class="login-page">
     <div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 col-lg-7">
+                <div class="col-md-6 col-lg-7 order-2 order-md-1">
                     <img src="/file/vendors/images/login-page-img.png" alt="">
                 </div>
-                <div class="col-md-6 col-lg-5">
+                <div class="col-md-6 col-lg-5 order-1 order-md-2">
                     <div class="login-box bg-white box-shadow border-radius-10">
                         <div class="login-title">
                             <h2 class="text-center text-primary">Login To BSSL Task Manager</h2>

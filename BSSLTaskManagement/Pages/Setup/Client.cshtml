@@ -1,0 +1,115 @@
+﻿@page
+@model BSSLTaskManagement.Pages.Setup.ClientModel
+@{
+    ViewData["Title"] = "Client Setup";
+}
+
+<form method="post" id="menuForm">
+    <main class="app-main">
+        <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+        <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">Client Setup</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Client Setup</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Single Save Card -->
+                        <div class="card mb-3">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label class="form-label">Client Code</label>
+                                        <input type="hidden" asp-for="SystemMenu.Id" id="menuId" />
+                                        <div class="input-group">
+                                            <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                            <input type="text" class="form-control border-primary" asp-for="SystemMenu.Code" id="menuCode" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-8">
+                                        <label class="form-label">Client Name</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <input type="text" class="form-control border-primary" asp-for="SystemMenu.Description" id="menuDescription" />
+                                    </div>
+                                </div>
+
+                                <div class="mt-3" style="margin-bottom:1.5%">
+                                    <button type="submit" class="btn btn-success me-2" id="btnSubmitForm">Submit</button>
+                                    <a href="./SystemMenuSetup" class="btn btn-warning">Refresh</a>
+                                </div>
+                                @if (Model.SystemMenuList.Count > 0)
+                                {
+                                    <table class="table table-bordered display nowrap" id="menuDataTable" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Client Code</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Client Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @for (int i = 0; i < Model.SystemMenuList.Count; i++)
+                                            {
+
+                                                //Store current item in variable to avoid repeated indexer access
+                                                var currentItem = Model.SystemMenuList[i];
+                                                <tr id="row_@i">
+                                                    <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+
+                                                        <button type="button" class="btn btn-primary btn-sm" onclick="editRow(@i, '@(currentItem.Id)', '@(currentItem.Code)', '@(currentItem.Description)')">
+                                                            Select
+                                                        </button>
+                                                    </td>
+
+                                                    <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+
+                                                        @(i + 1)
+                                                        <input type="hidden" value="@currentItem.Id" />
+                                                    </td>
+
+                                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+
+                                                        <input style="width:100px" readonly value="@currentItem.Code" type="text" class="form-control border-primary menuCode" />
+                                                    </td>
+
+                                                    <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+
+                                                        <input style="width:600px" readonly value="@currentItem.Description" type="text" class="form-control border-primary menuName" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/clienTab.js" asp-append-version="true"></script>
+}

@@ -51,6 +51,7 @@ namespace TaskManagement
         public  DbSet<SystemSubMenuTab> SystemSubMenuTab { get; set; }
 
         public  DbSet<SystemTypeTab> SystemTypeTab { get; set; }
+        public  DbSet<ClientTab> ClientTab { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{

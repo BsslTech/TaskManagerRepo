@@ -17,6 +17,8 @@ namespace BSSLTaskManagement.ServicesInterfaces
 
         Task<List<GeneralCodesVM>> GetSystemMenusAsync();
         Task<ResponseVM> SaveSystemMenusAsync(GeneralCodesVM menu);
+        Task<List<GeneralCodesVM>> GetClientsAsync();
+        Task<ResponseVM> SaveClientAsync(GeneralCodesVM menu);
     }
     public class SystemSerivces(TaskDbContext context, IWebHostEnvironment environment) : ISystemSerivces
     {
@@ -446,6 +448,72 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 {
                     Status = "Error",
                     StatusDescription = $"System menu not successfully saved: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<List<GeneralCodesVM>> GetClientsAsync()
+        {
+            List<GeneralCodesVM> generalCodes = [];
+            try
+            {
+                generalCodes = await _context.ClientTab.AsNoTracking()
+                    .Select(i => new GeneralCodesVM
+                    {
+                        Id = i.Id,
+                        Code = i.ClientCode,
+                        Description = i.ClientName,
+                    }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _ = ex;
+                generalCodes = [];
+            }
+            return generalCodes;
+        }
+
+        public async Task<ResponseVM> SaveClientAsync(GeneralCodesVM menu)
+        {
+            if (string.IsNullOrWhiteSpace(menu.Code))
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Enter client code"
+                };
+            if (string.IsNullOrWhiteSpace(menu.Description))
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Enter client name"
+                };
+
+            try
+            {
+
+                var dbModule = await _context.ClientTab.Where(x => x.Id == menu.Id).FirstOrDefaultAsync() ?? new ClientTab();
+                dbModule.ClientCode = menu.Code;
+                dbModule.ClientName = menu.Description;
+
+                if (menu.Id == null)
+                    _context.ClientTab.Add(dbModule);
+                else
+                    _context.ClientTab.Update(dbModule);
+
+                int succeeded = await _context.SaveChangesAsync();
+
+                return new ResponseVM
+                {
+                    Status = succeeded > 0 ? "Success" : "Failed",
+                    StatusDescription = succeeded > 0 ? "Client name successfully saved" : "Client name not successfully saved"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = $"Client name not successfully saved: {ex.Message}"
                 };
             }
         }
