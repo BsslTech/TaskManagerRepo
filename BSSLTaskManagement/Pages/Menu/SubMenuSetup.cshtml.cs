@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BSSLTaskManagement.Pages.Menu
 {
-    public class SubMenuSetupModel : PageModel
+    public class SubmenuSetupModel : PageModel
     {
         public void OnGet()
         {

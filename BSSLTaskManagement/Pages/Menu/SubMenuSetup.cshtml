@@ -1,5 +1,5 @@
 ﻿@page
-@model BSSLTaskManagement.Pages.Menu.SubMenuSetupModel
+@model BSSLTaskManagement.Pages.Menu.SubmenuSetupModel
 @{
 }
 
@@ -15,8 +15,8 @@
         <form>
             <!--begin::Body-->
             <div class="card-body">
-                <div class="row g-3 mb-3 ">
-                    <div class="col-sm-6">
+                <div class="row g-4 mb-2 ">
+                    <div class="col-sm-3">
                         <label for="clientName" class="form-label">System Type Name</label>
                         @* <input type="text" class="form-control" placeholder="Client Name" aria-label="clientName" id="clientName"> *@
                         <select class="form-select" id="clientName">
@@ -28,20 +28,18 @@
                             <option value="3">NCS</option>
                         </select>
                     </div>
-                    
-                </div>
-                <div class="mb-3">
-                    <div class="row g-3 my-3 ">
-                        <div class="col-sm-6">
+
+                    <div class="col-sm-3">
                                 <label for="clientNamoduleNameme" class="form-label">Module Name </label>
-                                <select class="form-select" id="moduleName">
+                              <select class="form-select" id="moduleName">
                                 <option selected>-Select-</option>
                                 <option value="1">One(1) Year License</option>
                                 <option value="2">Two(2) year License</option>
                                 <option value="3">Perpetual License</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-6">
+                              </select>
+                    </div>
+
+                        <div class="col-sm-3">
                                 <label for="menuName" class="form-label">Main Menu Name </label>
                                 <select class="form-select" id="menuName">
                                     <option selected>-Select-</option>
@@ -51,10 +49,7 @@
                                 </select>
                         </div>
 
-                    </div>
-                <div class="mb-3">
-                            <div class="row g-3 my-3 ">
-                                <div class="col-sm-6">
+                        <div class="col-sm-3">
                                     <label for="clientName" class="form-label">Menu Name </label>
                                     <select class="form-select" id="Licensetype">
                                         <option selected>-Select-</option>
@@ -63,12 +58,21 @@
                                         <option value="3">Perpetual License</option>
                                     </select>
                                 </div>
-                                <div class="col-sm-3">
+                    </div>
+                <div class="mb-3">
+                    <div class="row g-3 my-3 ">
+                        
+
+                    </div>
+                <div class="mb-3">
+                            <div class="row g-3 my-3 ">
+                                
+                                <div class="col-sm-6">
                                     <label class="form-label" for="NumberOfLicence">SubMenu Code</label>
                                     <input type="text" class="form-control" id="SubMenu" />
 
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <label class="form-label" for="GraceDays">Form ID</label>
                                     <input type="number" class="form-control" id="FormID" />
                                 </div>

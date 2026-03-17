@@ -61,8 +61,8 @@
         <!--end::Body-->
         <!--begin::Footer-->
         <div class="card-footer">
-            <button type="reset" class="btn btn-warning">Cancel Record</button>
-            <button type="submit" class="btn btn-success">Save</button>
+            <button type="button" class="btn btn-warning">Cancel Record</button>
+            <button type="button" class="btn btn-success">Save</button>
         </div>
 
         <!--end::Footer-->
@@ -71,90 +71,154 @@
 </div>
 
     <!--begin::Table-->
+<div class="card card-outline mb-4">
+                        <table class="table table-bordered display" id="MenuSetupTable">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Module Name</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Main Menu</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Name</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Order No.</th>
+                                    <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr id="0" role="row">
+                                    <td style=padding:10px;border:1px; width:20px ; solid lightgrey;">1</td>
 
-<div class="col-12 grid-margin">
-    <div class="card">
-        <div class="card-body">
-            <div class="scroll">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table id="tabId" class="table ">
-                                <thead>
-                                    <tr>
-                                        <th>S/N</th>
-                                        <th>Module Name</th>
-                                        <th>Main Menu</th>
-                                        <th>Name</th>
-                                        <th>Order No</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="Tablist">
-                                    <tr>
-                                        <td>1</td>
-                                        <td class="modulename 0">
-                                            Financial - PAYABLE/CREDITORS
-                                            <input type="hidden" class="iconImagename 0" value="advance.png">
-                                        </td>
-                                        <td class="moduleid 0" style="display:none">2</td>
-                                        <td class="mainmenu 0">Transactions</td>
-                                        <td class="mainmenuid 0" style="display:none">4</td>
-                                        <td class="name 0">PPE Investment</td>
-                                        <td style="width:5%;" class="orderNo 0">3</td>
-                                        <td style="width:15%;">
-                                            <input type="hidden" class="systemtype 0" value="1">
-                                            <input type="hidden" class="readid 0" value="11">
-                                            <a id="myEdit" addreedit="0" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
-                                            <a id="Delete" attrdel="0" class="btn btn-outline-danger btn-sm">Delete</a>
-                                        </td>
+                                    <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:350px" type="text" class="form-control border-primary moduleName" />
+                                    </td>
 
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td class="modulename 1">
-                                            Financial - PAYABLE/CREDITORS
-                                            <input type="hidden" class="iconImagename 1" value="advance.png">
-                                        </td>
-                                        <td class="moduleid 1" style="display:none">2</td>
-                                        <td class="mainmenu 1">Transactions</td>
-                                        <td class="mainmenuid 1" style="display:none">4</td>
-                                        <td class="name 1">Accounts Payable Integrity Reports</td>
-                                        <td style="width:5%;" class="orderNo 1"></td>
-                                        <td style="width:15%;">
-                                            <input type="hidden" class="systemtype 1" value="1">
-                                            <input type="hidden" class="readid 1" value="14">
-                                            <a id="myEdit" addreedit="1" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
-                                            <a id="Delete" attrdel="1" class="btn btn-outline-danger btn-sm">Delete</a>
-                                        </td>
+                                    <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:250px" type="text" class="form-control border-primary mainMenu" />
+                                    </td>
 
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td class="modulename 2">
-                                            Financial - PAYABLE/CREDITORS
-                                            <input type="hidden" class="iconImagename 2" value="advance.png">
-                                        </td>
-                                        <td class="moduleid 2" style="display:none">2</td>
-                                        <td class="mainmenu 2">Transactions</td>
-                                        <td class="mainmenuid 2" style="display:none">4</td>
-                                        <td class="name 2">Utilities</td>
-                                        <td style="width:5%;" class="orderNo 2"></td>
-                                        <td style="width:15%;">
-                                            <input type="hidden" class="systemtype 2" value="1">
-                                            <input type="hidden" class="readid 2" value="15">
-                                            <a id="myEdit" addreedit="2" class="btn btn-outline-primary btn-sm" data-toggle="tooltip" title="" data-bs-original-title="Edit Menu">Edit</a>
-                                            <a id="Delete" attrdel="2" class="btn btn-outline-danger btn-sm">Delete</a>
-                                        </td>
+                                    <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:250px" type="text" class="form-control border-primary name" />
+                                    </td>
 
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                        <input style="width:70px" type="text" class="form-control border-primary orderNumber" />
+                                    </td>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                    <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                        <button type="button" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-edit"></i> Edit
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>    
+                        </table>
+
+    <!-- Hidden template row — cloned when Add New Row is clicked -->
+    <table style="display:none">
+        <tr id="rowTemplate" style="display:none">
+            <td style=padding:10px;border:1px; width:20px ; solid lightgrey;" class="sn"></td>
+
+            <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                <input style="width:350px" type="text" class="form-control border-primary moduleName" />
+            </td>
+
+            <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                <input style="width:250px" type="text" class="form-control border-primary mainMenu" />
+            </td>
+
+            <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                <input style="width:250px" type="text" class="form-control border-primary name" />
+            </td>
+
+            <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                <input style="width:70px" type="text" class="form-control border-primary orderNumber" />
+            </td>
+
+            <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                <button type="button" class="btn btn-primary btn-sm">
+                    <i class="fa fa-edit"></i> Edit
+                </button>
+                <button type="button" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash"></i> Delete
+                </button>
+            </td>
+        </tr>
+    </table>
+
+
+<div class="card-footer">
+    <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+// ─── ADD NEW ROW ───────────────────────────────────────────────
+function AddDropdownRow() {
+
+// Count how many rows exist before adding
+let rowCount = table.rows().count();
+
+// Clone the hidden template row and remove its id so there's no duplicate
+let newRow = $("#rowTemplate").clone().removeAttr("id");
+
+// Make the cloned row visible
+newRow.show();
+
+// Set the S/No. serial number for the new row
+newRow.find(".sn").text(rowCount + 1);
+
+// Clear all input values in the new row (template may have leftover data)
+newRow.find("input").val("");
+
+// Add the new row to DataTables (not just the DOM) and redraw
+// draw(false) = redraw without jumping back to page 1
+table.row.add(newRow).draw(false);
+
+// ── Jump to the page that contains the newly added row ──
+let pageLength  = table.page.len();              // rows per page (10)
+let newRowIndex = table.rows().count() - 1;      // index of the last (new) row
+let newPage     = Math.floor(newRowIndex / pageLength); // which page it's on
+
+table.page(newPage).draw(false); // navigate to that page
+
+// Recalculate column widths for responsive layout
+table.columns.adjust().responsive.recalc();
+}
+
+
+// ─── REMOVE ROW ────────────────────────────────────────────────
+// Delegated click — works on both existing rows and newly added ones
+$(document).on('click', '.removeRow', function () {
+
+// Remove the row from DataTables (not just the DOM)
+// draw(false) = stay on current page, don't jump to page 1
+table.row($(this).closest('tr')).remove().draw(false);
+
+// Re-number all S/No. values so they stay sequential after deletion
+ReIndexRows();
+
+table.columns.adjust().responsive.recalc();
+});
+
+
+// ─── RE-INDEX ROWS ──────────────────────────────────────────────
+// After a row is removed, loop through all rows and fix their serial numbers
+function ReIndexRows() {
+table.rows().every(function (rowIdx) {
+let row = this.node();
+
+// Update the row's id attribute to match its new position
+$(row).attr("id", rowIdx);
+
+// Update the S/No. cell (first td) to show the correct number
+$(row).find("td:first").text(rowIdx + 1);
+});
+}
+
+
+    </script>
+}
