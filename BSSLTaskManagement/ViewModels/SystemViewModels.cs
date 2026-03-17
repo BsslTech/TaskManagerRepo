@@ -7,6 +7,7 @@ namespace BSSLTaskManagement.ViewModels
         public class GeneralCodesVM
         {
             public int? Id { get; set; }
+            public string Code { get; set; }
             public string Description { get; set; }
         }
         public class ResponseVM{

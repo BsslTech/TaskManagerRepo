@@ -1,4 +1,5 @@
 ﻿
+using BSSLTaskManagement.Pages.Menu;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement;
 using TaskManagement.Models;
@@ -15,6 +16,9 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<ResponseVM> SaveMainMenusAsync(MainMenuDefVM main);
         Task<List<MenuSetupVM>> GetMenuSetupAsync(int? mainMenuId);
         Task<ResponseVM> SaveMenuSetupAsync(MenuSetupDefVM menus);
+        Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, int? menuId);
+        Task<SubMenuSetupVM> GetSubMenuSetupSingleAsync(int? id);
+        Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu);
     }
     public class MainMenuSetupServices(ISystemSerivces system, TaskDbContext context) : IMainMenuSetupServices
     {
@@ -26,8 +30,8 @@ namespace BSSLTaskManagement.ServicesInterfaces
             List<MainMenuSetupVM> mainMenus = [];
             try
             {
-                mainMenus = await context.MainMenu.Where(i => i.ModuleSetupId == moduleId && i.ModuleSetup.SystemTypeTabId == systemType)
-                    .Select(p=>new MainMenuSetupVM
+                mainMenus = await context.MainMenu.AsNoTracking().Where(i => i.ModuleSetupId == moduleId && i.ModuleSetup.SystemTypeTabId == systemType)
+                    .Select(p => new MainMenuSetupVM
                     {
                         Description = p.Description,
                         Id = p.Id,
@@ -41,7 +45,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
             }
             return mainMenus;
 
-            
+
         }
         public async Task<ResponseVM> SaveMainMenusAsync(MainMenuDefVM main)
         {
@@ -96,7 +100,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
             try
             {
 
-                var dbModules = await context.MainMenu.Where(k=>k.ModuleSetupId ==  main.ModuleSetupId && k.ModuleSetup.SystemTypeTabId == main.SystemTypeTabId).ToListAsync();
+                var dbModules = await context.MainMenu.Where(k => k.ModuleSetupId == main.ModuleSetupId && k.ModuleSetup.SystemTypeTabId == main.SystemTypeTabId).ToListAsync();
 
                 var dbDict = dbModules
                     .ToDictionary(x => x.Description);
@@ -129,7 +133,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                     .Where(x => !incomingDict.ContainsKey(x.Description))
                     .ToList();
 
-               
+
 
                 if (toDelete.Any())
                     context.MainMenu.RemoveRange(toDelete);
@@ -157,7 +161,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
             List<MenuSetupVM> menus = [];
             try
             {
-                menus = await context.MenusetupTab.Where(i => i.MainMenuId == mainMenuId)
+                menus = await context.MenusetupTab.AsNoTracking().Where(i => i.MainMenuId == mainMenuId)
                     .Select(p => new MenuSetupVM
                     {
                         MenuName = p.MenuName,
@@ -289,7 +293,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                     .Where(x => !incomingDict.ContainsKey(x.MenuName))
                     .ToList();
 
-               
+
 
                 if (toDelete.Any())
                     context.MenusetupTab.RemoveRange(toDelete);
@@ -308,6 +312,228 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 {
                     Status = "Error",
                     StatusDescription = $"Menus not successfully saved: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, int? menuId)
+        {
+            List<SubMenuSetupListVM> menus = [];
+            try
+            {
+                menus = await context.SubMenusetupTab.AsNoTracking().Where(i => i.MainMenuId == mainMenuId && i.ModuleSetupId == moduleId && i.MenuId == menuId)
+                    .Select(p => new SubMenuSetupListVM
+                    {
+                        Id = p.Id,
+                        SubMenuCode = p.SubMenuCode,
+                        SubMenuName = p.SubMenuName,
+                        PageUrl = p.PageUrl,
+                        OrderNo = p.OrderNo,
+                    }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message.ToString();
+                menus = [];
+            }
+            return menus;
+        }
+        public async Task<SubMenuSetupVM> GetSubMenuSetupSingleAsync(int? id)
+        {
+            SubMenuSetupVM subMenu = new();
+            try
+            {
+                subMenu = await context.SubMenusetupTab.AsNoTracking().Where(i => i.Id == id)
+                    .Select(p => new SubMenuSetupVM
+                    {
+                        SystemId = p.Menu.MainMenu.ModuleSetup.SystemTypeTabId,
+                        ModuleSetupId = p.ModuleSetupId,
+                        MainMenuId = p.MainMenuId,
+                        MenuId = p.MenuId,
+                        Id = p.Id,
+                        SubMenuCode = p.SubMenuCode,
+                        SubMenuName = p.SubMenuName,
+                        //FormId = p.FormId,
+                        PageUrl = p.PageUrl,
+                        FormNameHeader = p.FormNameHeader,
+                        OrderNo = p.OrderNo,
+                        ReportPageUrl = p.ReportPageUrl,
+                        IsApprform = p.IsApprform,
+                        IsReport = p.IsReport,
+                        AccessType = p.AccessType,
+                        Approval = p.Approval,
+                        CompPrefix = p.CompPrefix,
+                        Deactivate = p.Deactivate,
+                        FileName = p.FileName,
+                        FolderPath = p.FolderPath,
+                        IconImagename = p.IconImagename,
+                        MakeDashboardMain = p.MakeDashboardMain,
+                        ShowonDashboard = p.ShowonDashboard,
+                        VideoUrl = p.VideoUrl,
+                    }).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message.ToString();
+                subMenu = new();
+            }
+            return subMenu;
+        }
+
+        public async Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu)
+        {
+            if (submenu.SystemId == null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Select system type"
+                };
+            }
+            else
+            {
+                var systemTypes = await system.GetSystemTypesAsync();
+                if (!systemTypes.Any(x => x.SystemId == submenu.SystemId))
+                {
+                    return new ResponseVM
+                    {
+                        Status = "Error",
+                        StatusDescription = "Invalid system type selected"
+                    };
+                }
+            }
+            if (submenu.ModuleSetupId == null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Select module name"
+                };
+            }
+            else
+            {
+                var modules = await system.GetModulesTypeSystemAsync(submenu.SystemId);
+                if (!modules.Any(x => x.ModuleId == submenu.ModuleSetupId))
+                {
+                    return new ResponseVM
+                    {
+                        Status = "Error",
+                        StatusDescription = "Invalid module name selected"
+                    };
+                }
+            }
+            if (submenu.MainMenuId == null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Select main menu name"
+                };
+            }
+            else
+            {
+                var mains = await GetMainMenusAsync(submenu.SystemId, submenu.ModuleSetupId);
+                if (!mains.Any(x => x.Id == submenu.MainMenuId))
+                {
+                    return new ResponseVM
+                    {
+                        Status = "Error",
+                        StatusDescription = "Invalid main menu name selected"
+                    };
+                }
+            }
+            if (submenu.MenuId == null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Select main name"
+                };
+            }
+            else
+            {
+                var mains = await GetMenuSetupAsync(submenu.MainMenuId);
+                if (!mains.Any(x => x.Id == submenu.MenuId))
+                {
+                    return new ResponseVM
+                    {
+                        Status = "Error",
+                        StatusDescription = "Invalid main name selected"
+                    };
+                }
+            }
+            if (string.IsNullOrWhiteSpace(submenu.SubMenuCode))
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Enter sub-menu code"
+                };
+            }
+            if (string.IsNullOrWhiteSpace(submenu.SubMenuName))
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Enter sub-menu name"
+                };
+            }
+            if (string.IsNullOrWhiteSpace(submenu.AccessType))
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = "Select access type"
+                };
+            }
+            try
+            {
+                var dbSubmenu = await context.SubMenusetupTab.Where(i=>i.Id == submenu.Id).FirstOrDefaultAsync() ?? new SubMenusetupTab();
+
+                var p = submenu;
+                dbSubmenu.ModuleSetupId = p.ModuleSetupId;
+                dbSubmenu.MainMenuId = p.MainMenuId;
+                dbSubmenu.MenuId = p.MenuId;
+
+                dbSubmenu.SubMenuCode = p.SubMenuCode;
+                dbSubmenu.SubMenuName = p.SubMenuName;
+                dbSubmenu.FormId = p.SubMenuCode;
+                dbSubmenu.PageUrl = p.PageUrl;
+                dbSubmenu.FormNameHeader = p.FormNameHeader;
+                dbSubmenu.OrderNo = p.OrderNo;
+                dbSubmenu.ReportPageUrl = p.ReportPageUrl;
+                dbSubmenu.IsApprform = p.IsApprform;
+                dbSubmenu.IsReport = p.IsReport;
+                dbSubmenu.AccessType = p.AccessType;
+                dbSubmenu.Approval = p.Approval;
+                dbSubmenu.CompPrefix = p.CompPrefix;
+                dbSubmenu.Deactivate = p.Deactivate;
+                dbSubmenu.FileName = p.FileName;
+                dbSubmenu.FolderPath = p.FolderPath;
+                dbSubmenu.IconImagename = p.IconImagename;
+                dbSubmenu.MakeDashboardMain = p.MakeDashboardMain;
+                dbSubmenu.ShowonDashboard = p.ShowonDashboard;
+                dbSubmenu.VideoUrl = p.VideoUrl;
+               
+                if(p.Id == null)
+                context.SubMenusetupTab.Add(dbSubmenu);
+                else
+                context.SubMenusetupTab.Update(dbSubmenu);
+
+                int succeeded = await context.SaveChangesAsync();
+
+                return new ResponseVM
+                {
+                    Status = succeeded > 0 ?"Success" : "Failed",
+                    StatusDescription = succeeded > 0 ? "Sub-Menu successfully saved" : "Sub-Menu not successfully saved"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription = $"Sub-Menu not successfully saved: {ex.Message}"
                 };
             }
         }
