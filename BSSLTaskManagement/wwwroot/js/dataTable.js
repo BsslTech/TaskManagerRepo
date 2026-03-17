@@ -11,13 +11,11 @@
         ]
     });
 
-    $('#listTableMenu').DataTable({
-        responsive: true,
-        pageLength: 10,
-        order: [],
-        columnDefs: [
-            { orderable: false, targets: 0 }
-        ]
+    subTable  = $('#listTableMenu').DataTable({
+        searching: true,
+        paging: true,
+        info: true,
+        destroy: true // allows re-init if needed
     });
 
 });

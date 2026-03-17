@@ -97,6 +97,7 @@ namespace BSSLTaskManagement.ViewModels
         public class SubMenuSetupListVM
         {
             public int? Id { get; set; }
+            public int? MainId { get; set; }
 
             public string? SubMenuCode { get; set; }
 

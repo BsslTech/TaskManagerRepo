@@ -16,7 +16,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<ResponseVM> SaveMainMenusAsync(MainMenuDefVM main);
         Task<List<MenuSetupVM>> GetMenuSetupAsync(int? mainMenuId);
         Task<ResponseVM> SaveMenuSetupAsync(MenuSetupDefVM menus);
-        Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, int? menuId);
+        Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, string menuId);
         Task<SubMenuSetupVM> GetSubMenuSetupSingleAsync(int? id);
         Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu);
     }
@@ -316,20 +316,23 @@ namespace BSSLTaskManagement.ServicesInterfaces
             }
         }
 
-        public async Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, int? menuId)
+        public async Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, string menuId)
         {
             List<SubMenuSetupListVM> menus = [];
             try
             {
-                menus = await context.SubMenusetupTab.AsNoTracking().Where(i => i.MainMenuId == mainMenuId && i.ModuleSetupId == moduleId && i.MenuId == menuId)
+                menus = await context.SubMenusetupTab.AsNoTracking().Where(i => i.MainMenuId == mainMenuId && i.ModuleSetupId == moduleId)
                     .Select(p => new SubMenuSetupListVM
                     {
                         Id = p.Id,
+                        MainId = p.MenuId,
                         SubMenuCode = p.SubMenuCode,
                         SubMenuName = p.SubMenuName,
                         PageUrl = p.PageUrl,
                         OrderNo = p.OrderNo,
                     }).ToListAsync();
+                if (menuId != "All")
+                    menus = menus.Where(i => i.MainId == Convert.ToInt32(menuId)).ToList();
             }
             catch (Exception ex)
             {

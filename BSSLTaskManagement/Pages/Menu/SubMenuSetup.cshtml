@@ -62,7 +62,7 @@
                             <div class="col-sm-3">
                                 <label for="systemTypeId" class="form-label">System Type Name</label>
                                 <select class="form-select" id="systemTypeId">
-                                    <option value="">-Select-</option>
+                                    <option value="">-Select System Type-</option>
                                     @foreach (var item in Model.SystemTypeList)
                                     {
                                         <option value="@item.Value">@item.Text</option>
@@ -74,7 +74,7 @@
                             <div class="col-sm-3">
                                 <label for="moduleName" class="form-label">Module Name</label>
                                 <select class="form-select" id="moduleName" disabled>
-                                    <option value="">-Select-</option>
+                                    <option value="">-Select Module Name-</option>
                                 </select>
                             </div>
 
@@ -82,7 +82,7 @@
                             <div class="col-sm-3">
                                 <label for="mainMenuName" class="form-label">Main Menu Name</label>
                                 <select class="form-select" id="mainMenuName" disabled>
-                                    <option value="">-Select-</option>
+                                    <option value="">-Select Main Menu-</option>
                                 </select>
                             </div>
 
@@ -90,7 +90,7 @@
                             <div class="col-sm-3">
                                 <label for="menuName" class="form-label">Menu Name</label>
                                 <select class="form-select" id="menuName" disabled>
-                                    <option value="">-Select-</option>
+                                    <option value="">-Select Menu Name-</option>
                                 </select>
                             </div>
 
@@ -243,7 +243,7 @@
                         <div class="col-sm-3">
                             <label class="form-label">System Type Name</label>
                             <select class="form-select" id="listSystemType">
-                                <option value="">-Select-</option>
+                                <option value="">-Select System Name-</option>
                                 @foreach (var item in Model.SystemTypeList)
                                 {
                                     <option value="@item.Value">@item.Text</option>
@@ -253,19 +253,19 @@
                         <div class="col-sm-3">
                             <label class="form-label">Module Name</label>
                             <select class="form-select" id="listModule" disabled>
-                                <option value="">-Select-</option>
+                                <option value="">-Select Module Name-</option>
                             </select>
                         </div>
                         <div class="col-sm-3">
                             <label class="form-label">Main Menu Name</label>
                             <select class="form-select" id="listMainMenu" disabled>
-                                <option value="">-Select-</option>
+                                <option value="">-Select Main Menu-</option>
                             </select>
                         </div>
                         <div class="col-sm-3">
                             <label class="form-label">Menu Name</label>
                             <select class="form-select" id="listMenu" disabled>
-                                <option value="">-Select-</option>
+                                <option value="">-Select Menu Name-</option>
                             </select>
                         </div>
                     </div>
@@ -354,9 +354,9 @@
 
         // List section Refresh → reset list dropdowns and hide the table
         document.getElementById('listRefreshBtn').addEventListener('click', function () {
-            resetDropdown(listModule);
-            resetDropdown(listMainMenu);
-            resetDropdown(listMenu);
+            resetDropdown(listModule, "--Select Module Name");
+            resetDropdown(listMainMenu, "--Select Main Menu");
+            resetDropdown(listMenu, "--Select Menu Name");
             listSystemType.value = '';
             document.getElementById('listTableWrapper').style.display = 'none';
             document.getElementById('listTableBody').innerHTML = '';
@@ -418,9 +418,9 @@
             document.getElementById('mainMenuHidden').value   = '';
             document.getElementById('menuHidden').value       = '';
 
-            resetDropdown(document.getElementById('moduleName'));
-            resetDropdown(document.getElementById('mainMenuName'));
-            resetDropdown(document.getElementById('menuName'));
+            resetDropdown(document.getElementById('moduleName'), "--Select Module Name--");
+            resetDropdown(document.getElementById('mainMenuName'), "--Select Main Menu--");
+            resetDropdown(document.getElementById('menuName'), "--Select Menu Name--");
             document.getElementById('systemTypeId').value = '';
         }
 
@@ -428,8 +428,8 @@
         // HELPER — reset a dropdown to "-Select-" and disable it
         // ═══════════════════════════════════════════════════════════════════════════
 
-        function resetDropdown(selectEl) {
-            selectEl.innerHTML = '<option value="">-Select-</option>';
+        function resetDropdown(selectEl, option) {
+            selectEl.innerHTML = `<option value="">${option}</option>`;
             selectEl.disabled = true;
         }
 
@@ -437,7 +437,13 @@
         // HELPER — populate a dropdown from a JSON array { value, text }
         // ═══════════════════════════════════════════════════════════════════════════
 
-        function populateDropdown(selectEl, data) {
+        function populateDropdown(selectEl, data, option) {
+            if(option === "Menu"){
+             const def = document.createElement('option');
+                def.value = "All";
+                def.textContent = "All Menus";
+                selectEl.appendChild(def);
+            }
             data.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.value;
@@ -461,14 +467,14 @@
             const systemId = this.value;
             document.getElementById('systemTypeHidden').value = systemId;
 
-            resetDropdown(moduleSelect);
-            resetDropdown(mainMenuSelect);
-            resetDropdown(menuSelect);
+            resetDropdown(moduleSelect, "--Select Module Name--");
+            resetDropdown(mainMenuSelect,"--Select Main Menu--");
+            resetDropdown(menuSelect,"--Select MEnu Name--");
 
             if (!systemId) return;
             try {
                 const res = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
-                populateDropdown(moduleSelect, await res.json());
+                populateDropdown(moduleSelect, await res.json(), "");
             } catch (err) { console.error('Modules fetch failed:', err); }
         });
 
@@ -478,13 +484,13 @@
             const systemId = systemTypeSelect.value;
             document.getElementById('moduleHidden').value = moduleId;
 
-            resetDropdown(mainMenuSelect);
-            resetDropdown(menuSelect);
+            resetDropdown(mainMenuSelect,"--Select Main Menu--");
+            resetDropdown(menuSelect, "--Select Menu Name--");
 
             if (!moduleId) return;
             try {
                 const res = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
-                populateDropdown(mainMenuSelect, await res.json());
+                populateDropdown(mainMenuSelect, await res.json(), "");
             } catch (err) { console.error('Main menus fetch failed:', err); }
         });
 
@@ -493,12 +499,12 @@
             const mainMenuId = this.value;
             document.getElementById('mainMenuHidden').value = mainMenuId;
 
-            resetDropdown(menuSelect);
+            resetDropdown(menuSelect, "--Select Menu Name--");
 
             if (!mainMenuId) return;
             try {
                 const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
-                populateDropdown(menuSelect, await res.json());
+                populateDropdown(menuSelect, await res.json(), "");
             } catch (err) { console.error('Menus fetch failed:', err); }
         });
 
@@ -517,35 +523,35 @@
         const listMenu       = document.getElementById('listMenu');
 
         listSystemType.addEventListener('change', async function () {
-            resetDropdown(listModule);
-            resetDropdown(listMainMenu);
-            resetDropdown(listMenu);
+            resetDropdown(listModule,"--Select Module Name--");
+            resetDropdown(listMainMenu,"--Select Main Menu--");
+            resetDropdown(listMenu, "--Select Menu Name--");
 
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=ModulesBySystem&systemId=${this.value}`);
-                populateDropdown(listModule, await res.json());
+                populateDropdown(listModule, await res.json(), "");
             } catch (err) { console.error(err); }
         });
 
         listModule.addEventListener('change', async function () {
-            resetDropdown(listMainMenu);
-            resetDropdown(listMenu);
+            resetDropdown(listMainMenu,"--Select Main Menu--");
+            resetDropdown(listMenu, "--Select Menu Name--");
 
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=MainMenusByModule&systemId=${listSystemType.value}&moduleId=${this.value}`);
-                populateDropdown(listMainMenu, await res.json());
+                populateDropdown(listMainMenu, await res.json(), "");
             } catch (err) { console.error(err); }
         });
 
         listMainMenu.addEventListener('change', async function () {
-            resetDropdown(listMenu);
+             resetDropdown(listMenu, "--Select Menu Name--");
 
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${this.value}`);
-                populateDropdown(listMenu, await res.json());
+                populateDropdown(listMenu, await res.json(), "Menu");
             } catch (err) { console.error(err); }
         });
 
@@ -559,45 +565,55 @@
             const menuId     = listMenu.value;
 
             if (!moduleId || !mainMenuId || !menuId) {
-                showAlert('warning', 'Please select all four dropdowns before fetching.');
-                return;
+                Swal.fire({
+                        icon: "warning",
+                        title: "Oops...",
+                        text: "Please select all four dropdowns before fetching",
+                    });
+                    return;
+                // showAlert('warning', 'Please select all four dropdowns before fetching.');
+                // return;
             }
 
             try {
                 const res  = await fetch(`?handler=SubMenuList&moduleId=${moduleId}&mainMenuId=${mainMenuId}&menuId=${menuId}`);
                 const data = await res.json();
 
-                const tbody = document.getElementById('listTableBody');
-                tbody.innerHTML = '';
+
+                // Clear DataTable before adding new rows
+               subTable.clear();
 
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No records found.</td></tr>';
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "No records found",
+                    });
+                    return;
+                    //tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No records found.</td></tr>';
                 } else {
+                    
                     data.forEach((item, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td style="text-align:center;padding:10px;border:1px solid lightgrey;"
-                                                    class="searchControl">
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectRecord(${item.id})">
-                                    Select
-                                </button>
-                            </td>
-                            <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
-                                                    class="searchControl">${index + 1}</td>
-                            <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
-                                                    class="searchControl">${item.subMenuCode ?? ''}</td>
-                            <td style="text-align:left;padding:10px;border:1px solid lightgrey; width:250px"
-                                                    class="searchControl">${item.subMenuName ?? ''}</td>
-                            <td style="text-align:left;padding:10px;border:1px solid lightgrey; width:250px"
-                                                    class="searchControl">${item.pageUrl ?? ''}</td>
-                        `;
-                        tbody.appendChild(row);
+                        subTable.row.add([
+                            `<button type="button" class="btn btn-sm btn-primary" onclick="selectRecord(${item.id})">Select</button>`,
+                            index + 1,
+                            item.subMenuCode ?? '',
+                            item.subMenuName ?? '',
+                            item.pageUrl ?? ''
+                        ]);
                     });
                 }
+                   // Redraw DataTable to reflect changes
+                subTable.draw();
 
                 document.getElementById('listTableWrapper').style.display = 'block';
             } catch (err) {
-                showAlert('danger', 'Failed to load records.');
+                Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Failed to load records",
+                    });
+                    return;
                 console.error(err);
             }
         });
@@ -659,23 +675,23 @@
         async function rebuildFormCascade(systemId, moduleId, mainMenuId, menuId) {
             systemTypeSelect.value = systemId ?? '';
 
-            resetDropdown(moduleSelect);
-            resetDropdown(mainMenuSelect);
-            resetDropdown(menuSelect);
+            resetDropdown(moduleSelect, "--Select Module Name");
+            resetDropdown(mainMenuSelect, "--Select Main Menu");
+            resetDropdown(menuSelect, "--Select Menu Name");
 
             if (!systemId) return;
             const modRes = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
-            populateDropdown(moduleSelect, await modRes.json());
+            populateDropdown(moduleSelect, await modRes.json(), "");
             moduleSelect.value = moduleId ?? '';
 
             if (!moduleId) return;
             const mainRes = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
-            populateDropdown(mainMenuSelect, await mainRes.json());
+            populateDropdown(mainMenuSelect, await mainRes.json(), "");
             mainMenuSelect.value = mainMenuId ?? '';
 
             if (!mainMenuId) return;
             const menuRes = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
-            populateDropdown(menuSelect, await menuRes.json());
+            populateDropdown(menuSelect, await menuRes.json(), "");
             menuSelect.value = menuId ?? '';
         }
 
