@@ -23,10 +23,7 @@ function editRow(index, id, code, description) {
 //    document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
 //}
 
-// Confirm batch save
-function confirmSaveAll() {
-    return confirm('Are you sure you want to save all menu changes?');
-}
+
 
 //// Enable editing on double click in table
 //document.querySelectorAll('.menu-code-input, .menu-desc-input').forEach(input => {
