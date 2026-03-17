@@ -7,29 +7,242 @@
     <h2>SubMenu Setup</h2>
 </div>
 
+@if (TempData["Success"] != null)
+{
+    <div class="container">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="container">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
 <div class="container mt-4">
     <div class="col-md-12">
         <div class="card card-primary card-outline mb-4">
+
             <!--begin::Header-->
             <div class="card-header">
                 <div class="card-title">
-                    <button type="button" class="btn btn-success text-light" id="cancelBtn">Save</button>
-                    <button type="submit" class="btn btn-warning">refresh</button>
-                    <button type="submit" class="btn btn-primary">View list</button>
+                    <button type="button" class="btn btn-success text-light" id="saveBtn-top">Save</button>
+                    <button type="button" class="btn btn-warning" id="refreshBtn-top">Refresh</button>
+                    <button type="button" class="btn btn-primary" id="viewListBtn-top">View List</button>
                 </div>
             </div>
             <!--end::Header-->
-            <!--begin::Form-->
-            <form>
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- FORM SECTION — shown by default, hidden when View List is open -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <div id="formSection">
+                <form id="subMenuForm" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Hidden fields — dropdowns write into these on change -->
+                    <input type="hidden" asp-for="SubMenuForm.Id" id="hiddenId" />
+                    <input type="hidden" asp-for="SubMenuForm.SystemId" id="systemTypeHidden" />
+                    <input type="hidden" asp-for="SubMenuForm.ModuleSetupId" id="moduleHidden" />
+                    <input type="hidden" asp-for="SubMenuForm.MainMenuId" id="mainMenuHidden" />
+                    <input type="hidden" asp-for="SubMenuForm.MenuId" id="menuHidden" />
+
+                    <div class="card-body">
+
+                        <!-- ROW 1: The 4 cascade dropdowns -->
+                        <div class="row g-4 mb-2">
+
+                            <!-- DROPDOWN 1: System Type — loaded on page load -->
+                            <div class="col-sm-3">
+                                <label for="systemTypeId" class="form-label">System Type Name</label>
+                                <select class="form-select" id="systemTypeId">
+                                    <option value="">-Select-</option>
+                                    @foreach (var item in Model.SystemTypeList)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- DROPDOWN 2: Module Name — AJAX populated -->
+                            <div class="col-sm-3">
+                                <label for="moduleName" class="form-label">Module Name</label>
+                                <select class="form-select" id="moduleName" disabled>
+                                    <option value="">-Select-</option>
+                                </select>
+                            </div>
+
+                            <!-- DROPDOWN 3: Main Menu Name — AJAX populated -->
+                            <div class="col-sm-3">
+                                <label for="mainMenuName" class="form-label">Main Menu Name</label>
+                                <select class="form-select" id="mainMenuName" disabled>
+                                    <option value="">-Select-</option>
+                                </select>
+                            </div>
+
+                            <!-- DROPDOWN 4: Menu Name — AJAX populated -->
+                            <div class="col-sm-3">
+                                <label for="menuName" class="form-label">Menu Name</label>
+                                <select class="form-select" id="menuName" disabled>
+                                    <option value="">-Select-</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- ROW 2: SubMenu Code, SubMenu Name, Form Header -->
+                        <div class="mb-3">
+                            <div class="row g-3 my-3">
+                                <div class="col-sm-4">
+                                    <label class="form-label">SubMenu Code / FormID</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.SubMenuCode" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">SubMenu Name</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.SubMenuName" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">Form Header Name</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.FormNameHeader" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 3: Page URL, Report Page URL, Icon Image Name -->
+                        <div class="mb-3">
+                            <div class="row g-3 my-3">
+                                <div class="col-sm-4">
+                                    <label class="form-label">Page URL</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.PageUrl" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">Report Page URL</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.ReportPageUrl" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">Icon Image Name</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.IconImagename" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 4: Upload Icon Image, Upload Help File -->
+                        <div class="mb-3">
+                            <div class="row g-2 my-3">
+                                <div class="col-sm-6">
+                                    <label class="col-auto col-form-label">Upload Icon Image</label>
+                                    <div class="col-auto">
+                                        <input type="file" class="form-control" id="iconImage" name="iconImage" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="col-auto col-form-label">Upload Help File</label>
+                                    <div class="col-auto">
+                                        <input type="file" class="form-control" id="helpFile" name="helpFile" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 5: User Access, Order Number, YouTube Video Hash -->
+                        <div class="mb-3">
+                            <div class="row g-3 my-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Assign from User Access</label>
+                                    <select class="form-select" asp-for="SubMenuForm.AccessType">
+                                        <option value="">-Select-</option>
+                                        <option value="R">Read Only</option>
+                                        <option value="RW">Read &amp; Write</option>
+                                        <option value="F">Full Access</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="form-label">Order Number</label>
+                                    <input type="number" class="form-control" asp-for="SubMenuForm.OrderNo" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label">Youtube Video Hash</label>
+                                    <input type="text" class="form-control" asp-for="SubMenuForm.VideoUrl" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 6: Checkboxes row 1 -->
+                        <div class="mb-3">
+                            <div class="row g-3 my-3">
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.MakeDashboardMain" />
+                                        <label class="form-check-label">Set as Dashboard Main Menu</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.ShowonDashboard" />
+                                        <label class="form-check-label">Show icon on dashboard</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.IsReport" />
+                                        <label class="form-check-label">Is a report</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.Deactivate" />
+                                        <label class="form-check-label">Deactivate</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 7: Checkboxes row 2 -->
+                        <div class="mb-3">
+                            <div class="row g-3 my-3">
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.IsApprform" />
+                                        <label class="form-check-label">Is approval form</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" asp-for="SubMenuForm.Approval" />
+                                        <label class="form-check-label">Pass Through Approval Process</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- footer BUTTONS -->
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-success text-light" id="saveBtn-bottom">Save</button>
+                        <button type="button" class="btn btn-warning" id="refreshBtn-bottom">Refresh</button>
+                        <button type="button" class="btn btn-primary" id="viewListBtn-bottom">View List</button>
+                    </div>
+
+                </form>
+            </div>
+            <!-- END FORM SECTION -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- VIEW LIST SECTION — hidden by default, shown when View List clicked -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <div id="listSection" style="display:none;">
                 <div class="card-body">
 
-                    <!-- ROW 1: The 4 cascade dropdowns -->
-                    <div class="row g-4 mb-2">
-
-                        <!-- DROPDOWN 1: System Type — loaded on page load from Model.SystemTypeList -->
+                    <!-- Filter dropdowns for the list -->
+                    <div class="row g-4 mb-3">
                         <div class="col-sm-3">
-                            <label for="systemTypeId" class="form-label">System Type Name</label>
-                            <select class="form-select" id="systemTypeId" name="systemTypeId">
+                            <label class="form-label">System Type Name</label>
+                            <select class="form-select" id="listSystemType">
                                 <option value="">-Select-</option>
                                 @foreach (var item in Model.SystemTypeList)
                                 {
@@ -37,300 +250,429 @@
                                 }
                             </select>
                         </div>
-
-                        <!-- DROPDOWN 2: Module Name — populated via AJAX when System Type is picked -->
                         <div class="col-sm-3">
-                            <label for="moduleName" class="form-label">Module Name</label>
-                            <select class="form-select" id="moduleName" name="moduleName" disabled>
+                            <label class="form-label">Module Name</label>
+                            <select class="form-select" id="listModule" disabled>
                                 <option value="">-Select-</option>
                             </select>
                         </div>
-
-                        <!-- DROPDOWN 3: Main Menu Name — populated via AJAX when Module is picked -->
                         <div class="col-sm-3">
-                            <label for="mainMenuName" class="form-label">Main Menu Name</label>
-                            <select class="form-select" id="mainMenuName" name="mainMenuName" disabled>
+                            <label class="form-label">Main Menu Name</label>
+                            <select class="form-select" id="listMainMenu" disabled>
                                 <option value="">-Select-</option>
                             </select>
                         </div>
-
-                        <!-- DROPDOWN 4: Menu Name — populated via AJAX when Main Menu is picked -->
                         <div class="col-sm-3">
-                            <label for="menuName" class="form-label">Menu Name</label>
-                            <select class="form-select" id="menuName" name="menuName" disabled>
+                            <label class="form-label">Menu Name</label>
+                            <select class="form-select" id="listMenu" disabled>
                                 <option value="">-Select-</option>
                             </select>
                         </div>
-
                     </div>
 
-                    <!-- ROW 2: SubMenu Code, SubMenu Name, Form Header -->
+                    <!-- Fetch button -->
                     <div class="mb-3">
-                        <div class="row g-3 my-3">
-                            <div class="col-sm-4">
-                                <label class="form-label" for="subMenuCode">SubMenu Code / FormID</label>
-                                <input type="text" class="form-control" id="subMenuCode" name="subMenuCode" />
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="form-label" for="subMenuName">SubMenu Name</label>
-                                <input type="text" class="form-control" id="subMenuName" name="subMenuName" />
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="form-label" for="formHeader">Form Header Name</label>
-                                <input type="text" class="form-control" id="formHeader" name="formHeader" />
-                            </div>
-                        </div>
+                        <button type="button" class="btn btn-primary" id="fetchBtn">Fetch</button>
+                        <button type="button" class="btn btn-warning" id="listRefreshBtn">Refresh</button>
                     </div>
 
-                    <!-- ROW 3: Page URL, Report Page URL, Icon Image Name -->
-                    <div class="mb-3">
-                        <div class="row g-3 my-3">
-                            <div class="col-sm-4">
-                                <label class="form-label" for="pageUrl">Page URL</label>
-                                <input type="text" class="form-control" id="pageUrl" name="pageUrl" />
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="form-label" for="reportPageUrl">Report Page URL</label>
-                                <input type="text" class="form-control" id="reportPageUrl" name="reportPageUrl" />
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="form-label" for="iconImageName">Icon Image Name</label>
-                                <input type="text" class="form-control" id="iconImageName" name="iconImageName" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 4: Upload Icon Image, Upload Help File -->
-                    <div class="mb-3">
-                        <div class="row g-2 my-3">
-                            <div class="col-sm-6">
-                                <label for="iconImage" class="col-auto col-form-label">Upload Icon Image</label>
-                                <div class="col-auto">
-                                    <input type="file" class="form-control" id="iconImage" name="iconImage" />
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="helpFile" class="col-auto col-form-label">Upload Help File</label>
-                                <div class="col-auto">
-                                    <input type="file" class="form-control" id="helpFile" name="helpFile" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 5: User Access, Order Number, YouTube Video Hash -->
-                    <div class="mb-3">
-                        <div class="row g-3 my-3">
-                            <div class="col-sm-6">
-                                <label for="userAccess" class="form-label">Assign from User Access</label>
-                                <select class="form-select" id="userAccess" name="userAccess">
-                                    <option value="">-Select-</option>
-                                    <option value="1">Read Only</option>
-                                    <option value="2">Read & Write</option>
-                                    <option value="3">Full Access</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="form-label" for="orderNumber">Order Number</label>
-                                <input type="number" class="form-control" id="orderNumber" name="orderNumber" />
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="form-label" for="videoHash">Youtube Video Hash</label>
-                                <input type="text" class="form-control" id="videoHash" name="videoHash" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 6: Checkboxes row 1 -->
-                    <div class="mb-3">
-                        <div class="row g-3 my-3">
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="makeDashboardMain" name="makeDashboardMain" />
-                                    <label class="form-check-label" for="makeDashboardMain">Set as Dashboard Main Menu</label>
-                                </div>
-                            </div>
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="showOnDashboard" name="showOnDashboard" />
-                                    <label class="form-check-label" for="showOnDashboard">Show icon on dashboard</label>
-                                </div>
-                            </div>
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="isReport" name="isReport" />
-                                    <label class="form-check-label" for="isReport">Is a report</label>
-                                </div>
-                            </div>
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="deactivate" name="deactivate" />
-                                    <label class="form-check-label" for="deactivate">Deactivate</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 7: Checkboxes row 2 -->
-                    <div class="mb-3">
-                        <div class="row g-3 my-3">
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="isApprovalForm" name="isApprovalForm" />
-                                    <label class="form-check-label" for="isApprovalForm">Is approval form</label>
-                                </div>
-                            </div>
-                            <div class="col-lg mt-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="approval" name="approval" />
-                                    <label class="form-check-label" for="approval">Pass Through Approval Process</label>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Results table — hidden until Fetch is clicked -->
+                    <div id="listTableWrapper" style="display:none;">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:80px">Action</th>
+                                    <th style="width:60px">S/N</th>
+                                    <th>SubMenu Code</th>
+                                    <th>SubMenu Name</th>
+                                    <th>Page URL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listTableBody">
+                                <!-- Rows injected by JS after Fetch -->
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
+            </div>
+            <!-- END VIEW LIST SECTION -->
 
-                <!-- FORM BUTTONS -->
-                <div class="mt-3">
-                    <div class="card-footer">
-                        <button type="button" class="btn btn-success text-light" id="cancelBtn">Save</button>
-                        <button type="submit" class="btn btn-warning">refresh</button>
-                        <button type="submit" class="btn btn-primary">View list</button>
-                    </div>
-                </div>
-            </form>
         </div>
-    </div>
-</div>
-
-<!-- RESULTS TABLE -->
-<div class="card mb-4">
-    <div class="card-body p-0">
-        <table class="table table-sm mb-0">
-            <thead>
-                <tr>
-                    <th style="width: 100px">S/N</th>
-                    <th>Menu Name</th>
-                    <th>SubMenu Code</th>
-                    <th>SubMenu Name</th>
-                    <th>Page URL</th>
-                </tr>
-            </thead>
-            <tbody id="subMenuTableBody">
-                <tr class="align-middle">
-                    <td>1</td>
-                    <td>HRM</td>
-                    <td>SDASS00008780</td>
-                    <td>Staff Development Appraisal</td>
-                    <td>/HRM/SDA/StfDevApList</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 
 @section Scripts {
     <script>
 
-        // ─── HELPER ──────────────────────────────────────────────────────────────────
-        // Resets a dropdown back to "-Select-" and disables it
-        // Called whenever a parent dropdown changes, to clear all children below it
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION TOGGLE — Form vs View List
+        // ═══════════════════════════════════════════════════════════════════════════
+
+                const formSection = document.getElementById('formSection');
+        const listSection = document.getElementById('listSection');
+
+        // View List / View Form toggle — same buttons, text changes based on current state
+        ['viewListBtn-top', 'viewListBtn-bottom'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function () {
+                const listIsVisible = listSection.style.display === 'block';
+
+                if (listIsVisible) {
+                    // Currently showing list → switch to form
+                    listSection.style.display = 'none';
+                    formSection.style.display = 'block';
+                    document.getElementById('viewListBtn-top').textContent    = 'View List';
+                    document.getElementById('viewListBtn-bottom').textContent = 'View List';
+                } else {
+                    // Currently showing form → switch to list
+                    formSection.style.display = 'none';
+                    listSection.style.display = 'block';
+                    document.getElementById('viewListBtn-top').textContent    = 'View Form';
+                    document.getElementById('viewListBtn-bottom').textContent = 'View Form';
+                }
+            });
+        });
+
+        // All "Refresh" buttons in the form (header + footer) do the same thing
+        // → show form, hide list, clear the form, restore button text to "View List"
+        ['refreshBtn-top', 'refreshBtn-bottom'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function () {
+                listSection.style.display = 'none';
+                formSection.style.display = 'block';
+                clearForm();
+                document.getElementById('viewListBtn-top').textContent    = 'View List';
+                document.getElementById('viewListBtn-bottom').textContent = 'View List';
+            });
+        });
+
+        // All "Save" buttons (header + footer) trigger the same save logic
+        ['saveBtn-top', 'saveBtn-bottom'].forEach(id => {
+            document.getElementById(id).addEventListener('click', async function () {
+                await saveForm();
+            });
+        });
+
+        // List section Refresh → reset list dropdowns and hide the table
+        document.getElementById('listRefreshBtn').addEventListener('click', function () {
+            resetDropdown(listModule);
+            resetDropdown(listMainMenu);
+            resetDropdown(listMenu);
+            listSystemType.value = '';
+            document.getElementById('listTableWrapper').style.display = 'none';
+            document.getElementById('listTableBody').innerHTML = '';
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SAVE — extracted into a function so both Save buttons can call it
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        async function saveForm() {
+            const form = document.getElementById('subMenuForm');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const result = await response.json();
+
+                showAlert(result.status === 'Success' ? 'success' : 'danger', result.statusDescription);
+
+                if (result.status === 'Success') {
+                    clearForm();
+                }
+            } catch (err) {
+                showAlert('danger', 'An unexpected error occurred. Please try again.');
+                console.error('Save error:', err);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPER — show a dismissible alert at the top
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function showAlert(type, message) {
+            const existing = document.getElementById('pageAlert');
+            if (existing) existing.remove();
+
+            const alert = document.createElement('div');
+            alert.id = 'pageAlert';
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+
+            document.querySelector('.container.mt-4').prepend(alert);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPER — clear all form fields and reset dropdowns
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function clearForm() {
+            document.getElementById('subMenuForm').reset();
+            document.getElementById('hiddenId').value         = '';
+            document.getElementById('systemTypeHidden').value = '';
+            document.getElementById('moduleHidden').value     = '';
+            document.getElementById('mainMenuHidden').value   = '';
+            document.getElementById('menuHidden').value       = '';
+
+            resetDropdown(document.getElementById('moduleName'));
+            resetDropdown(document.getElementById('mainMenuName'));
+            resetDropdown(document.getElementById('menuName'));
+            document.getElementById('systemTypeId').value = '';
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPER — reset a dropdown to "-Select-" and disable it
+        // ═══════════════════════════════════════════════════════════════════════════
+
         function resetDropdown(selectEl) {
             selectEl.innerHTML = '<option value="">-Select-</option>';
             selectEl.disabled = true;
         }
 
-        // ─── REFERENCES ──────────────────────────────────────────────────────────────
-        const systemTypeSelect  = document.getElementById('systemTypeId');
-        const moduleSelect      = document.getElementById('moduleName');
-        const mainMenuSelect    = document.getElementById('mainMenuName');
-        const menuSelect        = document.getElementById('menuName');
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPER — populate a dropdown from a JSON array { value, text }
+        // ═══════════════════════════════════════════════════════════════════════════
 
-        // ─── CASCADE STEP 1 ──────────────────────────────────────────────────────────
-        // When System Type changes → fetch Modules for that system
+        function populateDropdown(selectEl, data) {
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.textContent = item.text;
+                selectEl.appendChild(option);
+            });
+            selectEl.disabled = false;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // FORM CASCADE — dropdowns inside the form
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        const systemTypeSelect = document.getElementById('systemTypeId');
+        const moduleSelect     = document.getElementById('moduleName');
+        const mainMenuSelect   = document.getElementById('mainMenuName');
+        const menuSelect       = document.getElementById('menuName');
+
+        // Step 1 — System Type → Modules
         systemTypeSelect.addEventListener('change', async function () {
             const systemId = this.value;
+            document.getElementById('systemTypeHidden').value = systemId;
 
-            // Reset all downstream dropdowns whenever system type changes
             resetDropdown(moduleSelect);
             resetDropdown(mainMenuSelect);
             resetDropdown(menuSelect);
 
-            if (!systemId) return; // user selected "-Select-", nothing to fetch
-
+            if (!systemId) return;
             try {
-                const response = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
-                const data = await response.json();
-
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.value;
-                    option.textContent = item.text;
-                    moduleSelect.appendChild(option);
-                });
-
-                moduleSelect.disabled = false; // enable now that it has options
-            } catch (err) {
-                console.error('Failed to load modules:', err);
-            }
+                const res = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
+                populateDropdown(moduleSelect, await res.json());
+            } catch (err) { console.error('Modules fetch failed:', err); }
         });
 
-        // ─── CASCADE STEP 2 ──────────────────────────────────────────────────────────
-        // When Module changes → fetch Main Menus for that system + module combination
+        // Step 2 — Module → Main Menus
         moduleSelect.addEventListener('change', async function () {
-            const moduleId  = this.value;
-            const systemId  = systemTypeSelect.value; // still need systemId for the filter
+            const moduleId = this.value;
+            const systemId = systemTypeSelect.value;
+            document.getElementById('moduleHidden').value = moduleId;
 
-            // Reset downstream dropdowns
             resetDropdown(mainMenuSelect);
             resetDropdown(menuSelect);
 
             if (!moduleId) return;
-
             try {
-                const response = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
-                const data = await response.json();
-
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.value;
-                    option.textContent = item.text;
-                    mainMenuSelect.appendChild(option);
-                });
-
-                mainMenuSelect.disabled = false;
-            } catch (err) {
-                console.error('Failed to load main menus:', err);
-            }
+                const res = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
+                populateDropdown(mainMenuSelect, await res.json());
+            } catch (err) { console.error('Main menus fetch failed:', err); }
         });
 
-        // ─── CASCADE STEP 3 ──────────────────────────────────────────────────────────
-        // When Main Menu changes → fetch Menus under that main menu
+        // Step 3 — Main Menu → Menus
         mainMenuSelect.addEventListener('change', async function () {
             const mainMenuId = this.value;
+            document.getElementById('mainMenuHidden').value = mainMenuId;
 
-            // Reset downstream dropdown
             resetDropdown(menuSelect);
 
             if (!mainMenuId) return;
+            try {
+                const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
+                populateDropdown(menuSelect, await res.json());
+            } catch (err) { console.error('Menus fetch failed:', err); }
+        });
+
+        // Step 4 — Menu selected → write to hidden
+        menuSelect.addEventListener('change', function () {
+            document.getElementById('menuHidden').value = this.value;
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // LIST CASCADE — same cascade pattern for the View List dropdowns
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        const listSystemType = document.getElementById('listSystemType');
+        const listModule     = document.getElementById('listModule');
+        const listMainMenu   = document.getElementById('listMainMenu');
+        const listMenu       = document.getElementById('listMenu');
+
+        listSystemType.addEventListener('change', async function () {
+            resetDropdown(listModule);
+            resetDropdown(listMainMenu);
+            resetDropdown(listMenu);
+
+            if (!this.value) return;
+            try {
+                const res = await fetch(`?handler=ModulesBySystem&systemId=${this.value}`);
+                populateDropdown(listModule, await res.json());
+            } catch (err) { console.error(err); }
+        });
+
+        listModule.addEventListener('change', async function () {
+            resetDropdown(listMainMenu);
+            resetDropdown(listMenu);
+
+            if (!this.value) return;
+            try {
+                const res = await fetch(`?handler=MainMenusByModule&systemId=${listSystemType.value}&moduleId=${this.value}`);
+                populateDropdown(listMainMenu, await res.json());
+            } catch (err) { console.error(err); }
+        });
+
+        listMainMenu.addEventListener('change', async function () {
+            resetDropdown(listMenu);
+
+            if (!this.value) return;
+            try {
+                const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${this.value}`);
+                populateDropdown(listMenu, await res.json());
+            } catch (err) { console.error(err); }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // FETCH BUTTON — load submenus into the table
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        document.getElementById('fetchBtn').addEventListener('click', async function () {
+            const moduleId   = listModule.value;
+            const mainMenuId = listMainMenu.value;
+            const menuId     = listMenu.value;
+
+            if (!moduleId || !mainMenuId || !menuId) {
+                showAlert('warning', 'Please select all four dropdowns before fetching.');
+                return;
+            }
 
             try {
-                const response = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
-                const data = await response.json();
+                const res  = await fetch(`?handler=SubMenuList&moduleId=${moduleId}&mainMenuId=${mainMenuId}&menuId=${menuId}`);
+                const data = await res.json();
 
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.value;
-                    option.textContent = item.text;
-                    menuSelect.appendChild(option);
-                });
+                const tbody = document.getElementById('listTableBody');
+                tbody.innerHTML = '';
 
-                menuSelect.disabled = false;
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No records found.</td></tr>';
+                } else {
+                    data.forEach((item, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectRecord(${item.id})">
+                                    Select
+                                </button>
+                            </td>
+                            <td>${index + 1}</td>
+                            <td>${item.subMenuCode ?? ''}</td>
+                            <td>${item.subMenuName ?? ''}</td>
+                            <td>${item.pageUrl ?? ''}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                document.getElementById('listTableWrapper').style.display = 'block';
             } catch (err) {
-                console.error('Failed to load menus:', err);
+                showAlert('danger', 'Failed to load records.');
+                console.error(err);
             }
         });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SELECT RECORD — fill the form and switch to form view
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        async function selectRecord(id) {
+            try {
+                const res  = await fetch(`?handler=SubMenuById&id=${id}`);
+                const item = await res.json();
+
+                // Switch back to form view and restore button text
+                listSection.style.display = 'none';
+                formSection.style.display = 'block';
+                document.getElementById('viewListBtn-top').textContent    = 'View List';
+                document.getElementById('viewListBtn-bottom').textContent = 'View List';
+
+                // Fill hidden fields
+                document.getElementById('hiddenId').value         = item.id ?? '';
+                document.getElementById('systemTypeHidden').value = item.systemId ?? '';
+                document.getElementById('moduleHidden').value     = item.moduleSetupId ?? '';
+                document.getElementById('mainMenuHidden').value   = item.mainMenuId ?? '';
+                document.getElementById('menuHidden').value       = item.menuId ?? '';
+
+                // Fill text inputs
+                document.querySelector('[name="SubMenuForm.SubMenuCode"]').value    = item.subMenuCode ?? '';
+                document.querySelector('[name="SubMenuForm.SubMenuName"]').value    = item.subMenuName ?? '';
+                document.querySelector('[name="SubMenuForm.FormNameHeader"]').value = item.formNameHeader ?? '';
+                document.querySelector('[name="SubMenuForm.PageUrl"]').value        = item.pageUrl ?? '';
+                document.querySelector('[name="SubMenuForm.ReportPageUrl"]').value  = item.reportPageUrl ?? '';
+                document.querySelector('[name="SubMenuForm.IconImagename"]').value  = item.iconImagename ?? '';
+                document.querySelector('[name="SubMenuForm.OrderNo"]').value        = item.orderNo ?? '';
+                document.querySelector('[name="SubMenuForm.VideoUrl"]').value       = item.videoUrl ?? '';
+                document.querySelector('[name="SubMenuForm.AccessType"]').value     = item.accessType ?? '';
+
+                // Fill checkboxes
+                document.querySelector('[name="SubMenuForm.MakeDashboardMain"]').checked = item.makeDashboardMain ?? false;
+                document.querySelector('[name="SubMenuForm.ShowonDashboard"]').checked   = item.showonDashboard ?? false;
+                document.querySelector('[name="SubMenuForm.IsReport"]').checked          = item.isReport ?? false;
+                document.querySelector('[name="SubMenuForm.Deactivate"]').checked        = item.deactivate ?? false;
+                document.querySelector('[name="SubMenuForm.IsApprform"]').checked        = item.isApprform ?? false;
+                document.querySelector('[name="SubMenuForm.Approval"]').checked          = item.approval ?? false;
+
+                // Rebuild the form cascade dropdowns to match the loaded record
+                await rebuildFormCascade(item.systemId, item.moduleSetupId, item.mainMenuId, item.menuId);
+
+            } catch (err) {
+                showAlert('danger', 'Failed to load record details.');
+                console.error(err);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // REBUILD CASCADE — re-populate form dropdowns when loading a record
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        async function rebuildFormCascade(systemId, moduleId, mainMenuId, menuId) {
+            systemTypeSelect.value = systemId ?? '';
+
+            resetDropdown(moduleSelect);
+            resetDropdown(mainMenuSelect);
+            resetDropdown(menuSelect);
+
+            if (!systemId) return;
+            const modRes = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
+            populateDropdown(moduleSelect, await modRes.json());
+            moduleSelect.value = moduleId ?? '';
+
+            if (!moduleId) return;
+            const mainRes = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
+            populateDropdown(mainMenuSelect, await mainRes.json());
+            mainMenuSelect.value = mainMenuId ?? '';
+
+            if (!mainMenuId) return;
+            const menuRes = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
+            populateDropdown(menuSelect, await menuRes.json());
+            menuSelect.value = menuId ?? '';
+        }
 
     </script>
 }
