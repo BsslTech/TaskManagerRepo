@@ -13,7 +13,8 @@ namespace BSSLTaskManagement.Pages.Menu
         private readonly IWebHostEnvironment environment;
 
         [BindProperty]
-        public List<GeneralCodesVM> SystemMenu { get; set; } = [];
+        public GeneralCodesVM SystemMenu { get; set; } = new();
+        public List<GeneralCodesVM> SystemMenuList { get; set; } = [];
         public ResponseVM ResponseMessage { get; set; } = new ResponseVM();
 
  
@@ -31,13 +32,13 @@ namespace BSSLTaskManagement.Pages.Menu
 
         private async Task LoadSystemMenusAsync()
         {
-            SystemMenu = await system.GetSystemMenusAsync();
-            if (SystemMenu.Count == 0)
+            SystemMenuList = await system.GetSystemMenusAsync();
+            if (SystemMenuList.Count == 0)
             {
                 // Initialize with 6 empty menu entries for user 
                 for (int i = 0; i <= 5; i++)
                 {
-                    SystemMenu.Add(new GeneralCodesVM
+                    SystemMenuList.Add(new GeneralCodesVM
                     {
                         Id = null,
                         Code = "",
@@ -47,7 +48,7 @@ namespace BSSLTaskManagement.Pages.Menu
             }
             else
             {
-                await SaveSystemMenusToFileAsync(SystemMenu); 
+                await SaveSystemMenusToFileAsync(SystemMenuList); 
             }
         }
 
@@ -67,7 +68,7 @@ namespace BSSLTaskManagement.Pages.Menu
             // ✅ Fixed: Save each menu individually if service expects single item
             var results = new List<ResponseVM>();
 
-            foreach (var menu in SystemMenu.Where(m => !string.IsNullOrEmpty(m.Code)))
+            foreach (var menu in SystemMenuList.Where(m => !string.IsNullOrEmpty(m.Code)))
             {
                 var result = await system.SaveSystemMenusAsync(menu);
                 results.Add(result);
@@ -105,7 +106,7 @@ namespace BSSLTaskManagement.Pages.Menu
             string lastError = string.Empty;
 
             // Filter and save only non-empty menus
-            var menusToSave = SystemMenu
+            var menusToSave = SystemMenuList
                 .Where(m => !string.IsNullOrWhiteSpace(m.Code) && !string.IsNullOrWhiteSpace(m.Description))
                 .ToList();
 

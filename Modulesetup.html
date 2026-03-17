@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <title>Module Setup</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+
+        .page-wrapper {
+            padding: 28px 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+    
+        .card {
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            padding: 28px 32px 32px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 22px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+
+       
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 32px;
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+            .form-group label {
+                font-size: 13px;
+                font-weight: 500;
+                color: #555;
+            }
+
+            .form-group input[type="text"],
+            .form-group select {
+                width: 100%;
+                padding: 8px 11px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 14px;
+                color: #333;
+                background: #fff;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+                .form-group input[type="text"]:focus,
+                .form-group select:focus {
+                    border-color: #4a90d9;
+                    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
+                }
+
+            .form-group select {
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                padding-right: 32px;
+                cursor: pointer;
+            }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .file-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-btn {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            background: #f5f5f5;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+            .file-btn:hover {
+                background: #e8e8e8;
+            }
+
+        .file-name-display {
+            font-size: 13px;
+            color: #888;
+        }
+
+       
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 9px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            letter-spacing: 0.3px;
+        }
+
+            .btn:hover {
+                opacity: 0.88;
+            }
+
+            .btn:active {
+                transform: scale(0.97);
+            }
+
+        .btn-cancel {
+            background: #e8a020;
+            color: #fff;
+        }
+
+        .btn-submit {
+            background: #28a060;
+            color: #fff;
+        }
+
+      
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead tr {
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        thead th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+           
+            thead th:nth-child(2),
+            thead th:nth-child(3),
+            thead th:nth-child(4) {
+                color: #4a90d9;
+            }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+
+            tbody tr:hover {
+                background: #f8fbff;
+            }
+
+        tbody td {
+            padding: 12px 14px;
+            vertical-align: middle;
+            color: #333;
+        }
+
+            tbody td.system-type-cell {
+                color: #4a90d9;
+                font-weight: 500;
+                cursor: default;
+            }
+
+            tbody td.sn-cell {
+                color: #555;
+                font-weight: 500;
+            }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid;
+            background: #fff;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .btn-edit {
+            color: #4a90d9;
+            border-color: #4a90d9;
+        }
+
+            .btn-edit:hover {
+                background: #4a90d9;
+                color: #fff;
+            }
+
+        .btn-delete {
+            color: #e03c3c;
+            border-color: #e03c3c;
+        }
+
+            .btn-delete:hover {
+                background: #e03c3c;
+                color: #fff;
+            }
+
+        .loading-cell,
+        .empty-cell {
+            text-align: center;
+            color: #aaa;
+            padding: 30px 0 !important;
+            font-size: 14px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 18px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+            .pagination button {
+                padding: 5px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #fff;
+                font-size: 13px;
+                color: #444;
+                cursor: pointer;
+                transition: background 0.15s;
+            }
+
+                .pagination button:hover:not(:disabled) {
+                    background: #f0f4ff;
+                    border-color: #4a90d9;
+                    color: #4a90d9;
+                }
+
+                .pagination button.active {
+                    background: #4a90d9;
+                    color: #fff;
+                    border-color: #4a90d9;
+                }
+
+                .pagination button:disabled {
+                    opacity: 0.45;
+                    cursor: not-allowed;
+                }
+
+            .pagination .page-info {
+                font-size: 13px;
+                color: #777;
+                margin: 0 4px;
+            }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: #333;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+
+            .toast.success {
+                background: #28a060;
+            }
+
+            .toast.error {
+                background: #e03c3c;
+            }
+
+            .toast.hidden {
+                display: none;
+            }
+
+       
+        @media (max-width: 700px) {
+            .page-wrapper {
+                padding: 16px 10px;
+            }
+
+            .card {
+                padding: 18px 12px 24px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .file-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="card">
+            <h2 class="card-title">Module Setup</h2>
+
+            
+            <form id="moduleForm" novalidate>
+                <input type="hidden" id="editId" />
+
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label for="systemType">System Type</label>
+                        <select id="systemType" name="systemType">
+                            <option value="">--Select--</option>
+                            <option value="Financial">Financial</option>
+                            <option value="HR">HR</option>
+                            <option value="Inventory">Inventory</option>
+                            <option value="Payroll">Payroll</option>
+                            <option value="Procurement">Procurement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="youtubeHash">Youtube Video Hash</label>
+                        <input type="text" id="youtubeHash" name="youtubeHash" placeholder="" />
+                    </div>
+
+                   
+                    <div class="form-group">
+                        <label for="moduleCode">Module Code:</label>
+                        <input type="text" id="moduleCode" name="moduleCode" placeholder="" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="moduleDesc">Module Decription:</label>
+                        <input type="text" id="moduleDesc" name="moduleDesc" placeholder="" />
+                    </div>
+                </div>
+
+                
+                <div class="form-row file-row">
+                    <label class="file-label">Upload Module Help File</label>
+                    <label class="file-btn" for="moduleFile">Choose File</label>
+                    <input type="file" id="moduleFile" name="moduleFile" accept=".pdf,.doc,.docx" />
+                    <span id="fileNameDisplay" class="file-name-display">No file chosen</span>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-cancel">Cancel Record</button>
+                    <button type="submit" id="submitBtn" class="btn btn-submit">Submit</button>
+                </div>
+            </form>
+
+            <div class="table-wrapper">
+                <table id="moduleTable">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>System Type</th>
+                            <th>Module Code</th>
+                            <th>Description</th>
+                            <th>Module FileName</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody1">
+                        <tr>
+                            <td class="editable" contenteditable="true">1</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">5</td>
+                            <td class="editable" contenteditable="true">PAYABLE/CREDITORS</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">2</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">7</td>
+                            <td class="editable" contenteditable="true">ACCOUNT CODE SETTINGS/END-OF-YEAR PROCESS</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">3</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">1</td>
+                            <td class="editable" contenteditable="true">ADMINISTRATION</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">4</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">14</td>
+                            <td class="editable" contenteditable="true">AUDIT, REPORTS &amp; ENQUIRIES</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">5</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">10</td>
+                            <td class="editable" contenteditable="true">BUDGET</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">6</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">4</td>
+                            <td class="editable" contenteditable="true">GENERAL LEDGER</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">7</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">20</td>
+                            <td class="editable" contenteditable="true">INVESTMENT</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">8</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">3</td>
+                            <td class="editable" contenteditable="true">NON-CURRENT ASSET</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">9</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">17</td>
+                            <td class="editable" contenteditable="true">PROCUREMENT</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">10</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">6</td>
+                            <td class="editable" contenteditable="true">RECEIVABLE/DEBTOR, SALES &amp; INVOICING</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">11</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">11</td>
+                            <td class="editable" contenteditable="true">REVENUE COLLECTION</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="editable" contenteditable="true">12</td>
+                            <td class="editable" contenteditable="true">Financial</td>
+                            <td class="editable" contenteditable="true">9</td>
+                            <td class="editable" contenteditable="true">STOCK AND INVENTORY</td>
+                            <td>
+                                <button class="btn btn-edit" onclick="editRow(this)">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+              
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+   
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

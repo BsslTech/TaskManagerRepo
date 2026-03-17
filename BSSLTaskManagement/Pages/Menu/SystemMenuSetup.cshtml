@@ -86,16 +86,16 @@
                                     </thead>
                                     <tbody>
                                        
-                                        @for (int i = 0; i < Model.SystemMenu.Count; i++)
+                                        @for (int i = 0; i < Model.SystemMenuList.Count; i++)
                                         {
 
                                                 //Store current item in variable to avoid repeated indexer access
-                                                var currentItem = Model.SystemMenu[i];
+                                            var currentItem = Model.SystemMenuList[i];
                                                 <tr id="row_@i
                                                 ">
                                                     <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
                                                     
-                                                    <button type="button" class="btn btn-primary btn-sm" onclick="editRow(@i, '@(Model.SystemMenu[i].Id)', '@(Model.SystemMenu[i].Code)', '@(Model.SystemMenu[i].Description)')">
+                                                    <button type="button" class="btn btn-primary btn-sm" onclick="editRow(@i, '@(Model.SystemMenuList[i].Id)', '@(Model.SystemMenuList[i].Code)', '@(Model.SystemMenuList[i].Description)')">
                                                         Select
                                                     </button>
                                                 </td>
@@ -103,17 +103,17 @@
                                                 <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
                                                     
                                                     @(i + 1)
-                                                    <input type="hidden" asp-for="SystemMenu[@i].Id" />
+                                                    <input type="hidden" asp-for="SystemMenuList[@i].Id" />
                                                 </td>
 
                                                 <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
                                                
-                                                    <input style="width:100px" readonly asp-for="SystemMenu[@i].Code" type="text" class="form-control border-primary menuCode" />
+                                                    <input style="width:100px" readonly asp-for="SystemMenuList[@i].Code" type="text" class="form-control border-primary menuCode" />
                                                 </td>
 
                                                 <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
                                                     
-                                                    <input style="width:600px" readonly asp-for="SystemMenu[@i].Description" type="text" class="form-control border-primary menuName" />
+                                                    <input style="width:600px" readonly asp-for="SystemMenuList[@i].Description" type="text" class="form-control border-primary menuName" />
                                                 </td>
                                             </tr>
                                         }

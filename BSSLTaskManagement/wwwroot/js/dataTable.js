@@ -10,4 +10,14 @@
             { orderable: false, targets: 2 }
         ]
     });
+
+    $('#listTableWrapper').DataTable({
+        responsive: true,
+        pageLength: 10,
+        order: [],
+        columnDefs: [
+            { orderable: false, targets: 0 }
+        ]
+    });
+
 });
