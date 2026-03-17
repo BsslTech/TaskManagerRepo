@@ -278,14 +278,14 @@
 
                     <!-- Results table — hidden until Fetch is clicked -->
                     <div id="listTableWrapper" style="display:none;">
-                        <table class="table table-sm table-bordered mb-0">
+                        <table class="table table-bordered display nowrap" id="listTableMenu" style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width:80px">Action</th>
-                                    <th style="width:60px">S/N</th>
-                                    <th>SubMenu Code</th>
-                                    <th>SubMenu Name</th>
-                                    <th>Page URL</th>
+                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Action</th>
+                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">S/N</th>
+                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">SubMenu Code</th>
+                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">SubMenu Name</th>
+                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none;">Page URL</th>
                                 </tr>
                             </thead>
                             <tbody id="listTableBody">
@@ -576,15 +576,20 @@
                     data.forEach((item, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>
+                            <td style="text-align:center;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl">
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectRecord(${item.id})">
                                     Select
                                 </button>
                             </td>
-                            <td>${index + 1}</td>
-                            <td>${item.subMenuCode ?? ''}</td>
-                            <td>${item.subMenuName ?? ''}</td>
-                            <td>${item.pageUrl ?? ''}</td>
+                            <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl">${index + 1}</td>
+                            <td style="text-align:left;padding:10px;border:1px solid lightgrey;"
+                                                    class="searchControl">${item.subMenuCode ?? ''}</td>
+                            <td style="text-align:left;padding:10px;border:1px solid lightgrey; width:250px"
+                                                    class="searchControl">${item.subMenuName ?? ''}</td>
+                            <td style="text-align:left;padding:10px;border:1px solid lightgrey; width:250px"
+                                                    class="searchControl">${item.pageUrl ?? ''}</td>
                         `;
                         tbody.appendChild(row);
                     });
