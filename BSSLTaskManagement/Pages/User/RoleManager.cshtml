@@ -1,7 +1,7 @@
 ﻿@page
-@model BSSLTaskManagement.Pages.Setup.ClientModel
+@model BSSLTaskManagement.Pages.User.RoleManagerModel
 @{
-    ViewData["Title"] = "Client Setup";
+    ViewData["Title"] = "User Role Setup";
 }
 
 <form method="post" id="menuForm">
@@ -9,73 +9,65 @@
         <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
         <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
         <!--begin::App Content Header-->
-        <div class="app-content-header">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <h3 class="mb-0">Client Setup</h3>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-end">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Client Setup</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="app-content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
                         <!-- Single Save Card -->
                         <div class="card mb-3">
-
+                            <div class="app-content-header">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <h3 class="mb-0">User Role Setup</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <label class="form-label">Client Code</label>
-                                        <input type="hidden" asp-for="SystemMenu.Id" id="menuId" />
+                                        <label class="form-label">Role Code</label>
+                                        <input type="hidden" asp-for="UserRole.Id" id="id" />
                                         <div class="input-group">
                                             <!-- ✅ Fixed: Added id for JS and asp-for binding -->
-                                            <input type="text" class="form-control border-primary" asp-for="SystemMenu.Code" id="menuCode" />
+                                            <input type="text" class="form-control border-primary" asp-for="UserRole.RoleId" id="roleId" />
                                         </div>
                                     </div>
-
                                     <div class="col-sm-8">
-                                        <label class="form-label">Client Name</label>
+                                        <label class="form-label">Role Description</label>
                                         <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
-                                        <input type="text" class="form-control border-primary" asp-for="SystemMenu.Description" id="menuDescription" />
+                                        <input type="text" class="form-control border-primary" asp-for="UserRole.RoleName" id="roleName" />
                                     </div>
                                 </div>
 
                                 <div class="mt-3" style="margin-bottom:1.5%">
-                                    <button type="submit" class="btn btn-success me-2" id="btnSubmitForm">Submit</button>
-                                    <a href="./SystemMenuSetup" class="btn btn-warning">Refresh</a>
+                                    <button type="submit" style="display:none" id="btnSubmitForm"></button>
+                                    <button type="button" class="btn btn-success me-2" id="btnChangePwd">Submit</button>
+                                    <a href="./RoleManager" class="btn btn-warning">Refresh</a>
                                 </div>
-                                @if (Model.SystemMenuList.Count > 0)
+                                @if (Model.UserRoles.Count > 0)
                                 {
-                                    <table class="table table-bordered display nowrap" id="menuDataTable" style="width:100%">
+                                    <table class="table table-bordered display nowrap" id="roleDataTable" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
                                                 <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
-                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Client Code</th>
-                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Client Name</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Role Code</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Role Description</th>
                                             </tr>
                                         </thead>
                                         <tbody>
 
-                                            @for (int i = 0; i < Model.SystemMenuList.Count; i++)
+                                            @for (int i = 0; i < Model.UserRoles.Count; i++)
                                             {
 
                                                 //Store current item in variable to avoid repeated indexer access
-                                                var currentItem = Model.SystemMenuList[i];
+                                                var currentItem = Model.UserRoles[i];
                                                 <tr id="row_@i">
                                                     <td style="text-align:center;padding:10px;border:1px solid lightgrey;">
 
-                                                        <button type="button" class="btn btn-primary" onclick="editRow(@i, '@(currentItem.Id)', '@(currentItem.Code)', '@(currentItem.Description)')">
+                                                        <button type="button" class="btn btn-primary" onclick="editRow(@i, '@(currentItem.Id)', '@(currentItem.RoleId)', '@(currentItem.RoleName)')">
                                                             Select
                                                         </button>
                                                     </td>
@@ -88,12 +80,12 @@
 
                                                     <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
 
-                                                        <input style="width:100px" readonly value="@currentItem.Code" type="text" class="form-control border-primary menuCode" />
+                                                        <input style="width:100px" readonly value="@currentItem.RoleId" type="text" class="form-control border-primary roleId" />
                                                     </td>
 
                                                     <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
 
-                                                        <input style="width:600px" readonly value="@currentItem.Description" type="text" class="form-control border-primary menuName" />
+                                                        <input style="width:600px" readonly value="@currentItem.RoleName" type="text" class="form-control border-primary roleName" />
                                                     </td>
                                                 </tr>
                                             }
@@ -111,5 +103,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/clienTab.js" asp-append-version="true"></script>
+    <script src="~/js/usermanagement/roleManagement.js" asp-append-version="true"></script>
 }

@@ -98,6 +98,9 @@ $(document).on('click', '#btnSubmitForm', function () {
     }
 
     if (!valid) return;
+
+    $(".loadingDiv-parent").fadeIn("fast");
+    //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
     document.getElementById('postForm').click();
 });
 function ReIndexRows() {
@@ -149,7 +152,9 @@ async function UpdateTextFile(element, option, todo) {
         // Check for duplicates in the table (ignore the current row)
         try {
             //showLoading();
-            $(".loadingDiv-parent").fadeIn('fast');
+
+            $(".loadingDiv-parent").fadeIn("fast");
+            //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
             if (option === 1 && systemCode) {
                 let duplicate = false;
                 table.rows().every(function () {
@@ -162,7 +167,8 @@ async function UpdateTextFile(element, option, todo) {
                     }
                 });
                 if (duplicate) {
-                    $(".loadingDiv-parent").fadeOut('slow');
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
@@ -185,7 +191,8 @@ async function UpdateTextFile(element, option, todo) {
                     }
                 });
                 if (duplicate) {
-                    $(".loadingDiv-parent").fadeOut('slow');
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
@@ -197,7 +204,8 @@ async function UpdateTextFile(element, option, todo) {
         }
         catch (e) {
             // ignore duplicate-check errors and continue
-            $(".loadingDiv-parent").fadeOut('slow');
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -212,14 +220,15 @@ async function UpdateTextFile(element, option, todo) {
             const fileInput = $(element)[0];
             const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
             if (!file) {
-                $(".loadingDiv-parent").fadeOut('slow');
+                $(".loadingDiv-parent").fadeOut("slow");
+                //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
                     text: `No file selected.`,
                 });
                 return;
-                alert('No file selected');
+                //alert('No file selected');
                 //hideLoading();
                 return;
             }
@@ -259,7 +268,8 @@ async function UpdateTextFile(element, option, todo) {
 
         if (!response.ok) {
             const text = await response.text();
-            $(".loadingDiv-parent").fadeOut('slow');
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -283,7 +293,8 @@ async function UpdateTextFile(element, option, todo) {
             }
             else if (result && result.status) {
                 if (result.status !== 'Success') {
-                    $(".loadingDiv-parent").fadeOut('slow');
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
                     const msg = result.statusDescription || result.message || 'Operation failed';
                     Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
                     return;
@@ -292,11 +303,13 @@ async function UpdateTextFile(element, option, todo) {
 
             if (uniqno === '')
                 row.find(".code").val(systemCode);
-            $(".loadingDiv-parent").fadeOut('slow');
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
         }
         else {
             const text = await response.text();
-            $(".loadingDiv-parent").fadeOut('slow');
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -309,7 +322,8 @@ async function UpdateTextFile(element, option, todo) {
     }
     catch (e) {
         console.log(e);
-        $(".loadingDiv-parent").fadeOut('slow');
+        $(".loadingDiv-parent").fadeOut("slow");
+        //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
         //hideLoading();
     }
 }

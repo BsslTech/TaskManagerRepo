@@ -18,11 +18,11 @@ namespace TaskManagement
         }
         public DbSet<TaskIdentityUser> TaskIdentityUsers { get; set; }
         public DbSet<TaskIdentityRole> TaskIdentityRoles { get; set; }
-        public  DbSet<AssignTaskTab> AssignTaskTabs { get; set; }
+        public  DbSet<AssignTaskTab> AssignTaskTab { get; set; }
 
-        public  DbSet<Curtab> Curtabs { get; set; }
+        public  DbSet<Curtab> Curtab { get; set; }
 
-        public  DbSet<LicenseTab> LicenseTabs { get; set; }
+        public  DbSet<LicenseTab> LicenseTab { get; set; }
 
         public  DbSet<MainMenu> MainMenu { get; set; }
 
@@ -38,7 +38,7 @@ namespace TaskManagement
 
         public  DbSet<ProjectTab> ProjectTabs { get; set; }
 
-        public  DbSet<StaffTab> StaffTabs { get; set; }
+        public  DbSet<StaffTab> StaffTab { get; set; }
 
         public  DbSet<SubMenusetupTab> SubMenusetupTab { get; set; }
 

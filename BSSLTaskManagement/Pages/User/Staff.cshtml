@@ -1,0 +1,158 @@
+﻿@page
+@model BSSLTaskManagement.Pages.User.StaffModel
+@{
+    ViewData["Title"] = "Create/Modify Staff Details";
+}
+<form method="post" id="menuForm">
+    <main class="app-main">
+        <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+        <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
+        <input asp-for="StaffTab.Id" id="id" type="hidden" />
+        <!--begin::App Content Header-->
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Single Save Card -->
+                        <div class="card mb-3">
+                            <div class="app-content-header">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <h3 class="mb-0">Create/Modify Staff Details</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="spn font-italic"></h6>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Staff ID</label>
+
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <input type="text" id="staffId" class="form-control border-primary" asp-for="StaffTab.StaffId" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.StaffId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Staff Name</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <input type="text" class="form-control border-primary" asp-for="StaffTab.StaffName" id="staffName" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.StaffName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Email</label>
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <input type="text" id="email" class="form-control border-primary" asp-for="StaffTab.Email" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.Email" class="text-danger"></span>
+                                        </div>
+                                        <input type="hidden" id="oldemail" asp-for="StaffTab.OldEmail" />
+                                    </div>
+                                </div>
+                                <div class="row row2">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Staff Role</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <select class="form-control form-select border-primary" id="staffType" asp-for="StaffTab.StaffType">
+                                            <option selected>--Select Role--</option>
+                                            @foreach (var role in Model.UserRoles)
+                                                    {
+                                                <option value="@role.Id">@role.RoleName</option>
+                                                    }
+                                        </select>
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.StaffType" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label">Suspend Staff</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <select class="form-control form-select border-primary" id="suspend" asp-for="StaffTab.Suspend">
+                                           
+                                            <option value="1">Yes</option>
+                                            <option selected value="0">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Create Staff Account</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <select class="form-control form-select border-primary" id="createAccount" asp-for="StaffTab.CreateAccount">
+                                            <option selected>--Select Option--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                            <option value="2">Account Created</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row row2 createAccount d-none">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">User Email as Username?</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <select class="form-control form-select border-primary" id="useEmail" asp-for="StaffTab.UseEmail">
+                                            <option selected value="">--Select Option--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label class="form-label req">UserName</label>
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <input type="text" id="userName" class="form-control border-primary" asp-for="StaffTab.UserName" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.UserName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row2 createAccount d-none">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Password</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <input type="password" class="form-control border-primary" asp-for="StaffTab.Password" id="password" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.Password" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Confirm Password</label>
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <input type="password" class="form-control border-primary" asp-for="StaffTab.ConfirmPwd" id="confirm" />
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.ConfirmPwd" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Change password on login?</label>
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <select class="form-control form-select border-primary" id="changePwd" asp-for="StaffTab.ChangePwd">
+                                            <option selected value="">--Select Option--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                        <div class="danger">
+                                            <span asp-validation-for="StaffTab.ChangePwd" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3" style="margin-bottom:1.5%">
+                                    <button type="submit" style="display:none" id="btnSubmitForm"></button>
+                                    <button type="button" class="btn btn-success me-2" id="btnCreateAccount">Submit</button>
+                                    <a href="./Staff" class="btn btn-warning">Refresh</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/usermanagement/createStaff.js" asp-append-version="true"></script>
+}
