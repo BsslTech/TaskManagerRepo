@@ -15,6 +15,7 @@ namespace BSSLTaskManagement.ViewModels
         }
         public class StaffTabVM
         {
+            public int? ToDoId { get; set; }
             public int? Id { get; set; }
 
             public string? StaffId { get; set; }
@@ -48,6 +49,21 @@ namespace BSSLTaskManagement.ViewModels
             public string ConfirmPwd { get; set; }
             [Required(ErrorMessage = "Change password on login is required")]
             public string ChangePwd { get; set; }
+        }
+        public class StaffTabDetailsVM
+        {
+            public int? Id { get; set; }
+
+            public string? StaffId { get; set; }
+            public string Email { get; set; }
+            public string? StaffName { get; set; }
+
+            public string? RoleName { get; set; }
+            public string? StaffType { get; set; }
+            public string? Suspend { get; set; }
+            public string? Status { get; set; }
+            public string? CreateAccount { get; set; }
+           
         }
         public class ResetPwdVM
         {

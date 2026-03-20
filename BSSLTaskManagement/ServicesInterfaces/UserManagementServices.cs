@@ -4,7 +4,6 @@ using TaskManagement;
 using TaskManagement.Models;
 using static BSSLTaskManagement.ViewModels.SystemViewModels;
 using static BSSLTaskManagement.ViewModels.UserManagementViewModels;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 using static TaskManagement.IdentityLib;
 
 #nullable disable
@@ -21,7 +20,9 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<List<UserRoleVM>> GetUserRolesAsync();
         Task<ResponseVM> CreateModifyRoleAsync(UserRoleVM roleVM);
         Task<List<StaffTabVM>> GetStaffDetailsAsync();
+        Task<List<StaffTabDetailsVM>> GetAllStaffDetailsAsync();
         Task<ResponseVM> CreateModifyStaffAsync(StaffTabVM staffDetails);
+        Task<ResponseVM> CheckEmailUserNameAsync(string option, string userNameEmail);
     }
     public class UserManagementServices(TaskDbContext context,UserManager<TaskIdentityUser> userManager, 
         RoleManager<TaskIdentityRole> roleManager, IWebHostEnvironment environment) : IUserManagementServices
@@ -383,6 +384,47 @@ namespace BSSLTaskManagement.ServicesInterfaces
             }
             return staffDetails;
         }
+        public async Task<List<StaffTabDetailsVM>> GetAllStaffDetailsAsync()
+        {
+            List<StaffTabDetailsVM> staffDetails = [];
+            try
+            {
+                staffDetails = await _context.StaffTab.AsNoTracking().Select(st => new StaffTabDetailsVM
+                {
+                    Id = st.Id,
+                    StaffId = st.StaffId,
+                    StaffName = st.StaffName,
+                    Email = st.Email,
+                    StaffType = st.StaffType,
+                    Suspend = "",
+                    Status = "No Account",
+                    CreateAccount = "",
+                }).ToListAsync();
+
+                var users = await GetAllCreatedStaffDetailsAsync();
+                var roles = await GetUserRolesAsync();
+                var rolesDictionary = roles.ToDictionary(x => x.RoleName);
+                var usersDictionary = users.Where(k => k.Id != null).ToDictionary(x => x.Id);
+                foreach (var staff in staffDetails)
+                {
+                    if (rolesDictionary.TryGetValue(staff.StaffType, out var existing))
+                    {
+                        staff.StaffType = existing.Id;
+                        staff.RoleName = existing.RoleName;
+                    }
+                    if (usersDictionary.TryGetValue(staff.Id, out var accountCreated))
+                    {
+                        staff.CreateAccount = accountCreated.CreateAccount;
+                        staff.Status = "Account Created";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<StaffTabDetailsVM>();
+            }
+            return staffDetails;
+        }
         public async Task<List<StaffTabVM>> GetStaffDetailsAsync()
         {
             List<StaffTabVM> staffDetails = [];
@@ -590,6 +632,24 @@ namespace BSSLTaskManagement.ServicesInterfaces
                     StatusDescription = ex.Message
                 };
             }
+        }
+        public async Task<ResponseVM> CheckEmailUserNameAsync(string option, string userNameEmail)
+        {
+            TaskIdentityUser user;
+            if(option == "1")
+                user = await _userManager.FindByEmailAsync(userNameEmail);
+            else
+                user = await _userManager.FindByNameAsync(userNameEmail);
+
+            if (user != null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Failed",
+                    StatusDescription = option == "2" ? "Username already exists." : "Email already exists."
+                };
+            }
+            else return new ResponseVM();
         }
     }
 }

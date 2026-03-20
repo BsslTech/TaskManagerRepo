@@ -11,6 +11,13 @@ namespace BSSLTaskManagement.Api
     public class UserManagement(IUserManagementServices managementServices) : ControllerBase
     {
         // GET: api/<UserManagement>
+        [HttpGet("CheckEmailUserNameAsync")]
+        public async Task<IActionResult> CheckEmailUserNameAsync(string checkType, string value)
+        {
+            var userDetails = await managementServices.CheckEmailUserNameAsync(checkType, value);
+           
+            return Ok(userDetails);
+        }
         [HttpGet("GetUserDetails")]
         public async Task<IActionResult> GetUserDetails(string userName)
         {
@@ -40,15 +47,16 @@ namespace BSSLTaskManagement.Api
         [HttpGet("GetStaffDetails")]
         public async Task<IActionResult> GetStaffDetails(string staffId)
         {
-            var roleName = new StaffTabVM();
+            var staffDetails = new StaffTabVM();
             var userDetails = await managementServices.GetStaffDetailsAsync();
             if (userDetails.Count > 0)
             {
-                    roleName = userDetails.Where(x => x.StaffId.Equals(staffId, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault()
+                staffDetails = userDetails.Where(x => x.StaffId.Equals(staffId, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault()
                         ?? new StaffTabVM();
             }
             else return Ok(new StaffTabVM());
-            return Ok(roleName);
+            return Ok(staffDetails);
         }
+      
     }
 }
