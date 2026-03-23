@@ -1,0 +1,94 @@
+﻿@page
+@model BSSLTaskManagement.Pages.User.ResetPwdModel
+@{
+    ViewData["Title"] = "Reset User Password";
+}
+<form method="post" id="menuForm">
+    <main class="app-main">
+        <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+        <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
+        <!--begin::App Content Header-->
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Single Save Card -->
+                        <div class="card mb-3">
+                            <div class="app-content-header">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <h3 class="mb-0">Reset User Password</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="spn font-italic"></h6>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">User Name/Email</label>
+                                      
+                                            <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                            <input type="text" id="userName" class="form-control border-primary" asp-for="ResetPwd.UserName"  />
+                                            <div class="danger">
+                                                <span asp-validation-for="ResetPwd.UserName" class="text-danger"></span>
+                                            </div>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <label class="form-label">Staff Name</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <input type="text" readonly class="form-control border-primary" asp-for="ResetPwd.Name" id="staffName" />
+                                        <div class="danger">
+                                            <span asp-validation-for="ResetPwd.Name" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row2">
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">New Password</label>
+                                        <!-- ✅ Fixed: Changed id to menuDescription and added name/asp-for -->
+                                        <input type="password" class="form-control border-primary" asp-for="ResetPwd.Password" id="password" />
+                                        <div class="danger">
+                                            <span asp-validation-for="ResetPwd.Password" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Confirm Password</label>
+                                            <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                            <input type="password" class="form-control border-primary" asp-for="ResetPwd.ConfirmPwd" id="confirm"/>
+                                            <div class="danger">
+                                                <span asp-validation-for="ResetPwd.ConfirmPwd" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label req">Change password on login?</label>
+                                        <!-- ✅ Fixed: Added id for JS and asp-for binding -->
+                                        <select class="form-control border-primary" id="changePwd" asp-for="ResetPwd.ChangePwd">
+                                            <option selected>--Select Option--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                        <div class="danger">
+                                            <span asp-validation-for="ResetPwd.ChangePwd" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3" style="margin-bottom:1.5%">
+                                    <button type="submit" style="display:none" id="btnSubmitForm"></button>
+                                    <button type="button" class="btn btn-success me-2" id="btnChangePwd">Reset Password</button>
+                                    <a href="./ResetPwd" class="btn btn-warning">Refresh</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/usermanagement/resetpassword.js" asp-append-version="true"></script>
+}

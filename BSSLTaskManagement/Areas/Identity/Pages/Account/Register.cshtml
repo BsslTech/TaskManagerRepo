@@ -2,66 +2,147 @@
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
+    Layout = "_Login";
 }
+<head>
+    <!-- Basic Page Info -->
+    <meta charset="utf-8">
+    <title>BSSL Task Manager</title>
 
-<h1>@ViewData["Title"]</h1>
+    <link rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/dashboard/assets/images/images.jpg" />
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/file/vendors/styles/core.css">
+    <link rel="stylesheet" type="text/css" href="/file/vendors/styles/icon-font.min.css">
+    <link rel="stylesheet" type="text/css" href="/file/vendors/styles/style.css">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119386393-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-119386393-1');
+    </script>
+    <style>
+        /* On small screens make the login box overlay the image and stay on top */
+        @@media (max-width: 767.98px) {
+            .login-wrap .container {
+                position: relative;
             }
-        </section>
+
+            .req:after {
+                content: " *";
+                color: red;
+                font: italic;
+            }
+
+            .login-wrap .login-box {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                z-index: 20;
+                background: rgba(255,255,255,0.98);
+                box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            }
+            /* slightly dim the image behind when overlaid */
+            .login-wrap img {
+                opacity: 0.4;
+            }
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
+        <div id="loader" class="justify-content-center loadingDiv-parent modal-backdrop fade show">
+            <div class="loadingDiv" style="margin-top:30px;">
+                <div class="card-body">
+                    <img style="height:50px; width:50px;" src="~/images/chasing.gif" />
+                    <div class="loadingText" style="color:red;">Please wait...</div>
+                    <span id="panelclose_btn"></span>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 col-lg-7 order-2 order-md-1">
+                    <img src="/File/vendors/images/register-page-img.png" alt="">
+                </div>
+                <div class="col-md-6 col-lg-5 order-1 order-md-2">
+                    <div class="login-box bg-white box-shadow border-radius-10" style="max-height:calc(100vh - 80px); overflow-y:auto; padding:20px;">
+                        <div class="login-title mb-3">
+                            <h2 class="text-center text-primary">Register To BSSL Task Manager</h2>
+                        </div>
+
+                        <form method="post" novalidate>
+                            <input asp-for="Response.Status" id="status" type="hidden" />
+                            <input asp-for="Response.StatusDescription" id="statusDescription" type="hidden" />
+                            <div class="mb-3 form-group">
+                                <label for="staffId" class="form-label req">Staff ID</label>
+                                <input type="text" id="staffId" asp-for="Input.StaffID" class="form-control" placeholder="101509" />
+                                <span asp-validation-for="Input.StaffID" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 form-group">
+                                <label for="staffName" class="form-label">Staff Name</label>
+                                <input type="text" id="staffName" readonly asp-for="Input.StaffName" class="form-control" placeholder="John Doe" />
+                            </div>
+
+                            <div class="mb-3 form-group">
+                                <label asp-for="Input.Email" class="form-label req">Email</label>
+                                <input type="email" id="email" asp-for="Input.Email" class="form-control" placeholder="johnDoe@gmail.com" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 form-group">
+                                <label for="userName" class="form-label req">Username</label>
+                                <input type="text" id="userName" asp-for="Input.UserName" class="form-control" placeholder="JohnDoe" />
+                                <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 form-group">
+                                <label asp-for="Input.Password" class="form-label req">Password</label>
+                                <input type="password" id="password" asp-for="Input.Password" class="form-control" placeholder="********" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 form-group">
+                                <label asp-for="Input.ConfirmPassword" class="form-label req">Confirm Password</label>
+                                <input type="password" id="confirm" asp-for="Input.ConfirmPassword" class="form-control" placeholder="********" />
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="row mt-3 g-2">
+                                <div class="col-6">
+                                    <button class="btn btn-primary btn-lg w-100" type="submit">Register</button>
+                                </div>
+                                <div class="col-6">
+                                    <a class="btn btn-outline-primary btn-lg w-100" href="/Identity/Account/Login">Login</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+    <!-- js -->
+    <script src="/file/vendors/scripts/core.js"></script>
+    <script src="/file/vendors/scripts/script.min.js"></script>
+    <script src="/file/vendors/scripts/process.js"></script>
+    <script src="/file/vendors/scripts/layout-settings.js"></script>
+</body>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/usermanagement/register.js" asp-append-version="true"></script>
 }

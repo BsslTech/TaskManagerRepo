@@ -12,18 +12,11 @@ using static TaskManagement.IdentityLib;
 
 namespace BSSLTaskManagement.Areas.Identity.Pages.Account
 {
-    public class LoginModel : PageModel
+    public class LoginModel(UserManager<TaskManagement.IdentityLib.TaskIdentityUser> userManager, SignInManager<TaskManagement.IdentityLib.TaskIdentityUser> signInManager, ILogger<LoginModel> logger) : PageModel
     {
-        private readonly UserManager<TaskIdentityUser> _userManager;
-        private readonly SignInManager<TaskIdentityUser> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(UserManager<TaskIdentityUser> userManager,SignInManager<TaskIdentityUser> signInManager, ILogger<LoginModel> logger)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-        }
+        private readonly UserManager<TaskIdentityUser> _userManager = userManager;
+        private readonly SignInManager<TaskIdentityUser> _signInManager = signInManager;
+        private readonly ILogger<LoginModel> _logger = logger;
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -108,22 +101,32 @@ namespace BSSLTaskManagement.Areas.Identity.Pages.Account
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 user ??= await _userManager.FindByNameAsync(Input.Email);
-
+                if(user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid Username or Email.");
+                    return Page();
+                }
                 if (!user.EmailConfirmed)
                 {
-                    throw new Exception("Email not confirmed");
+                    //throw new Exception("Email not confirmed");
+                    ModelState.AddModelError(string.Empty, "Email not confirmed.");
+                    return Page();
                 }
 
                 if (await _userManager.IsLockedOutAsync(user))
                 {
-                    throw new Exception("User is locked out");
+                   // throw new Exception("User is locked out");
+                    ModelState.AddModelError(string.Empty, "User is locked out.");
+                    return Page();
                 }
 
                 var passwordValid = await _userManager.CheckPasswordAsync(user, Input.Password);
 
                 if (!passwordValid)
                 {
-                    throw new Exception("Invalid password");
+                    //throw new Exception("Invalid password");
+                    ModelState.AddModelError(string.Empty, "Invalid password.");
+                    return Page();
                 }
 
                 // This doesn't count login failures towards account lockout
@@ -141,6 +144,7 @@ namespace BSSLTaskManagement.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
+                    ModelState.AddModelError(string.Empty, "User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else

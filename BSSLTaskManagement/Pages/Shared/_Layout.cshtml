@@ -94,6 +94,7 @@
     <!-- Responsive extension CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="~/css/dataTable.css" as="style" />
+    <link rel="stylesheet" href="~/css/custom.css" as="style" />
 
     @* raymonds datable algorith *@
     <script src="~/js/datatableManager.js"></script>
@@ -123,28 +124,18 @@
                         </a>
                     </li>
                     <li class="nav-item d-none d-md-block">
-                        <a href="#" class="nav-link">Home</a>
-                    </li>
-                    <li class="nav-item d-none d-md-block">
-                        <a href="#" class="nav-link">Contact</a>
+                        <a href="~/" class="nav-link">Home</a>
                     </li>
                 </ul>
                 <!--end::Start Navbar Links-->
                 <!--begin::End Navbar Links-->
                 <ul class="navbar-nav ms-auto">
                     <!--begin::Navbar Search-->
-                    <li class="nav-item">
-                        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                            <i class="bi bi-search"></i>
-                        </a>
-                    </li>
+                  
                     <!--end::Navbar Search-->
                     <!--begin::Messages Dropdown Menu-->
                     <li class="nav-item dropdown">
-                        <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                            <i class="bi bi-chat-text"></i>
-                            <span class="navbar-badge badge text-bg-danger">3</span>
-                        </a>
+                      
                         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                             <a href="#" class="dropdown-item">
                                 <!--begin::Message-->
@@ -352,6 +343,41 @@
                                         <a href="/SystemPage/System" class="nav-link">
                                             <i class="nav-icon bi bi-circle"></i>
                                             <p> System Type Setup</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon bi bi-speedometer"></i>
+                                    <p>
+                                        User Management
+                                        <i class="nav-arrow bi bi-chevron-right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/User/ChangePwd" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p> Change Password</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/User/ResetPwd" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p> Reset Password</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/User/RoleManager" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p> Create/Modify Role</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/User/Staff" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p> Create/Modify Staff Details</p>
                                         </a>
                                     </li>
                                 </ul>
