@@ -4,6 +4,24 @@
     ViewData["Title"] = "Menu";
 }
 
+<div class="app-content-header" style="padding:10px;">
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Menu Setup</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item" style="padding:5px;"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" style="padding:5px;">Menu Setup</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+</div>
+
 <div class="card card-primary card-outline mb-4">
     <!--begin::Header-->
     <div class="card-header">
@@ -46,18 +64,16 @@
         <!--end::Body-->
         <!--begin::Footer-->
         <div class="card-footer">
-            <button type="button" class="btn btn-success">Save</button>
+            <button type="button" class="btn btn-success btnSave">Save</button>
             <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
-            <button type="reset" class="btn btn-warning">Refresh</button>
+            <a href="./MenuSetup" class="btn btn-warning">Refresh</a>
         </div>
 
         <!--end::Footer-->
     </form>
     <!--end::Form-->
-</div>
 
     <!--begin::Table-->
-<div class="card card-outline mb-4">
                         <table class="table table-bordered display" id="MenuSetupTable">
                             <thead>
                                 <tr>
@@ -127,12 +143,190 @@
 
 
 <div class="card-footer">
-    <button type="button" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-success btnSave">Save</button>
     <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
-    <button type="button" class="btn btn-warning">Refresh</button>
+        <a href="./MenuSetup" class="btn btn-warning">Refresh</a>
     
 </div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+        // ─── INITIALIZE DATATABLE ──────────────────────────────────────
+        let table = $('#MenuSetupTable').DataTable({
+            paging: true,
+            pageLength: 10,
+            ordering: false,
+            searching: false,
+            info: true,
+            columnDefs: [{ orderable: false, targets: '_all' }]
+        });
+
+        // ─── CASCADE: System Type → Module Name ───────────────────────
+        $('#inputSystemTypeName').on('change', function () {
+            const systemId = $(this).val();
+            $('#inputModuleName').html('<option value="">--Select--</option>');
+            $('#inputMainMenu').html('<option value="">--Select--</option>');
+            ClearTable();
+            if (!systemId) return;
+
+            $.getJSON(`?handler=ModulesBySystem&systemId=${systemId}`, function (data) {
+                data.forEach(item => {
+                    $('#inputModuleName').append(`<option value="${item.value}">${item.text}</option>`);
+                });
+            });
+        });
+
+        // ─── CASCADE: Module Name → Main Menu ─────────────────────────
+        $('#inputModuleName').on('change', function () {
+            const moduleId = $(this).val();
+            const systemId = $('#inputSystemTypeName').val();
+            $('#inputMainMenu').html('<option value="">--Select--</option>');
+            ClearTable();
+            if (!moduleId) return;
+
+            $.getJSON(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`, function (data) {
+                data.forEach(item => {
+                    $('#inputMainMenu').append(`<option value="${item.value}">${item.text}</option>`);
+                });
+            });
+        });
+
+        // ─── CASCADE: Main Menu → Load Existing Rows ──────────────────
+        $('#inputMainMenu').on('change', function () {
+            const mainMenuId = $(this).val();
+            ClearTable();
+            if (!mainMenuId) return;
+
+            $.getJSON(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`, function (data) {
+                if (data.length === 0) {
+                    // No saved data — keep the blank starter row
+                    AddDropdownRow();
+                    return;
+                }
+                data.forEach((item, index) => {
+                    let newRow = $("#rowTemplate").clone().removeAttr("id").show();
+                    newRow.find(".sn").text(index + 1);
+                    newRow.find(".menuCode").val(item.menuCode);
+                    newRow.find(".menuName").val(item.menuName);
+                    newRow.find(".menuName").attr("data-saved-name", item.savedName);
+                    newRow.find(".orderNumber").val(item.orderNo);
+                    table.row.add(newRow[0]).draw(false);
+                });
+                table.columns.adjust();
+            });
+        });
+
+        // ─── ADD NEW ROW ───────────────────────────────────────────────
+        function AddDropdownRow() {
+            let rowCount = table.rows().count();
+            let newRow = $("#rowTemplate").clone().removeAttr("id").show();
+            newRow.find(".sn").text(rowCount + 1);
+            newRow.find("input").val("");
+            table.row.add(newRow[0]).draw(false);
+
+            let pageLength = table.page.len();
+            let newPage = Math.floor(table.rows().count() - 1) / pageLength;
+            table.page(Math.floor(newPage)).draw(false);
+            table.columns.adjust();
+        }
+
+        // ─── REMOVE ROW ────────────────────────────────────────────────
+        $(document).on('click', '.removeRow', function () {
+            table.row($(this).closest('tr')).remove().draw(false);
+            ReIndexRows();
+            table.columns.adjust();
+        });
+
+        // ─── RE-INDEX ROWS ─────────────────────────────────────────────
+        function ReIndexRows() {
+            table.rows().every(function (rowIdx) {
+                let row = $(this.node());
+                row.attr("id", rowIdx);
+                row.find("td:first").text(rowIdx + 1);
+            });
+        }
+
+        // ─── CLEAR TABLE ───────────────────────────────────────────────
+        function ClearTable() {
+            table.clear().draw();
+        }
+
+        // ─── SAVE ──────────────────────────────────────────────────────
+        $(document).on('click', '.btnSave', function () {
+            const systemId = $('#inputSystemTypeName').val();
+            const moduleId = $('#inputModuleName').val();
+            const mainMenuId = $('#inputMainMenu').val();
+
+            if (!systemId || !moduleId || !mainMenuId) {
+                alert("Please select System Type, Module Name, and Main Menu before saving.");
+                return;
+            }
+
+            let menuRows = [];
+            let hasError = false;
+
+            table.rows().every(function () {
+                let row = $(this.node());
+                const menuCode  = row.find('.menuCode').val().trim();
+                const menuName  = row.find('.menuName').val().trim();
+                const savedName = row.find('.menuName').attr('data-saved-name') || menuName;
+                const orderNo   = row.find('.orderNumber').val().trim();
+
+                if (!menuCode || !menuName) {
+                    hasError = true;
+                    return;
+                }
+
+                menuRows.push({
+                    menuCode:  menuCode,
+                    menuName:  menuName,
+                    savedName: savedName,
+                    orderNo:   orderNo ? parseInt(orderNo) : null
+                });
+            });
+
+            if (hasError) {
+                alert("Please fill in Menu Code and Menu Name for all rows.");
+                return;
+            }
+
+            if (menuRows.length === 0) {
+                alert("Please add at least one menu row before saving.");
+                return;
+            }
+
+            const payload = {
+                systemTypeTabId:  parseInt(systemId),
+                moduleSetupId:    parseInt(moduleId),
+                mainMenuSetupId:  parseInt(mainMenuId),
+                menuSetup: menuRows
+            };
+
+            $.ajax({
+                url: '?handler=SaveMenuSetup',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                    alert(response.statusDescription);
+                    if (response.status === "Success") {
+                        // Reload the table with fresh data from DB
+                        $('#inputMainMenu').trigger('change');
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while saving. Please try again.");
+                }
+            });
+        });
+
+    </script>
+}
+
+@* 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
@@ -202,5 +396,44 @@
             });
         }
 
+                 // ─── CASCADE: System Type → Module Name ───────────────────────────────────
+            $('#inputSystemTypeName').on('change', function () {
+                const systemId = $(this).val();
+
+                // Reset downstream dropdowns
+                $('#inputModuleName').html('<option value="">--Select--</option>');
+                $('#inputMainMenu').html('<option value="">--Select--</option>');
+
+                if (!systemId) return;
+
+                $.getJSON(`?handler=ModulesBySystem&systemId=${systemId}`, function (data) {
+                    data.forEach(item => {
+                        $('#inputModuleName').append(
+                            `<option value="${item.value}">${item.text}</option>`
+                        );
+                    });
+                });
+            });
+
+
+                        // ─── CASCADE: Module Name → Main Menu ─────────────────────────────────────
+            $('#inputModuleName').on('change', function () {
+                const moduleId = $(this).val();
+                const systemId = $('#inputSystemTypeName').val(); // ← also grab systemId
+
+                // Reset downstream dropdown
+                $('#inputMainMenu').html('<option value="">--Select--</option>');
+
+                if (!moduleId) return;
+
+                // ↓ Changed "MainMenuByModule" → "MainMenusByModule" to match backend
+                $.getJSON(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`, function (data) {
+                    data.forEach(item => {
+                        $('#inputMainMenu').append(
+                            `<option value="${item.value}">${item.text}</option>`
+                        );
+                    });
+                });
+            });
     </script>
-}
+} *@
