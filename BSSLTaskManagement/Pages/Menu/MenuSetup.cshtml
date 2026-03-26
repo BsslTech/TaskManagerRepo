@@ -89,11 +89,11 @@
                                     <td style="padding:10px; border:1px solid lightgrey; width:20px;">1</td>
 
                                     <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                                        <input style="width:350px" type="text" class="form-control border-primary menuCode" />
+                                        <input style="width:300px" type="text" class="form-control border-primary menuCode" />
                                     </td>
 
                                     <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                                        <input style="width:350px" type="text" class="form-control border-primary menuName" />
+                                        <input style="width:300px" type="text" class="form-control border-primary menuName" />
                                     </td>
 
                                      <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
@@ -118,11 +118,11 @@
             <td style="padding:10px;border:1px solid lightgrey; width:20px; " class="sn"></td>
 
             <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                <input style="width:350px" type="text" class="form-control border-primary menuCode" />
+                <input style="width:300px" type="text" class="form-control border-primary menuCode" />
             </td>
 
             <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
-                <input style="width:350px" type="text" class="form-control border-primary menuName" />
+                <input style="width:300px" type="text" class="form-control border-primary menuName" />
             </td>
 
             <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
@@ -321,6 +321,60 @@
                     alert("An error occurred while saving. Please try again.");
                 }
             });
+
+                    // ─── REAL-TIME DUPLICATE WARNING ───────────────────────────────
+        $(document).on('input', '.menuCode', function () {
+            const input      = $(this);
+            const val        = input.val().trim();
+            const currentRow = input.closest('tr')[0];
+
+            input.next('.dup-warning').remove();
+
+            if (!val) return;
+
+            let isDuplicate = false;
+            table.rows().every(function () {
+                const row = $(this.node());
+                if (row[0] === currentRow) return;
+                if (row.find('.menuCode').val().trim().toLowerCase() === val.toLowerCase()) {
+                    isDuplicate = true;
+                }
+            });
+
+            if (isDuplicate) {
+                input.after(`<small class="dup-warning text-danger d-block">Duplicate Menu Code</small>`);
+            }
+        });
+
+        $(document).on('input', '.orderNumber', function () {
+            const input      = $(this);
+            const val        = input.val().trim();
+            const currentRow = input.closest('tr')[0];
+
+            input.next('.dup-warning').remove();
+
+            if (!val) return;
+
+            let isDuplicate = false;
+            table.rows().every(function () {
+                const row = $(this.node());
+                if (row[0] === currentRow) return;
+                if (row.find('.orderNumber').val().trim() === val) {
+                    isDuplicate = true;
+                }
+            });
+
+            if (isDuplicate) {
+                input.after(`<small class="dup-warning text-danger d-block">Duplicate Order No.</small>`);
+            }
+        });
+
+                // ─── BLOCK SAVE IF DUPLICATES EXIST ────────────────────────────
+        if ($('.dup-warning').length > 0) {
+            alert("Please resolve duplicate Menu Code or Order No. before saving.");
+            return;
+        }
+
         });
 
     </script>

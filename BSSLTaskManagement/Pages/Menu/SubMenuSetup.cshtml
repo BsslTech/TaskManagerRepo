@@ -26,6 +26,7 @@
     </div>
 }
 
+
 <div class="container mt-4">
     <div class="col-md-12">
         <div class="card card-primary card-outline mb-4">
@@ -271,9 +272,11 @@
                     </div>
 
                     <!-- Fetch button -->
+                    <!-- Fetch button -->
                     <div class="mb-3">
                         <button type="button" class="btn btn-primary" id="fetchBtn">Fetch</button>
                         <button type="button" class="btn btn-warning" id="listRefreshBtn">Refresh</button>
+                        <button type="button" class="btn btn-success text-light" id="addNewBtn">Add New</button>
                     </div>
 
                     <!-- Results table — hidden until Fetch is clicked -->
@@ -304,12 +307,11 @@
 
 @section Scripts {
     <script>
-
         // ═══════════════════════════════════════════════════════════════════════════
         // SECTION TOGGLE — Form vs View List
         // ═══════════════════════════════════════════════════════════════════════════
 
-                const formSection = document.getElementById('formSection');
+        const formSection = document.getElementById('formSection');
         const listSection = document.getElementById('listSection');
 
         // View List / View Form toggle — same buttons, text changes based on current state
@@ -318,30 +320,34 @@
                 const listIsVisible = listSection.style.display === 'block';
 
                 if (listIsVisible) {
-                    // Currently showing list → switch to form
+                    // Currently showing list → switch to form, show the button again
                     listSection.style.display = 'none';
                     formSection.style.display = 'block';
-                    document.getElementById('viewListBtn-top').textContent    = 'View List';
-                    document.getElementById('viewListBtn-bottom').textContent = 'View List';
+                    document.getElementById('viewListBtn-top').style.display    = 'inline-block';
+                    document.getElementById('viewListBtn-bottom').style.display = 'inline-block';
+                    document.getElementById('viewListBtn-top').textContent      = 'View List';
+                    document.getElementById('viewListBtn-bottom').textContent   = 'View List';
                 } else {
-                    // Currently showing form → switch to list
+                    // Currently showing form → switch to list, hide the button
                     formSection.style.display = 'none';
                     listSection.style.display = 'block';
-                    document.getElementById('viewListBtn-top').textContent    = 'View Form';
-                    document.getElementById('viewListBtn-bottom').textContent = 'View Form';
+                    document.getElementById('viewListBtn-top').style.display    = 'none';
+                    document.getElementById('viewListBtn-bottom').style.display = 'none';
                 }
             });
         });
 
-        // All "Refresh" buttons in the form (header + footer) do the same thing
-        // → show form, hide list, clear the form, restore button text to "View List"
+        // All "Refresh" buttons in the form (header + footer)
+        // → show form, hide list, clear the form, restore + show View List button
         ['refreshBtn-top', 'refreshBtn-bottom'].forEach(id => {
             document.getElementById(id).addEventListener('click', function () {
                 listSection.style.display = 'none';
                 formSection.style.display = 'block';
                 clearForm();
-                document.getElementById('viewListBtn-top').textContent    = 'View List';
-                document.getElementById('viewListBtn-bottom').textContent = 'View List';
+                document.getElementById('viewListBtn-top').style.display    = 'inline-block';
+                document.getElementById('viewListBtn-bottom').style.display = 'inline-block';
+                document.getElementById('viewListBtn-top').textContent      = 'View List';
+                document.getElementById('viewListBtn-bottom').textContent   = 'View List';
             });
         });
 
@@ -354,12 +360,22 @@
 
         // List section Refresh → reset list dropdowns and hide the table
         document.getElementById('listRefreshBtn').addEventListener('click', function () {
-            resetDropdown(listModule, "--Select Module Name");
-            resetDropdown(listMainMenu, "--Select Main Menu");
-            resetDropdown(listMenu, "--Select Menu Name");
+            resetDropdown(listModule, "--Select Module Name--");
+            resetDropdown(listMainMenu, "--Select Main Menu--");
+            resetDropdown(listMenu, "--Select Menu Name--");
             listSystemType.value = '';
-            document.getElementById('listTableWrapper').style.display = 'none';
-            document.getElementById('listTableBody').innerHTML = '';
+            resetListTable();
+        });
+
+        // Add New — switch back to form, clear it, restore + show View List button
+        document.getElementById('addNewBtn').addEventListener('click', function () {
+            listSection.style.display = 'none';
+            formSection.style.display = 'block';
+            clearForm();
+            document.getElementById('viewListBtn-top').style.display    = 'inline-block';
+            document.getElementById('viewListBtn-bottom').style.display = 'inline-block';
+            document.getElementById('viewListBtn-top').textContent      = 'View List';
+            document.getElementById('viewListBtn-bottom').textContent   = 'View List';
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
@@ -425,7 +441,7 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // HELPER — reset a dropdown to "-Select-" and disable it
+        // HELPER — reset a dropdown to a placeholder and disable it
         // ═══════════════════════════════════════════════════════════════════════════
 
         function resetDropdown(selectEl, option) {
@@ -438,8 +454,8 @@
         // ═══════════════════════════════════════════════════════════════════════════
 
         function populateDropdown(selectEl, data, option) {
-            if(option === "Menu"){
-             const def = document.createElement('option');
+            if (option === "Menu") {
+                const def = document.createElement('option');
                 def.value = "All";
                 def.textContent = "All Menus";
                 selectEl.appendChild(def);
@@ -451,6 +467,15 @@
                 selectEl.appendChild(option);
             });
             selectEl.disabled = false;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPER — reset the results table whenever list filters change
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function resetListTable() {
+            subTable.clear().draw();
+            document.getElementById('listTableWrapper').style.display = 'none';
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
@@ -468,8 +493,8 @@
             document.getElementById('systemTypeHidden').value = systemId;
 
             resetDropdown(moduleSelect, "--Select Module Name--");
-            resetDropdown(mainMenuSelect,"--Select Main Menu--");
-            resetDropdown(menuSelect,"--Select MEnu Name--");
+            resetDropdown(mainMenuSelect, "--Select Main Menu--");
+            resetDropdown(menuSelect, "--Select Menu Name--");
 
             if (!systemId) return;
             try {
@@ -484,7 +509,7 @@
             const systemId = systemTypeSelect.value;
             document.getElementById('moduleHidden').value = moduleId;
 
-            resetDropdown(mainMenuSelect,"--Select Main Menu--");
+            resetDropdown(mainMenuSelect, "--Select Main Menu--");
             resetDropdown(menuSelect, "--Select Menu Name--");
 
             if (!moduleId) return;
@@ -523,9 +548,10 @@
         const listMenu       = document.getElementById('listMenu');
 
         listSystemType.addEventListener('change', async function () {
-            resetDropdown(listModule,"--Select Module Name--");
-            resetDropdown(listMainMenu,"--Select Main Menu--");
+            resetDropdown(listModule, "--Select Module Name--");
+            resetDropdown(listMainMenu, "--Select Main Menu--");
             resetDropdown(listMenu, "--Select Menu Name--");
+            resetListTable(); // table resets when system type changes
 
             if (!this.value) return;
             try {
@@ -535,8 +561,9 @@
         });
 
         listModule.addEventListener('change', async function () {
-            resetDropdown(listMainMenu,"--Select Main Menu--");
+            resetDropdown(listMainMenu, "--Select Main Menu--");
             resetDropdown(listMenu, "--Select Menu Name--");
+            resetListTable(); // table resets when module changes
 
             if (!this.value) return;
             try {
@@ -546,13 +573,18 @@
         });
 
         listMainMenu.addEventListener('change', async function () {
-             resetDropdown(listMenu, "--Select Menu Name--");
+            resetDropdown(listMenu, "--Select Menu Name--");
+            resetListTable(); // table resets when main menu changes
 
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${this.value}`);
                 populateDropdown(listMenu, await res.json(), "Menu");
             } catch (err) { console.error(err); }
+        });
+
+        listMenu.addEventListener('change', function () {
+            resetListTable(); // table resets when menu changes — user must click Fetch again
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
@@ -566,22 +598,19 @@
 
             if (!moduleId || !mainMenuId || !menuId) {
                 Swal.fire({
-                        icon: "warning",
-                        title: "Oops...",
-                        text: "Please select all four dropdowns before fetching",
-                    });
-                    return;
-                // showAlert('warning', 'Please select all four dropdowns before fetching.');
-                // return;
+                    icon: "warning",
+                    title: "Oops...",
+                    text: "Please select all four dropdowns before fetching",
+                });
+                return;
             }
 
             try {
                 const res  = await fetch(`?handler=SubMenuList&moduleId=${moduleId}&mainMenuId=${mainMenuId}&menuId=${menuId}`);
                 const data = await res.json();
 
-
                 // Clear DataTable before adding new rows
-               subTable.clear();
+                subTable.clear();
 
                 if (data.length === 0) {
                     Swal.fire({
@@ -590,9 +619,7 @@
                         text: "No records found",
                     });
                     return;
-                    //tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No records found.</td></tr>';
                 } else {
-                    
                     data.forEach((item, index) => {
                         subTable.row.add([
                             `<button type="button" class="btn btn-sm btn-primary" onclick="selectRecord(${item.id})">Select</button>`,
@@ -603,17 +630,17 @@
                         ]);
                     });
                 }
-                   // Redraw DataTable to reflect changes
-                subTable.draw();
 
+                // Redraw DataTable to reflect changes
+                subTable.draw();
                 document.getElementById('listTableWrapper').style.display = 'block';
+
             } catch (err) {
                 Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Failed to load records",
-                    });
-                    return;
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Failed to load records",
+                });
                 console.error(err);
             }
         });
@@ -627,11 +654,13 @@
                 const res  = await fetch(`?handler=SubMenuById&id=${id}`);
                 const item = await res.json();
 
-                // Switch back to form view and restore button text
+                // Switch back to form view, restore + show View List button
                 listSection.style.display = 'none';
                 formSection.style.display = 'block';
-                document.getElementById('viewListBtn-top').textContent    = 'View List';
-                document.getElementById('viewListBtn-bottom').textContent = 'View List';
+                document.getElementById('viewListBtn-top').style.display    = 'inline-block';
+                document.getElementById('viewListBtn-bottom').style.display = 'inline-block';
+                document.getElementById('viewListBtn-top').textContent      = 'View List';
+                document.getElementById('viewListBtn-bottom').textContent   = 'View List';
 
                 // Fill hidden fields
                 document.getElementById('hiddenId').value         = item.id ?? '';
@@ -675,9 +704,9 @@
         async function rebuildFormCascade(systemId, moduleId, mainMenuId, menuId) {
             systemTypeSelect.value = systemId ?? '';
 
-            resetDropdown(moduleSelect, "--Select Module Name");
-            resetDropdown(mainMenuSelect, "--Select Main Menu");
-            resetDropdown(menuSelect, "--Select Menu Name");
+            resetDropdown(moduleSelect, "--Select Module Name--");
+            resetDropdown(mainMenuSelect, "--Select Main Menu--");
+            resetDropdown(menuSelect, "--Select Menu Name--");
 
             if (!systemId) return;
             const modRes = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
