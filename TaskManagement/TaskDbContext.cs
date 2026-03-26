@@ -52,6 +52,9 @@ namespace TaskManagement
 
         public  DbSet<SystemTypeTab> SystemTypeTab { get; set; }
         public  DbSet<ClientTab> ClientTab { get; set; }
+        public  DbSet<CountryTab> CountryTab { get; set; }
+        public  DbSet<StateTab> StateTab { get; set; }
+        public  DbSet<LgaTab> LgaTab { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
