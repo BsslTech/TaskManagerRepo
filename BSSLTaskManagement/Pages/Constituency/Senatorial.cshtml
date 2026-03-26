@@ -1,0 +1,87 @@
+﻿@page
+@model BSSLTaskManagement.Pages.Constituency.SenatorialModel
+@{
+}
+
+
+
+<div class="container mt-4">
+    <div class="col-md-12">
+        <div class="card card-primary card-outline mb-4">
+            <!--begin::Header-->
+            <div class="card-header">
+                <div class="card-title">
+                    <h3>SENATORIAL DISTRICT CODE SETUP</h3>
+                </div>
+            </div>
+
+            <div id="formSection">
+                <form id="FedralForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="card-body">
+
+                        <!-- ROW 3: Page URL, Report Page URL, Icon Image Name -->
+                        <div class="mb-3">
+                            <div class="row my-3">
+                                <div class="row mb-3">
+                                    <div class="mb-3 col-12">
+                                        <label for="inputModuleName" class="form-label">Country</label>
+                                        <select class="form-control" id="inputModuleName">
+                                            <option value="">--Select Country--</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="mb-3 col-12">
+                                        <label for="inputModuleName" class="form-label">State</label>
+                                        <select class="form-control" id="inputModuleName">
+                                            <option value="">--Select State--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        
+
+                    </div>
+                    <!-- footer BUTTONS -->
+                    <div class="card-footer">
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-warning" id="AddBtn">Add Row</button>
+                        </div>
+                        
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+
+        <!-- /.card-header -->
+        <div class="card-body  p-0">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 100px">S/N</th>
+                        <th style="width: 20%">Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="align-middle">
+                        <td>1</td>
+                        <td><input type="text" class="form-control" id="inputEmail3"></td>
+                        <td><input type="text" class="form-control" id="inputEmail3"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- /.card-body -->
+    </div>
+</div>
