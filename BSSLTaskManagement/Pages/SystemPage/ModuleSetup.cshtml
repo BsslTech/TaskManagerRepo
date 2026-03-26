@@ -1,0 +1,274 @@
+﻿@page
+@model BSSLTaskManagement.Pages.SystemPage.ModuleSetupModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Module Setup";
+}
+<form method="post" enctype="multipart/form-data" asp-antiforgery="true">
+    <main class="app-main">
+        <input asp-for="ResponseMessage.Status" id="status" type="hidden" />
+        <input asp-for="ResponseMessage.StatusDescription" id="statusDescription" type="hidden" />
+
+@* ── Minimal overrides on top of Bootstrap 5 ── *@
+<style>
+    .card            { border: none; box-shadow: 0 2px 12px rgba(0,0,0,.08); border-radius: .6rem; }
+    .card-header     { border-radius: .6rem .6rem 0 0 !important; }
+    .table > :not(caption) > * > * { padding: .65rem 1rem; }
+    .badge-code      { font-family: monospace; font-size: .8rem; }
+    .sn-badge        { width: 26px; height: 26px; font-size: .72rem;
+                       display: inline-flex; align-items: center;
+                       justify-content: center; border-radius: 50%; }
+    .file-label      { cursor: pointer; }
+    #fileNameDisplay { font-size: .82rem; max-width: 260px;
+                       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+
+@* ── Page heading ── *@
+<div class="d-flex align-items-center gap-2 mb-4">
+    <div class="bg-primary bg-gradient rounded p-2 text-white d-flex">
+        <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+    </div>
+    <div>
+        <h4 class="mb-0 fw-bold">Module Setup</h4>
+        <small class="text-muted">Configure and manage system modules</small>
+    </div>
+</div>
+
+
+
+@* ════════════════════════════════════════════
+   FORM CARD
+   ════════════════════════════════════════════ *@
+@* <div class="card mb-4">
+    <div class="card-header bg-white py-3 d-flex align-items-center gap-2">
+        <span class="badge bg-primary rounded-pill" style="width:10px;height:10px;padding:0;">&nbsp;</span>
+        <h6 class="mb-0 fw-semibold">
+            @(Model.IsEditMode ? "Edit Module" : "Add New Module")
+        </h6>
+    </div> *@
+
+    @* <div class="card-body p-4">
+        <form id="moduleForm" method="post" enctype="multipart/form-data" novalidate>
+            @Html.AntiForgeryToken() *@
+
+            @* Hidden ID – only rendered in edit mode *@
+            @* @if (Model.IsEditMode)
+            {
+                <input type="hidden" asp-for=".Id" />
+            } *@
+
+            @* ── Row 1: System Type | YouTube Hash ── *@
+            @* <div class="row g-3 mb-3">
+
+                <div class="col-md-6">
+                    <label asp-for="Input.SystemTypeId"
+                           class="form-label fw-semibold small text-uppercase text-secondary">
+                        System Type <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="Input.SystemTypeId"
+                            asp-items="Model.systemTypes"
+                            class="form-select"
+                            id="ddlSystemType">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="Input.SystemTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Input.YoutubeVideoHash"
+                           class="form-label fw-semibold small text-uppercase text-secondary">
+                        Youtube Video Hash
+                    </label>
+                    <input asp-for="Input.YoutubeVideoHash"
+                           class="form-control"
+                           placeholder="e.g. dQw4w9WgXcQ" />
+                    <span asp-validation-for="Input.YoutubeVideoHash" class="text-danger small"></span>
+                </div>
+
+            </div> *@
+
+            @* ── Row 2: Module Code | Module Description ── *@
+            @* <div class="row g-3 mb-3">
+
+                <div class="col-md-6">
+                    <label asp-for="moduleList.ModuleCode"
+                           class="form-label fw-semibold small text-uppercase text-secondary">
+                        Module Code <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="Input.ModuleCode"
+                           class="form-control"
+                           placeholder="Enter module code" />
+                    <span asp-validation-for="Input.ModuleCode" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Input.ModuleDescription"
+                           class="form-label fw-semibold small text-uppercase text-secondary">
+                        Module Description <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="Input.ModuleDescription"
+                           class="form-control"
+                           placeholder="Enter module description" />
+                    <span asp-validation-for="Input.ModuleDescription" class="text-danger small"></span>
+                </div>
+
+            </div> *@
+
+            @* ── Row 3: File Upload (full width) ── *@
+            @* <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <label class="form-label fw-semibold small text-uppercase text-secondary">
+                        Upload Module Help File
+                    </label>
+                    <div class="input-group">
+                        <label class="input-group-text file-label bg-white text-secondary"
+                               for="HelpFile">
+                            <i class="bi bi-upload me-2"></i> Choose File
+                        </label>
+                        <input type="file"
+                               class="form-control"
+                               id="HelpFile"
+                               name="HelpFile"
+                               accept=".pdf,.doc,.docx" />
+                        <span id="fileNameDisplay"
+                              class="input-group-text bg-light text-muted"
+                              title="">
+                            No file chosen
+                        </span>
+                    </div>
+                    <div class="form-text text-muted">Accepted: .pdf, .doc, .docx</div>
+                    <span id="fileError" class="text-danger small d-none">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        Invalid file type. Only .pdf, .doc, .docx are allowed.
+                    </span>
+                </div>
+            </div> *@
+
+            @* ── Action buttons ── *@
+@*             <div class="d-flex gap-2">
+                <button type="submit"
+                        asp-page-handler="Save"
+                        id="btnSubmit"
+                        class="btn btn-success px-4">
+                    <i class="bi bi-check-lg me-1"></i> Submit
+                </button>
+                <a asp-page="/Setup/ModuleSetup"
+                   id="btnCancel"
+                   class="btn btn-warning px-4 text-white">
+                    <i class="bi bi-x-lg me-1"></i> Cancel Record
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div> *@
+
+@* ════════════════════════════════════════════
+   RECORDS TABLE CARD
+   ════════════════════════════════════════════ *@
+@* <div class="card">
+    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning rounded-pill" style="width:10px;height:10px;padding:0;">&nbsp;</span>
+            <h6 class="mb-0 fw-semibold">Module Records</h6>
+        </div>
+        <span class="badge bg-secondary rounded-pill">
+            @Model.moduleList.Count record@(Model.moduleList.Count != 1 ? "s" : "")
+        </span>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0" id="moduleTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:60px">S/N</th>
+                        <th>System Type</th>
+                        <th>Module Code</th>
+                        <th>Description</th>
+                        <th>Module File Name</th>
+                        <th class="text-center" style="width:150px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.moduleList.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-4 d-block mb-1"></i>
+                                No module records found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int sn = 1;
+
+                        foreach (ModuleSetupItem item in Model.moduleList)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="sn-badge bg-primary text-white fw-bold">@sn</span>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-warning text-dark fw-semibold">
+                                        @item.SystemTypeName
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <code class="badge-code text-primary">@item.ModuleCode</code>
+                                </td>
+
+                                <td class="fw-medium">@item.ModuleDescription</td>
+
+                                <td class="text-muted small font-monospace">
+                                    @(string.IsNullOrWhiteSpace(item.ModuleFileName) ? "—" : item.ModuleFileName)
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="d-flex gap-1 justify-content-center"> *@
+
+                                        @* Edit – GET request with route id *@
+                                        @* <a asp-page="/Setup/ModuleSetup"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil-fill"></i> Edit
+                                        </a> *@
+
+                                        @* Delete – POST with CSRF token + JS confirmation *@
+            @*                             <form method="post"
+                                              class="d-inline delete-form"
+                                              data-module-name="@item.ModuleDescription">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit"
+                                                    asp-page-handler="Delete"
+                                                    class="btn btn-sm btn-outline-danger btn-delete">
+                                                <i class="bi bi-trash-fill"></i> Delete
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+
+                            sn++;
+                        }
+                    }
+                </tbody>
+            </table> *@
+        @* </div> *@
+@*     </div>
+</div> *@
+    </main>
+</form>
+
+@* =====================================================================
+   Section: Scripts  (injected into _Layout's @RenderSection("Scripts"))
+   ===================================================================== *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/module.js" asp-append-version="true"></script>
+}

@@ -19,3 +19,11 @@
     });
 
 });
+
+const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+        confirmButton: "btn btn-success me-2",
+        cancelButton: "btn btn-danger ms-3"
+    },
+    buttonsStyling: false
+});

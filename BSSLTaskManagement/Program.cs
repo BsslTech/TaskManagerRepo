@@ -43,6 +43,7 @@ builder.Services.AddControllers();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<ISystemSerivces, SystemSerivces>();
 builder.Services.AddScoped<IMainMenuSetupServices, MainMenuSetupServices>();
+builder.Services.AddScoped<IUserManagementServices, UserManagementServices>();
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/"); // protect everything
