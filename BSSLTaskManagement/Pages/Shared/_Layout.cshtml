@@ -96,6 +96,8 @@
     <link rel="stylesheet" href="~/css/dataTable.css" as="style" />
     <link rel="stylesheet" href="~/css/custom.css" as="style" />
 
+    @await RenderSectionAsync("Styles", required: false)
+
     @* raymonds datable algorith *@
     <script src="~/js/datatableManager.js"></script>
 </head>

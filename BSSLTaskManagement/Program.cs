@@ -1,4 +1,4 @@
-
+using BSSLTaskManagement.Services;
 using BSSLTaskManagement.ServicesInterfaces;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement;
@@ -23,6 +23,8 @@ builder.Services.AddDefaultIdentity<TaskIdentityUser>(options => options.SignIn.
     .AddRoles<TaskIdentityRole>()
     .AddEntityFrameworkStores<TaskDbContext>();
 
+
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -44,6 +46,7 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<ISystemSerivces, SystemSerivces>();
 builder.Services.AddScoped<IMainMenuSetupServices, MainMenuSetupServices>();
 builder.Services.AddScoped<IUserManagementServices, UserManagementServices>();
+builder.Services.AddScoped<IConstituencyService, ConstituencyService>();
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/"); // protect everything

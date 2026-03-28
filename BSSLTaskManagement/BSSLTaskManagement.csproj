@@ -24,4 +24,10 @@
     <ProjectReference Include="..\TaskManagement\TaskManagement.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Migrations\ConsituencyDb\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>
