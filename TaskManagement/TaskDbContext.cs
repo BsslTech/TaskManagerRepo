@@ -16,6 +16,11 @@ namespace TaskManagement
             : base(options)
         {
         }
+
+        public DbSet<FederalConstituencyTab> FederalConstituencyTab { get; set; }
+        public DbSet<SenatorialDistrictTab> SenatorialDistrictTab { get; set; }
+        public DbSet<StateConstituencyTab> StateConstituencyTab { get; set; }
+
         public DbSet<TaskIdentityUser> TaskIdentityUsers { get; set; }
         public DbSet<TaskIdentityRole> TaskIdentityRoles { get; set; }
         public  DbSet<AssignTaskTab> AssignTaskTab { get; set; }
