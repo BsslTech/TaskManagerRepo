@@ -235,31 +235,47 @@
                 return;
             }
 
-            let menuRows = [];
-            let hasError = false;
+                    let menuRows = [];
+        let hasError = false;
+        const seenOrderNumbers = new Set();
+        let hasDuplicate = false;
 
-            table.rows().every(function () {
-                let row = $(this.node());
-                const description  = row.find('.mainMenuDescription').val().trim();
-                const savedDescription = row.find('.mainMenuDescription').attr('data-saved-description') || description;
-                const orderNo = row.find('.orderNumber').val().trim();
+        table.rows().every(function () {
+            let row = $(this.node());
+            const description  = row.find('.mainMenuDescription').val().trim();
+            const savedDescription = row.find('.mainMenuDescription').attr('data-saved-description') || description;
+            const orderNo = row.find('.orderNumber').val().trim();
 
-                if (!description) {
-                    hasError = true;
-                    return;
-                }
-
-                menuRows.push({
-                    description: description,
-                    savedDescription: savedDescription,
-                    orderNo: orderNo ? parseInt(orderNo) : null
-                });
-            });
-
-            if (hasError) {
-                alert("Please fill in the Main Menu Description for all rows.");
+            if (!description) {
+                hasError = true;
                 return;
             }
+
+            // Duplicate order number check (only if an order number was entered)
+            if (orderNo) {
+                if (seenOrderNumbers.has(orderNo)) {
+                    hasDuplicate = true;
+                    return false; // break
+                }
+                seenOrderNumbers.add(orderNo);
+            }
+
+            menuRows.push({
+                description: description,
+                savedDescription: savedDescription,
+                orderNo: orderNo ? parseInt(orderNo) : null
+            });
+        });
+
+        if (hasError) {
+            alert("Please fill in the Main Menu Description for all rows.");
+            return;
+        }
+
+        if (hasDuplicate) {
+            Swal.fire('Validation', 'Duplicate order numbers are not allowed. Please ensure each Order Number is unique.', 'warning');
+            return;
+        }
 
             if (menuRows.length === 0) {
                 alert("Please add at least one row before saving.");
