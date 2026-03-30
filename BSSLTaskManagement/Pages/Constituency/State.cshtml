@@ -76,7 +76,7 @@
             <h5 class="card-title mb-0">State Codes</h5>
         </div>
         <div class="card-body p-0">
-            <table class="table table-sm mb-0" id="tblFederal">
+            <table class="table table-sm mb-0" id="tblState">
                 <thead>
                     <tr>
                         <th style="width: 80px">S/N</th>
@@ -85,7 +85,7 @@
                         <th style="width: 80px">Action</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
+                <tbody id="tblBody">
                     @* Default empty row visible on page load  *@
                     <tr data-id="0">
                         <td class="align-middle">1</td>
@@ -216,22 +216,22 @@
         toggleButtons(true);
 
         $.ajax({
-        url: `?handler=FederalRows&stateId=${stateId}`,
+        url: `?handler=StateRows&stateId=${stateId}`,
         type: 'GET',
-        success: function(data) {
+        success: function (data) {
         if (data.length === 0) {
         // No existing records — just show the default empty row
         addDefaultRow();
         } else {
         // Load existing records then add one blank row at the bottom
-        $.each(data, function(i, row) {
+        $.each(data, function (i, row) {
         appendRow(row.id, row.code, row.description);
         });
         addNewRow();
         }
         },
         error: function() {
-        Swal.fire('Error', 'Failed to load federal constituency records.', 'error');
+        Swal.fire('Error', 'Failed to load state records.', 'error');
         }
         });
         });
@@ -258,6 +258,8 @@
 
         const rows = [];
         let hasError = false;
+        const seenCodes = new Set();
+        let hasDuplicate = false;
 
         $('#tblBody tr').each(function() {
         const id = parseInt($(this).data('id') || 0);
@@ -272,12 +274,24 @@
         return false; // break
         }
 
+        // Duplicate code check
+        if (seenCodes.has(code.toLowerCase())) {
+            hasDuplicate = true;
+            return false; //break
+        }
+        seenCodes.add(code.toLowerCase());
+
         rows.push({ id, code, description: desc });
         });
 
         if (hasError) {
         Swal.fire('Validation', 'Each row must have both a Code and a Description.', 'warning');
         return;
+        }
+
+        if (hasDuplicate) {
+            Swal.fire('Validation', 'Duplicate codes are not allowed. Please ensure each code is unique', 'warning');
+            return;
         }
 
         if (rows.length === 0) {
@@ -288,7 +302,7 @@
         const payload = { stateId: selectedStateId, rows: rows };
 
         $.ajax({
-        url: '?handler=SaveFederal',
+        url: '?handler=SaveState',
         type: 'POST',
         contentType: 'application/json',
         headers: { 'RequestVerificationToken': antiForgeryToken },
@@ -334,7 +348,7 @@
         }).then((confirmed) => {
         if (confirmed.isConfirmed) {
         $.ajax({
-        url: `?handler=DeleteFederal&id=${id}`,
+        url: `?handler=DeleteState&id=${id}`,
         type: 'POST',
         headers: { 'RequestVerificationToken': antiForgeryToken },
         success: function(res) {
@@ -369,7 +383,7 @@
         <td><input type="text" class="form-control form-control-sm col-desc" value="${escapeHtml(description)}"></td>
         <td class="align-middle text-center">
         <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>
+        <i class="fas fa-trash"></i>Delete
         </button>
         </td>
         </tr>`;
@@ -386,7 +400,7 @@
         <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
         <td class="align-middle text-center">
         <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>
+        <i class="fas fa-trash"></i>Delete
         </button>
         </td>
         </tr>`;
@@ -403,7 +417,7 @@
         <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
         <td class="align-middle text-center">
         <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>
+        <i class="fas fa-trash"></i>Delete
         </button>
         </td>
         </tr>`;
@@ -414,7 +428,7 @@
         function reloadRows(stateId) {
         clearTable();
         $.ajax({
-        url: `?handler=FederalRows&stateId=${stateId}`,
+        url: `?handler=StateRows&stateId=${stateId}`,
         type: 'GET',
         success: function(data) {
         if (data.length === 0) {
@@ -425,6 +439,9 @@
         });
         addNewRow();
         }
+        },
+        error: function () {
+            Swal.fire('Error', 'Failed to load state records.', 'error');
         }
         });
         }
