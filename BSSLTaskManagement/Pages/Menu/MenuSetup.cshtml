@@ -264,33 +264,63 @@
                 return;
             }
 
-            let menuRows = [];
-            let hasError = false;
+                   let menuRows = [];
+        let hasError = false;
+        const seenMenuCodes = new Set();
+        const seenOrderNumbers = new Set();
+        let hasDuplicateCode = false;
+        let hasDuplicateOrder = false;
 
-            table.rows().every(function () {
-                let row = $(this.node());
-                const menuCode  = row.find('.menuCode').val().trim();
-                const menuName  = row.find('.menuName').val().trim();
-                const savedName = row.find('.menuName').attr('data-saved-name') || menuName;
-                const orderNo   = row.find('.orderNumber').val().trim();
+        table.rows().every(function () {
+            let row = $(this.node());
+            const menuCode  = row.find('.menuCode').val().trim();
+            const menuName  = row.find('.menuName').val().trim();
+            const savedName = row.find('.menuName').attr('data-saved-name') || menuName;
+            const orderNo   = row.find('.orderNumber').val().trim();
 
-                if (!menuCode || !menuName) {
-                    hasError = true;
-                    return;
-                }
-
-                menuRows.push({
-                    menuCode:  menuCode,
-                    menuName:  menuName,
-                    savedName: savedName,
-                    orderNo:   orderNo ? parseInt(orderNo) : null
-                });
-            });
-
-            if (hasError) {
-                alert("Please fill in Menu Code and Menu Name for all rows.");
+            if (!menuCode || !menuName) {
+                hasError = true;
                 return;
             }
+
+            // Duplicate menu code check
+            if (seenMenuCodes.has(menuCode.toLowerCase())) {
+                hasDuplicateCode = true;
+                return false; // break
+            }
+            seenMenuCodes.add(menuCode.toLowerCase());
+
+            // Duplicate order number check (only if entered)
+            if (orderNo) {
+                if (seenOrderNumbers.has(orderNo)) {
+                    hasDuplicateOrder = true;
+                    return false; // break
+                }
+                seenOrderNumbers.add(orderNo);
+            }
+
+            menuRows.push({
+                menuCode:  menuCode,
+                menuName:  menuName,
+                savedName: savedName,
+                orderNo:   orderNo ? parseInt(orderNo) : null
+            });
+        });
+
+        if (hasError) {
+            alert("Please fill in Menu Code and Menu Name for all rows.");
+            return;
+        }
+
+        if (hasDuplicateCode) {
+            Swal.fire('Validation', 'Duplicate menu codes are not allowed. Please ensure each Menu Code is unique.', 'warning');
+            return;
+        }
+
+        if (hasDuplicateOrder) {
+            Swal.fire('Validation', 'Duplicate order numbers are not allowed. Please ensure each Order Number is unique.', 'warning');
+            return;
+        }
 
             if (menuRows.length === 0) {
                 alert("Please add at least one menu row before saving.");
