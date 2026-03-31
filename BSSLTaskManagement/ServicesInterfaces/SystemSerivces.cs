@@ -197,6 +197,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         SystemDescription = i.SystemTypeTab.Description,
                         ModuleId = i.Id,
                         ModuleCode = i.ModuleCode,
+                        Code = i.ModuleCode,
                         ModuleDescription = i.Description,
                         HelperFileName = i.ModuleFileName,
                         HelperFile = null,
@@ -223,11 +224,12 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         SystemDescription = i.SystemTypeTab.Description,
                         ModuleId = i.Id,
                         ModuleCode = i.ModuleCode,
+                        Code = i.ModuleCode,
                         ModuleDescription = i.Description,
                         HelperFileName = i.ModuleFileName,
                         HelperFile = null,
                         YouTubeHash = i.VideoUrl
-                    }).ToListAsync();
+                    }).OrderBy(i=>i.ModuleCode).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -332,7 +334,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         existing.SystemType = type.SystemCode;
                         existing.ModuleCode = item.ModuleCode;
                         existing.Description = item.ModuleDescription;
-                        existing.VideoUrl = item.YouTubeHash;
+                        existing.VideoUrl = item.YouTubeHash ?? "";
                     }
                     else
                     {
@@ -345,7 +347,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                             Description = item.ModuleDescription,
                             ModuleFileName = newFileName ?? "",
                             FolderPath = newFilePath ?? "",
-                            VideoUrl = item.YouTubeHash,
+                            VideoUrl = item.YouTubeHash ?? "",
                         };
 
                         _context.ModuleSetup.Add(newItem);

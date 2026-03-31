@@ -35,7 +35,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         Description = p.Description,
                         Id = p.Id,
                         OrderNo = p.OrderNo,
-                    }).ToListAsync();
+                    }).OrderBy(i=>i.OrderNo).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -168,7 +168,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         Id = p.Id,
                         MenuCode = p.MenuCode,
                         OrderNo = p.OrderNo,
-                    }).ToListAsync();
+                    }).OrderBy(i=>i.OrderNo).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -249,7 +249,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
 
             try
             {
-                var dbTypes = await context.MenusetupTab.ToListAsync();
+                var dbTypes = await context.MenusetupTab.Where(k=>k.MainMenuId == menus.MainMenuSetupId).ToListAsync();
 
                 var dbDict = dbTypes
                     .ToDictionary(x => x.MenuName, StringComparer.OrdinalIgnoreCase);
@@ -501,7 +501,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 dbSubmenu.SubMenuName = p.SubMenuName;
                 dbSubmenu.FormId = p.SubMenuCode;
                 dbSubmenu.PageUrl = p.PageUrl;
-                dbSubmenu.FormNameHeader = p.FormNameHeader;
+                dbSubmenu.FormNameHeader = p.SubMenuName;
                 dbSubmenu.OrderNo = p.OrderNo;
                 dbSubmenu.ReportPageUrl = p.ReportPageUrl;
                 dbSubmenu.IsApprform = p.IsApprform;

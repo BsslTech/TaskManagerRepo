@@ -27,12 +27,12 @@ namespace BSSLTaskManagement.Pages.Menu
         private async Task LoadSystemTypesAsync()
         {
             var systemTypes = await _systemServices.GetSystemTypesAsync();
-            SystemTypeList = systemTypes
-                .Select(x => new SelectListItem
-                {
-                    Value = x.SystemId.ToString(),
-                    Text = x.SystemDescription
-                }).ToList();
+            SystemTypeList = [.. systemTypes
+            .Select(x => new SelectListItem
+            {
+                Value = x.SystemId.ToString(),
+                Text = x.SystemDescription
+            })];
         }
 
         // ─── AJAX — CASCADE STEP 1 ───────────────────────────────────────────────

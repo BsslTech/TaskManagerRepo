@@ -36,6 +36,7 @@ namespace BSSLTaskManagement.ViewModels
             public string? SystemDescription { get; set; } = "";
             public int? ModuleId { get; set; }
             public string? ModuleCode { get; set; } = "";
+            public string? Code { get; set; } = "";
             public string? ModuleDescription { get; set; } = "";
             [JsonIgnore]
             public IFormFile? HelperFile { get; set; } = null;

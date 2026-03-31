@@ -1,242 +1,432 @@
-﻿
-// ── In-memory data store ───────────────────────────────────────────
-// Replace with a fetch('/ModuleSetup/GetAll') call to load from server.
-const moduleData = [
-    { id: 1, systemType: 'Financial', youtubeHash: '', moduleCode: '5', description: 'PAYABLE/CREDITORS', fileName: '' },
-    { id: 2, systemType: 'Financial', youtubeHash: '', moduleCode: '7', description: 'ACCOUNT CODE SETTINGS/END-OF-YEAR PROCESS', fileName: '' },
-    { id: 3, systemType: 'Financial', youtubeHash: '', moduleCode: '1', description: 'ADMINISTRATION', fileName: '' },
-    { id: 4, systemType: 'Financial', youtubeHash: '', moduleCode: '14', description: 'AUDIT, REPORTS & ENQUIRIES', fileName: '' },
-    { id: 5, systemType: 'Financial', youtubeHash: '', moduleCode: '10', description: 'BUDGET', fileName: '' },
-    { id: 6, systemType: 'Financial', youtubeHash: '', moduleCode: '4', description: 'GENERAL LEDGER', fileName: '' },
-    { id: 7, systemType: 'Financial', youtubeHash: '', moduleCode: '20', description: 'INVESTMENT', fileName: '' },
-    { id: 8, systemType: 'Financial', youtubeHash: '', moduleCode: '3', description: 'NON-CURRENT ASSET', fileName: '' },
-    { id: 9, systemType: 'Financial', youtubeHash: '', moduleCode: '17', description: 'PROCUREMENT', fileName: '' },
-    { id: 10, systemType: 'Financial', youtubeHash: '', moduleCode: '6', description: 'RECEIVABLE/DEBTOR, SALES & INVOICING', fileName: '' },
-    { id: 11, systemType: 'Financial', youtubeHash: '', moduleCode: '11', description: 'REVENUE COLLECTION', fileName: '' },
-    { id: 12, systemType: 'Financial', youtubeHash: '', moduleCode: '9', description: 'STOCK AND INVENTORY', fileName: '' }
-];
-
-// ── Pagination config ──────────────────────────────────────────────
-const PAGE_SIZE = 10;
-let currentPage = 1;
-let nextId = moduleData.length + 1;
-
-// ── DOM references ─────────────────────────────────────────────────
-const form = document.getElementById('moduleForm');
-const editIdInput = document.getElementById('editId');
-const systemTypeEl = document.getElementById('systemType');
-const youtubeHashEl = document.getElementById('youtubeHash');
-const moduleCodeEl = document.getElementById('moduleCode');
-const moduleDescEl = document.getElementById('moduleDesc');
-const moduleFileEl = document.getElementById('moduleFile');
-const fileNameDisplay = document.getElementById('fileNameDisplay');
-const tableBody = document.getElementById('ModuleTableBody');
-const paginationEl = document.getElementById('pagination');
-const cancelBtn = document.getElementById('cancelBtn');
-const toastEl = document.getElementById('liveToast');
-const toastMsgEl = document.getElementById('toastMessage');
-
-// Bootstrap Toast instance
-const bsToast = new bootstrap.Toast(toastEl, { delay: 3500 });
-
-// ── File input feedback ────────────────────────────────────────────
-moduleFileEl.addEventListener('change', () => {
-    fileNameDisplay.textContent = moduleFileEl.files.length
-        ? moduleFileEl.files[0].name
-        : 'No file chosen';
-});
-
-// ── Toast helper ───────────────────────────────────────────────────
-function showToast(message, type = 'success') {
-    toastEl.className = `toast align-items-center border-0 text-white bg-${type === 'error' ? 'danger' : 'success'}`;
-    toastMsgEl.textContent = message;
-    bsToast.show();
-}
-
-// ── Reset form to blank state ──────────────────────────────────────
-function resetForm() {
-    form.reset();
-    editIdInput.value = '';
-    fileNameDisplay.textContent = 'No file chosen';
-    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-}
-
-// ── HTML-escape utility ────────────────────────────────────────────
-function escHtml(str) {
-    const d = document.createElement('div');
-    d.appendChild(document.createTextNode(str || ''));
-    return d.innerHTML;
-}
-
-// ── Find record index by id ────────────────────────────────────────
-function findIdx(id) {
-    return moduleData.findIndex(r => r.id === id);
-}
-
-// ── Render current page ────────────────────────────────────────────
-function renderTable() {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const page = moduleData.slice(start, start + PAGE_SIZE);
-
-    if (moduleData.length === 0) {
-        tableBody.innerHTML =
-            `<tr><td colspan="6" class="text-center text-muted py-4">No records found.</td></tr>`;
-        paginationEl.innerHTML = '';
+﻿function AddModuleSetup() {
+    const inputSystemTypeName = document.getElementById('inputSystemTypeName').value;
+    if (inputSystemTypeName.toString().trim().toLowerCase() === '') {
+        Swal.fire({
+            title: "Warning!",
+            text: "Select system type",
+            icon: "warning"
+        });
         return;
     }
+    let rowCount = table.rows().count();
 
-    tableBody.innerHTML = page.map((row, idx) => `
-                <tr data-id="${row.id}">
-                    <td class="ps-3 text-secondary fw-semibold">${start + idx + 1}</td>
-                    <td class="text-primary fw-semibold">${escHtml(row.systemType)}</td>
-                    <td>${escHtml(row.moduleCode)}</td>
-                    <td>${escHtml(row.description)}</td>
-                    <td class="text-muted">${escHtml(row.fileName)}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn btn-edit btn-outline-primary btn-sm" onclick="editRow(${row.id})">Edit</button>
-                            <button class="btn btn-delete btn-outline-danger  btn-sm" onclick="deleteRow(${row.id})">Delete</button>
-                        </div>
-                    </td>
-                </tr>`).join('');
+    let newRow = $("#rowTemplate").clone().removeAttr("id");
 
-    renderPagination();
+    newRow.show();
+
+    // set serial number
+    newRow.find(".sn").text(rowCount + 1);
+
+    newRow.find("input").each(function () {
+
+        let name = $(this).attr("name");
+        if (name)
+            $(this).attr("name", name.replace("[0]", `[${rowCount}]`));
+
+        let id = $(this).attr("id");
+        if (id)
+            $(this).attr("id", id.replace("_0__", `_${rowCount}__`));
+
+        $(this).val("");
+    });
+
+    // ADD THROUGH DATATABLE
+    table.row.add(newRow).draw(false);
+
+    // jump to the page containing the new row
+    let pageLength = table.page.len();          // rows per page
+    let newRowIndex = table.rows().count() - 1; // index of last row
+    let newPage = Math.floor(newRowIndex / pageLength);
+
+    table.page(newPage).draw(false);
+
+
+    table.columns.adjust().responsive.recalc();
 }
+$(document).ready(function () {
 
-// ── Pagination ─────────────────────────────────────────────────────
-function renderPagination() {
-    const totalPages = Math.ceil(moduleData.length / PAGE_SIZE);
-    if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
-
-    let html = `<nav><ul class="pagination pagination-sm mb-0">`;
-    html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <button class="page-link" onclick="goToPage(${currentPage - 1})">&laquo;</button>
-                     </li>`;
-
-    for (let p = 1; p <= totalPages; p++) {
-        html += `<li class="page-item ${p === currentPage ? 'active' : ''}">
-                            <button class="page-link" onclick="goToPage(${p})">${p}</button>
-                         </li>`;
-    }
-
-    html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                        <button class="page-link" onclick="goToPage(${currentPage + 1})">&raquo;</button>
-                     </li>`;
-    html += `</ul></nav>`;
-    paginationEl.innerHTML = html;
-}
-
-function goToPage(page) {
-    const totalPages = Math.ceil(moduleData.length / PAGE_SIZE);
-    if (page < 1 || page > totalPages) return;
-    currentPage = page;
-    renderTable();
-}
-
-// ── Edit row ───────────────────────────────────────────────────────
-function editRow(id) {
-    const rec = moduleData[findIdx(id)];
-    if (!rec) return;
-
-    editIdInput.value = rec.id;
-    systemTypeEl.value = rec.systemType;
-    youtubeHashEl.value = rec.youtubeHash;
-    moduleCodeEl.value = rec.moduleCode;
-    moduleDescEl.value = rec.description;
-    fileNameDisplay.textContent = rec.fileName || 'No file chosen';
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ── Delete row ─────────────────────────────────────────────────────
-function deleteRow(id) {
-    if (!confirm('Are you sure you want to delete this record?')) return;
-    const idx = findIdx(id);
-    if (idx === -1) return;
-    moduleData.splice(idx, 1);
-
-    const totalPages = Math.ceil(moduleData.length / PAGE_SIZE);
-    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
-
-    renderTable();
-    showToast('Record deleted successfully.');
-
-    // ── Real AJAX delete (uncomment to activate) ──────────────────
-    // fetch(`/ModuleSetup/Delete/${id}`, {
-    //     method: 'POST',
-    //     headers: { 'RequestVerificationToken': getAntiForgeryToken() }
-    // }).then(r => r.json()).then(res => {
-    //     if (res.success) { moduleData.splice(idx, 1); renderTable(); showToast('Deleted.'); }
-    //     else { showToast(res.message, 'error'); }
-    // });
-}
-
-// ── Form submit: add or update ─────────────────────────────────────
-form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const systemType = systemTypeEl.value.trim();
-    const youtubeHash = youtubeHashEl.value.trim();
-    const moduleCode = moduleCodeEl.value.trim();
-    const description = moduleDescEl.value.trim();
-    const file = moduleFileEl.files[0];
-    const fileName = file ? file.name : '';
-
-    // Inline Bootstrap validation
-    let valid = true;
-    [systemTypeEl, moduleCodeEl, moduleDescEl].forEach(el => el.classList.remove('is-invalid'));
-
-    if (!systemType) { systemTypeEl.classList.add('is-invalid'); valid = false; }
-    if (!moduleCode) { moduleCodeEl.classList.add('is-invalid'); valid = false; }
-    if (!description) { moduleDescEl.classList.add('is-invalid'); valid = false; }
-    if (!valid) { showToast('Please fill in all required fields.', 'error'); return; }
-
-    const existingId = editIdInput.value ? parseInt(editIdInput.value) : null;
-
-    if (existingId) {
-        const idx = findIdx(existingId);
-        if (idx !== -1) {
-            moduleData[idx] = {
-                ...moduleData[idx],
-                systemType, youtubeHash, moduleCode, description,
-                fileName: fileName || moduleData[idx].fileName
-            };
+    table = $('#moduleSetupTab').DataTable({
+        responsive: true,
+        ordering: false,
+        pageLength: 10,
+        order: [],
+        columnDefs: [
+            { orderable: false, targets: 0 }
+        ]
+    });
+    const status = document.getElementById('status').value;
+    const statusDescription = document.getElementById('statusDescription').value;
+    if (status) {
+        if (status.toString().trim().toLowerCase() === 'success') {
+            Swal.fire({
+                title: "Success!",
+                text: statusDescription,
+                icon: "success"
+            });
+            return;
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: statusDescription,
+            });
+            return;
         }
-        showToast('Record updated successfully.');
-    } else {
-        moduleData.push({ id: nextId++, systemType, youtubeHash, moduleCode, description, fileName });
-        currentPage = Math.ceil(moduleData.length / PAGE_SIZE);
-        showToast('Record added successfully.');
+    }
+});
+$(document).on('click', '.removeRow', async function () {
+    const el = this; // the clicked button
+
+    // call server to remove (todo != 1 => remove)
+    await UpdateTextFile(el, 1, 2);
+
+    // now remove the row and reindex
+    table.row($(el).closest('tr')).remove().draw(false);
+    ReIndexRows();
+    table.columns.adjust().responsive.recalc();
+});
+$(document).on('click', '.btnSave', function () {
+    let valid = true;
+    const nodes = table.rows().nodes().toArray();
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const moduleCode = $(node).find('.moduleCode').val();
+        const moduleDescription = $(node).find('.moduleDescription').val();
+
+        if (moduleCode && moduleCode.toString().trim() !== '') {
+            if (!moduleDescription || moduleDescription.toString().trim() === '') {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `Module description is required for module code ${moduleCode}.`,
+                });
+                valid = false;
+                break;
+            }
+        }
     }
 
-    resetForm();
-    renderTable();
+    if (!valid) return;
 
-    // ── Real AJAX save (uncomment to activate) ────────────────────
-    // const formData = new FormData(form);
-    // fetch('/ModuleSetup/Save', {
-    //     method: 'POST',
-    //     body: formData,
-    //     headers: { 'RequestVerificationToken': getAntiForgeryToken() }
-    // }).then(r => r.json()).then(res => {
-    //     if (res.success) { showToast('Saved.'); resetForm(); renderTable(); }
-    //     else { showToast(res.message, 'error'); }
-    // });
+    $(".loadingDiv-parent").fadeIn("fast");
+    //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
+    document.getElementById('postForm').click();
 });
+function ReIndexRows() {
 
-// ── Cancel button ──────────────────────────────────────────────────
-cancelBtn.addEventListener('click', resetForm);
+    table.rows().every(function (rowIdx) {
 
-// ── Anti-forgery token helper ──────────────────────────────────────
-function getAntiForgeryToken() {
-    const el = document.querySelector('input[name="__RequestVerificationToken"]');
-    return el ? el.value : '';
+        let row = this.node();
+
+        $(row).attr("id", rowIdx);
+
+        $(row).find("td:first").text(rowIdx + 1);
+
+        $(row).find("input").each(function () {
+
+            let name = $(this).attr("name");
+            if (name)
+                $(this).attr("name", name.replace(/\[\d+\]/, `[${rowIdx}]`));
+
+            let id = $(this).attr("id");
+            if (id)
+                $(this).attr("id", id.replace(/_\d+__/, `_${rowIdx}__`));
+        });
+
+    });
+
+}
+async function SystemTypeChange() {
+    try { 
+        // If uploading a file, send multipart/form-data to a dedicated handler
+        let response;
+        $(".loadingDiv-parent").fadeIn("fast");
+        const inputSystemTypeName = document.getElementById('inputSystemTypeName').value;
+        response = await fetch(`?handler=SystemModules&systemId=${inputSystemTypeName}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile failed:, ${response.status}, ${text}.`,
+            });
+            return;
+        }
+
+        // Try to parse JSON, but guard against empty/non-JSON responses
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') !== -1) {
+            const result = await response.json();
+
+            // Normalize result: handler may return a string or an object { status, statusDescription }
+            if (typeof result === 'string') {
+                if (result !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: result });
+                    return;
+                }
+            }
+            else if (result && result.status) {
+                if (result.status !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+                    const msg = result.statusDescription || result.message || 'Operation failed';
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
+                    return;
+                }
+                
+            }
+            if (result.statusDescription.length > 0) {
+                result.statusDescription.sort((a, b) => {
+                    const numA = Number(a.code);
+                    const numB = Number(b.code);
+
+                    if (numA !== numB) {
+                        return numA - numB; // numeric sort
+                    }
+
+                    // If same number (e.g., 001, 01, 1), prioritize longer string
+                    return b.code.length - a.code.length;
+                });
+                var div = '';
+                for (var i = 0; i < result.statusDescription.length; i++) {
+                    var item = result.statusDescription[i];
+                    const className = (i + 1) % 2 === 0 ? 'even' : 'odd';
+                    div += `<tr id="${i}" role="row" class="${className}">
+                              <td style="padding:10px; border:1px solid lightgrey; width:20px;" class="dtr-control" tabindex="0">${(i+1)}</td>
+                              <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                <input class="code ${i}" type="hidden" id="ModuleSetup_ModuleDetails_${i}__SystemCode" name="ModuleSetup.ModuleDetails[${i}].SystemCode" value="${item.code}">
+                                <input onchange="UpdateTextFile(this,1,1)" id="moduleCode" style="width:150px" type="text" class="form-control border-primary moduleCode" value="${item.moduleCode}" name="ModuleSetup.ModuleDetails[${i}].ModuleCode">
+                            </td>
+
+                            <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                <input onchange="UpdateTextFile(this,2,1)" style="width:450px" type="text" id="moduleDescription" class="form-control border-primary moduleDescription" value="${item.moduleDescription}" name="ModuleSetup.ModuleDetails[${i}].ModuleDescription">
+                            </td>
+
+                            <td style="text-align:center;padding:10px;border:1px solid lightgrey; width:150px">
+
+                                <button type="button" class="btn btn-danger removeRow">
+                                    <i class="fa fa-trash"></i> Delete Row
+                                </button>
+                            </td>
+                        </tr>`
+                    }
+                jQuery('#tableBody').empty();
+                jQuery('#tableBody').append(div);
+
+                // build jQuery collection of <tr> elements from your HTML string
+                const $rows = $(div);
+
+                // replace table content via DataTables API
+                table.clear();
+                table.rows.add($rows.toArray()).draw(false);
+
+                // then reflow/responsive after draw
+                setTimeout(() => {
+                    table.columns.adjust().responsive.recalc();
+                }, 0);
+
+                table.columns.adjust().responsive.recalc();
+                    jQuery(".loadingDiv-parent").fadeOut("slow");
+                
+            }
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+        }
+        else {
+            const text = await response.text();
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile response:, ${text}.`,
+            });
+            return;
+            //hideLoading();
+        }
+
+    }
+    catch (e) {
+        console.log(e);
+        $(".loadingDiv-parent").fadeOut("slow");
+        //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+        //hideLoading();
+    }
+}
+async function UpdateTextFile(element, option, todo) {
+
+    try {
+
+        let row = $(element).closest("tr");
+        let uniqno = row.find(".code").val();
+        let moduleCode = row.find(".moduleCode").val();
+
+        let moduleDescription = row.find(".moduleDescription").val();
+
+        let value = [];
+
+        if (option === 1) {
+            value = ["1", moduleCode];
+        }
+        else if (option === 2) {
+            value = ["2", moduleDescription];
+        }
+
+        // Check for duplicates in the table (ignore the current row)
+        try {
+            //showLoading();
+
+            $(".loadingDiv-parent").fadeIn("fast");
+            //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
+            if (option === 1 && moduleCode) {
+                let duplicate = false;
+                table.rows().every(function () {
+                    const node = this.node();
+                    if (node === row[0]) return; // skip current row
+                    const val = $(node).find('.moduleCode').val();
+                    if (val && val.toString().trim().toLowerCase() === moduleCode.toString().trim().toLowerCase()) {
+                        duplicate = true; row.find(".moduleCode").val('');
+                        return false; // break
+                    }
+                });
+                if (duplicate) {
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `Module code '${moduleCode}' already exists in the table.`,
+                    });
+                    return;
+                }
+            }
+
+            if (option === 2 && moduleDescription) {
+                let duplicate = false;
+                table.rows().every(function () {
+                    const node = this.node();
+                    if (node === row[0]) return; // skip current row
+                    const val = $(node).find('.moduleDescription').val();
+                    if (val && val.toString().trim().toLowerCase() === moduleDescription.toString().trim().toLowerCase()) {
+                        duplicate = true;
+                        row.find(".moduleDescription").val('');
+                        return false; // break
+                    }
+                });
+                if (duplicate) {
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: `Module description '${systemDescription}' already exists in the table.`,
+                    });
+                    return;
+                }
+            }
+        }
+        catch (e) {
+            // ignore duplicate-check errors and continue
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `Duplicate check error, ${e}.`,
+            });
+            return;
+        }
+
+        // If uploading a file, send multipart/form-data to a dedicated handler
+        let response;
+       
+            response = await fetch('?handler=UpdateTextFile', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                body: JSON.stringify({
+                    uniqno: uniqno,
+                    uniqueUpdated: moduleCode,
+                    todo: todo,
+                    value: value,
+                    systemId: document.getElementById('inputSystemTypeName').value,
+                })
+            });
+       
+        if (!response.ok) {
+            const text = await response.text();
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile failed:, ${response.status}, ${text}.`,
+            });
+            return;
+        }
+
+        // Try to parse JSON, but guard against empty/non-JSON responses
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') !== -1) {
+            const result = await response.json();
+
+            // Normalize result: handler may return a string or an object { status, statusDescription }
+            if (typeof result === 'string') {
+                if (result !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut('slow');
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: result });
+                    return;
+                }
+            }
+            else if (result && result.status) {
+                if (result.status !== 'Success') {
+                    $(".loadingDiv-parent").fadeOut("slow");
+                    //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+                    const msg = result.statusDescription || result.message || 'Operation failed';
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: msg });
+                    return;
+                }
+            }
+
+            if (uniqno === '')
+                row.find(".code").val(moduleCode);
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+        }
+        else {
+            const text = await response.text();
+            $(".loadingDiv-parent").fadeOut("slow");
+            //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `UpdateTextFile response:, ${text}.`,
+            });
+            return;
+            //hideLoading();
+        }
+
+    }
+    catch (e) {
+        console.log(e);
+        $(".loadingDiv-parent").fadeOut("slow");
+        //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
+        //hideLoading();
+    }
 }
 
-// ── Clear validation state on user input ───────────────────────────
-[systemTypeEl, moduleCodeEl, moduleDescEl].forEach(el => {
-    el.addEventListener('input', () => el.classList.remove('is-invalid'));
-});
 
-// ── Initial render ─────────────────────────────────────────────────
-renderTable();
