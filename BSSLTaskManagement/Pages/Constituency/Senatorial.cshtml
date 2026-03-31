@@ -256,7 +256,9 @@
         const rows = [];
         let hasError = false;
         const seenCodes = new Set();
-        let hasDuplicate = false;
+        const seenDescs = new Set();
+        let hasDuplicateCode = false;
+        let hasDuplicateDesc = false;
 
         $('#tblBody tr').each(function () {
         const id   = parseInt($(this).data('id') || 0);
@@ -273,10 +275,17 @@
 
         // Duplicate code check
         if (seenCodes.has(code.toLowerCase())) {
-        hasDuplicate = true;
-        return false; // break
+        hasDuplicateCode = true;
+        return false;
         }
         seenCodes.add(code.toLowerCase());
+
+        // Duplicate description check
+        if (seenDescs.has(desc.toLowerCase())) {
+        hasDuplicateDesc = true;
+        return false;
+        }
+        seenDescs.add(desc.toLowerCase());
 
         rows.push({ id, code, description: desc });
         });
@@ -286,8 +295,13 @@
         return;
         }
 
-        if (hasDuplicate) {
+        if (hasDuplicateCode) {
         Swal.fire('Validation', 'Duplicate codes are not allowed. Please ensure each Code is unique.', 'warning');
+        return;
+        }
+
+        if (hasDuplicateDesc) {
+        Swal.fire('Validation', 'Duplicate descriptions are not allowed. Please ensure each Description is unique.', 'warning');
         return;
         }
 
