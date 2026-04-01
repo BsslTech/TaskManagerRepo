@@ -18,6 +18,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<List<SubMenuSetupListVM>> GetSubMenuSetupListAsync(int? moduleId, int? mainMenuId, string menuId);
         Task<SubMenuSetupVM> GetSubMenuSetupSingleAsync(int? id);
         Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu);
+        Task<List<SubMenuSetupVM>> GetAllSubMenusAsync();
     }
     public class MainMenuSetupServices(ISystemSerivces system, TaskDbContext context) : IMainMenuSetupServices
     {
@@ -380,6 +381,19 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 subMenu = new();
             }
             return subMenu;
+        }
+
+        public async Task<List<SubMenuSetupVM>> GetAllSubMenusAsync()
+        {
+            return await context.SubMenusetupTab
+                .Select(x => new SubMenuSetupVM
+                {
+                    Id = x.Id,
+                    SubMenuCode = x.SubMenuCode,
+                    SubMenuName = x.SubMenuName,
+                    PageUrl = x.PageUrl
+                })
+                .ToListAsync();
         }
 
         public async Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu)
