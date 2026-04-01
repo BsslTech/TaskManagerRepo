@@ -1,485 +1,485 @@
-﻿@page
-@model BSSLTaskManagement.Pages.Constituency.SenatorialModel
-@{
-}
+﻿    @page
+    @model BSSLTaskManagement.Pages.Constituency.SenatorialModel
+    @{
+    }
 
-@section Styles {
-    @* {{-- Select2 CSS for searchable dropdowns --}} *@
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-}
+    @section Styles {
+        @* {{-- Select2 CSS for searchable dropdowns --}} *@
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    }
 
-<div class="container mt-4">
+    <div class="container mt-4">
 
-    @*
-    FORM CARD: Country + State dropdowns
-    *@
-    <div class="col-md-12">
-        <div class="card card-primary card-outline mb-4">
+        @*
+        FORM CARD: Country + State dropdowns
+        *@
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
 
-            <div class="card-header">
-                <div class="card-title">
-                    <h3>SENATORIAL DISTRICT CODE SETUP</h3>
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3>SENATORIAL DISTRICT CODE SETUP</h3>
+                    </div>
+                </div>
+
+                <div id="formSection">
+                    <form id="SenatorialForm" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="card-body">
+
+                            @* Country Dropdown (Select2 searchable) *@
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label for="ddlCountry" class="form-label">Country</label>
+                                    <select class="form-control" id="ddlCountry" style="width:100%">
+                                        <option value="">--Select Country--</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            @* State Dropdown (Select2 searchable, cascades from Country) *@
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label for="ddlState" class="form-label">State</label>
+                                    <select class="form-control" id="ddlState" style="width:100%" disabled>
+                                        <option value="">--Select State--</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        @* Card Footer: Add Row + Save buttons *@
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-warning" id="btnAddRow" disabled>
+                                    <i class="fas fa-plus"></i> Add Row
+                                </button>
+                                <button type="button" class="btn btn-primary" id="btnSave" disabled>
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <div id="formSection">
-                <form id="SenatorialForm" method="post">
-                    @Html.AntiForgeryToken()
-
-                    <div class="card-body">
-
-                        @* Country Dropdown (Select2 searchable) *@
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="ddlCountry" class="form-label">Country</label>
-                                <select class="form-control" id="ddlCountry" style="width:100%">
-                                    <option value="">--Select Country--</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        @* State Dropdown (Select2 searchable, cascades from Country) *@
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="ddlState" class="form-label">State</label>
-                                <select class="form-control" id="ddlState" style="width:100%" disabled>
-                                    <option value="">--Select State--</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    @* Card Footer: Add Row + Save buttons *@
-                    <div class="card-footer">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-warning" id="btnAddRow" disabled>
-                                <i class="fas fa-plus"></i> Add Row
-                            </button>
-                            <button type="button" class="btn btn-primary" id="btnSave" disabled>
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </div>
-                    </div>
-
-                </form>
+        @*
+        TABLE CARD: Inline editable Senatorial District rows
+        *@
+        <div class="card mb-4" id="tableCard">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Senatorial District Codes</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0" id="tblSenatorial">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px">S/N</th>
+                            <th style="width: 25%">Code</th>
+                            <th>Description</th>
+                            <th style="width: 80px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblBody">
+                        @* Default empty row visible on page load *@
+                        <tr data-id="0">
+                            <td class="align-middle">1</td>
+                            <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
+                            <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
+                            <td class="align-middle text-center">
+                                <button type="button" class="btn btn-danger btn-delete-row" title="Delete">
+                                    <i class="fas fa-trash"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+
     </div>
 
-    @*
-    TABLE CARD: Inline editable Senatorial District rows
-    *@
-    <div class="card mb-4" id="tableCard">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Senatorial District Codes</h5>
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-sm mb-0" id="tblSenatorial">
-                <thead>
-                    <tr>
-                        <th style="width: 80px">S/N</th>
-                        <th style="width: 25%">Code</th>
-                        <th>Description</th>
-                        <th style="width: 80px">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tblBody">
-                    @* Default empty row visible on page load *@
-                    <tr data-id="0">
-                        <td class="align-middle">1</td>
-                        <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
-                        <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
-                        <td class="align-middle text-center">
-                            <button type="button" class="btn btn-danger btn-delete-row" title="Delete">
-                                <i class="fas fa-trash"></i>Delete
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    @section Scripts {
+        @* {{-- Select2 JS --}} *@
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-</div>
+        <script>
+            (function () {
 
-@section Scripts {
-    @* {{-- Select2 JS --}} *@
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            // ── State tracking ───────────────────────────────────────────────────────
+            let selectedStateId = 0;
 
-    <script>
-        (function () {
+            // ── Antiforgery token (needed for POST requests) ─────────────────────────
+            const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
 
-        // ── State tracking ───────────────────────────────────────────────────────
-        let selectedStateId = 0;
+            // ════════════════════════════════════════════════════════════════════════
+            // INITIALIZE Select2 on both dropdowns
+            // ════════════════════════════════════════════════════════════════════════
+            $('#ddlCountry').select2({
+            theme: 'bootstrap-5',
+            placeholder: '--Select Country--',
+            allowClear: true,
+            width: '100%'
+            });
 
-        // ── Antiforgery token (needed for POST requests) ─────────────────────────
-        const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
+            $('#ddlState').select2({
+            theme: 'bootstrap-5',
+            placeholder: '--Select State--',
+            allowClear: true,
+            width: '100%'
+            });
 
-        // ════════════════════════════════════════════════════════════════════════
-        // INITIALIZE Select2 on both dropdowns
-        // ════════════════════════════════════════════════════════════════════════
-        $('#ddlCountry').select2({
-        theme: 'bootstrap-5',
-        placeholder: '--Select Country--',
-        allowClear: true,
-        width: '100%'
-        });
+            // ════════════════════════════════════════════════════════════════════════
+            // ON PAGE LOAD: Populate Country dropdown
+            // ════════════════════════════════════════════════════════════════════════
+            loadCountries();
 
-        $('#ddlState').select2({
-        theme: 'bootstrap-5',
-        placeholder: '--Select State--',
-        allowClear: true,
-        width: '100%'
-        });
+            function loadCountries() {
+            $.ajax({
+            url: '?handler=Countries',
+            type: 'GET',
+            success: function (data) {
+            const ddl = $('#ddlCountry');
+            ddl.find('option:not(:first)').remove();
+            $.each(data, function (i, item) {
+            ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
+            });
+            // Refresh Select2 after options are added
+            ddl.trigger('change.select2');
+            },
+            error: function () {
+            Swal.fire('Error', 'Failed to load countries.', 'error');
+            }
+            });
+            }
 
-        // ════════════════════════════════════════════════════════════════════════
-        // ON PAGE LOAD: Populate Country dropdown
-        // ════════════════════════════════════════════════════════════════════════
-        loadCountries();
+            // ════════════════════════════════════════════════════════════════════════
+            // COUNTRY CHANGE: Load matching states
+            // ════════════════════════════════════════════════════════════════════════
+            $('#ddlCountry').on('change', function () {
+            const countryId = $(this).val();
 
-        function loadCountries() {
-        $.ajax({
-        url: '?handler=Countries',
-        type: 'GET',
-        success: function (data) {
-        const ddl = $('#ddlCountry');
-        ddl.find('option:not(:first)').remove();
-        $.each(data, function (i, item) {
-        ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
-        });
-        // Refresh Select2 after options are added
-        ddl.trigger('change.select2');
-        },
-        error: function () {
-        Swal.fire('Error', 'Failed to load countries.', 'error');
-        }
-        });
-        }
+            // Reset state dropdown and table
+            resetStateDropdown();
+            clearTable();
+            addDefaultRow();
+            selectedStateId = 0;
+            toggleButtons(false);
 
-        // ════════════════════════════════════════════════════════════════════════
-        // COUNTRY CHANGE: Load matching states
-        // ════════════════════════════════════════════════════════════════════════
-        $('#ddlCountry').on('change', function () {
-        const countryId = $(this).val();
+            if (!countryId) return;
 
-        // Reset state dropdown and table
-        resetStateDropdown();
-        clearTable();
-        addDefaultRow();
-        selectedStateId = 0;
-        toggleButtons(false);
+            $.ajax({
+            url: `?handler=StatesByCountry&countryId=${countryId}`,
+            type: 'GET',
+            success: function (data) {
+            const ddl = $('#ddlState');
+            ddl.find('option:not(:first)').remove();
 
-        if (!countryId) return;
+            if (data.length === 0) {
+            Swal.fire('Info', 'No states found for the selected country.', 'info');
+            ddl.trigger('change.select2');
+            return;
+            }
 
-        $.ajax({
-        url: `?handler=StatesByCountry&countryId=${countryId}`,
-        type: 'GET',
-        success: function (data) {
-        const ddl = $('#ddlState');
-        ddl.find('option:not(:first)').remove();
+            $.each(data, function (i, item) {
+            ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
+            });
 
-        if (data.length === 0) {
-        Swal.fire('Info', 'No states found for the selected country.', 'info');
-        ddl.trigger('change.select2');
-        return;
-        }
+            ddl.prop('disabled', false).trigger('change.select2');
+            },
+            error: function () {
+            Swal.fire('Error', 'Failed to load states.', 'error');
+            }
+            });
+            });
 
-        $.each(data, function (i, item) {
-        ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
-        });
+            // ════════════════════════════════════════════════════════════════════════
+            // STATE CHANGE: Load existing senatorial district rows
+            // ════════════════════════════════════════════════════════════════════════
+            $('#ddlState').on('change', function () {
+            const stateId = parseInt($(this).val());
+            selectedStateId = stateId;
+            clearTable();
 
-        ddl.prop('disabled', false).trigger('change.select2');
-        },
-        error: function () {
-        Swal.fire('Error', 'Failed to load states.', 'error');
-        }
-        });
-        });
+            if (!stateId) {
+            toggleButtons(false);
+            addDefaultRow();
+            return;
+            }
 
-        // ════════════════════════════════════════════════════════════════════════
-        // STATE CHANGE: Load existing senatorial district rows
-        // ════════════════════════════════════════════════════════════════════════
-        $('#ddlState').on('change', function () {
-        const stateId = parseInt($(this).val());
-        selectedStateId = stateId;
-        clearTable();
+            toggleButtons(true);
 
-        if (!stateId) {
-        toggleButtons(false);
-        addDefaultRow();
-        return;
-        }
+            $.ajax({
+            url: `?handler=SenatorialRows&stateId=${stateId}`,
+            type: 'GET',
+            success: function (data) {
+            if (data.length === 0) {
+            addDefaultRow();
+            } else {
+            $.each(data, function (i, row) {
+            appendRow(row.id, row.code, row.description);
+            });
+            addNewRow();
+            }
+            },
+            error: function () {
+            Swal.fire('Error', 'Failed to load senatorial district records.', 'error');
+            }
+            });
+            });
 
-        toggleButtons(true);
+            // ════════════════════════════════════════════════════════════════════════
+            // ADD ROW BUTTON
+            // ════════════════════════════════════════════════════════════════════════
+            $('#btnAddRow').on('click', function () {
+            if (selectedStateId <= 0) {
+            Swal.fire('Warning', 'Please select a state first.', 'warning');
+            return;
+            }
+            addNewRow();
+            });
 
-        $.ajax({
-        url: `?handler=SenatorialRows&stateId=${stateId}`,
-        type: 'GET',
-        success: function (data) {
-        if (data.length === 0) {
-        addDefaultRow();
-        } else {
-        $.each(data, function (i, row) {
-        appendRow(row.id, row.code, row.description);
-        });
-        addNewRow();
-        }
-        },
-        error: function () {
-        Swal.fire('Error', 'Failed to load senatorial district records.', 'error');
-        }
-        });
-        });
+            // ════════════════════════════════════════════════════════════════════════
+            // SAVE BUTTON: Collect all rows and POST to server
+            // ════════════════════════════════════════════════════════════════════════
+            $('#btnSave').on('click', function () {
+            if (selectedStateId <= 0) {
+            Swal.fire('Warning', 'Please select a state first.', 'warning');
+            return;
+            }
 
-        // ════════════════════════════════════════════════════════════════════════
-        // ADD ROW BUTTON
-        // ════════════════════════════════════════════════════════════════════════
-        $('#btnAddRow').on('click', function () {
-        if (selectedStateId <= 0) {
-        Swal.fire('Warning', 'Please select a state first.', 'warning');
-        return;
-        }
-        addNewRow();
-        });
+            const rows = [];
+            let hasError = false;
+            const seenCodes = new Set();
+            const seenDescs = new Set();
+            let hasDuplicateCode = false;
+            let hasDuplicateDesc = false;
 
-        // ════════════════════════════════════════════════════════════════════════
-        // SAVE BUTTON: Collect all rows and POST to server
-        // ════════════════════════════════════════════════════════════════════════
-        $('#btnSave').on('click', function () {
-        if (selectedStateId <= 0) {
-        Swal.fire('Warning', 'Please select a state first.', 'warning');
-        return;
-        }
+            $('#tblBody tr').each(function () {
+            const id   = parseInt($(this).data('id') || 0);
+            const code = $(this).find('.col-code').val().trim();
+            const desc = $(this).find('.col-desc').val().trim();
 
-        const rows = [];
-        let hasError = false;
-        const seenCodes = new Set();
-        const seenDescs = new Set();
-        let hasDuplicateCode = false;
-        let hasDuplicateDesc = false;
+            // Skip completely empty rows
+            if (!code && !desc) return;
 
-        $('#tblBody tr').each(function () {
-        const id   = parseInt($(this).data('id') || 0);
-        const code = $(this).find('.col-code').val().trim();
-        const desc = $(this).find('.col-desc').val().trim();
+            if (!code || !desc) {
+            hasError = true;
+            return false; // break
+            }
 
-        // Skip completely empty rows
-        if (!code && !desc) return;
+            // Duplicate code check
+            if (seenCodes.has(code.toLowerCase())) {
+            hasDuplicateCode = true;
+            return false;
+            }
+            seenCodes.add(code.toLowerCase());
 
-        if (!code || !desc) {
-        hasError = true;
-        return false; // break
-        }
+            // Duplicate description check
+            if (seenDescs.has(desc.toLowerCase())) {
+            hasDuplicateDesc = true;
+            return false;
+            }
+            seenDescs.add(desc.toLowerCase());
 
-        // Duplicate code check
-        if (seenCodes.has(code.toLowerCase())) {
-        hasDuplicateCode = true;
-        return false;
-        }
-        seenCodes.add(code.toLowerCase());
+            rows.push({ id, code, description: desc });
+            });
 
-        // Duplicate description check
-        if (seenDescs.has(desc.toLowerCase())) {
-        hasDuplicateDesc = true;
-        return false;
-        }
-        seenDescs.add(desc.toLowerCase());
+            if (hasError) {
+            Swal.fire('Validation', 'Each row must have both a Code and a Description.', 'warning');
+            return;
+            }
 
-        rows.push({ id, code, description: desc });
-        });
+            if (hasDuplicateCode) {
+            Swal.fire('Validation', 'Duplicate codes are not allowed. Please ensure each Code is unique.', 'warning');
+            return;
+            }
 
-        if (hasError) {
-        Swal.fire('Validation', 'Each row must have both a Code and a Description.', 'warning');
-        return;
-        }
+            if (hasDuplicateDesc) {
+            Swal.fire('Validation', 'Duplicate descriptions are not allowed. Please ensure each Description is unique.', 'warning');
+            return;
+            }
 
-        if (hasDuplicateCode) {
-        Swal.fire('Validation', 'Duplicate codes are not allowed. Please ensure each Code is unique.', 'warning');
-        return;
-        }
+            if (rows.length === 0) {
+            Swal.fire('Validation', 'No rows to save.', 'warning');
+            return;
+            }
 
-        if (hasDuplicateDesc) {
-        Swal.fire('Validation', 'Duplicate descriptions are not allowed. Please ensure each Description is unique.', 'warning');
-        return;
-        }
+            const payload = { stateId: selectedStateId, rows: rows };
 
-        if (rows.length === 0) {
-        Swal.fire('Validation', 'No rows to save.', 'warning');
-        return;
-        }
+            $.ajax({
+            url: '?handler=SaveSenatorial',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'RequestVerificationToken': antiForgeryToken },
+            data: JSON.stringify(payload),
+            success: function (result) {
+            if (result.success) {
+            Swal.fire('Success', result.message, 'success').then(() => {
+            reloadRows(selectedStateId);
+            });
+            } else {
+            Swal.fire('Error', result.message, 'error');
+            }
+            },
+            error: function () {
+            Swal.fire('Error', 'An unexpected error occurred while saving.', 'error');
+            }
+            });
+            });
 
-        const payload = { stateId: selectedStateId, rows: rows };
+            // ════════════════════════════════════════════════════════════════════════
+            // DELETE ROW (delegated — works on dynamically added rows)
+            // ════════════════════════════════════════════════════════════════════════
+            $('#tblBody').on('click', '.btn-delete-row', function () {
+            const row = $(this).closest('tr');
+            const id  = parseInt(row.data('id') || 0);
 
-        $.ajax({
-        url: '?handler=SaveSenatorial',
-        type: 'POST',
-        contentType: 'application/json',
-        headers: { 'RequestVerificationToken': antiForgeryToken },
-        data: JSON.stringify(payload),
-        success: function (result) {
-        if (result.success) {
-        Swal.fire('Success', result.message, 'success').then(() => {
-        reloadRows(selectedStateId);
-        });
-        } else {
-        Swal.fire('Error', result.message, 'error');
-        }
-        },
-        error: function () {
-        Swal.fire('Error', 'An unexpected error occurred while saving.', 'error');
-        }
-        });
-        });
+            if (id === 0) {
+            row.remove();
+            reNumberRows();
+            if ($('#tblBody tr').length === 0) addDefaultRow();
+            return;
+            }
 
-        // ════════════════════════════════════════════════════════════════════════
-        // DELETE ROW (delegated — works on dynamically added rows)
-        // ════════════════════════════════════════════════════════════════════════
-        $('#tblBody').on('click', '.btn-delete-row', function () {
-        const row = $(this).closest('tr');
-        const id  = parseInt(row.data('id') || 0);
+            Swal.fire({
+            title: 'Are you sure?',
+            text: 'This record will be permanently deleted.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel'
+            }).then((confirmed) => {
+            if (confirmed.isConfirmed) {
+            $.ajax({
+            url: `?handler=DeleteSenatorial&id=${id}`,
+            type: 'POST',
+            headers: { 'RequestVerificationToken': antiForgeryToken },
+            success: function (res) {
+            if (res.success) {
+            row.remove();
+            reNumberRows();
+            if ($('#tblBody tr').length === 0) addDefaultRow();
+            Swal.fire('Deleted', res.message, 'success');
+            } else {
+            Swal.fire('Error', res.message, 'error');
+            }
+            },
+            error: function () {
+            Swal.fire('Error', 'Failed to delete the record.', 'error');
+            }
+            });
+            }
+            });
+            });
 
-        if (id === 0) {
-        row.remove();
-        reNumberRows();
-        if ($('#tblBody tr').length === 0) addDefaultRow();
-        return;
-        }
+            // ════════════════════════════════════════════════════════════════════════
+            // HELPER FUNCTIONS
+            // ════════════════════════════════════════════════════════════════════════
 
-        Swal.fire({
-        title: 'Are you sure?',
-        text: 'This record will be permanently deleted.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it',
-        cancelButtonText: 'Cancel'
-        }).then((confirmed) => {
-        if (confirmed.isConfirmed) {
-        $.ajax({
-        url: `?handler=DeleteSenatorial&id=${id}`,
-        type: 'POST',
-        headers: { 'RequestVerificationToken': antiForgeryToken },
-        success: function (res) {
-        if (res.success) {
-        row.remove();
-        reNumberRows();
-        if ($('#tblBody tr').length === 0) addDefaultRow();
-        Swal.fire('Deleted', res.message, 'success');
-        } else {
-        Swal.fire('Error', res.message, 'error');
-        }
-        },
-        error: function () {
-        Swal.fire('Error', 'Failed to delete the record.', 'error');
-        }
-        });
-        }
-        });
-        });
+            function appendRow(id, code, description) {
+            const serial = $('#tblBody tr').length + 1;
+            const row = `
+            <tr data-id="${id}">
+            <td class="align-middle">${serial}</td>
+            <td><input type="text" class="form-control form-control-sm col-code" value="${escapeHtml(code)}"></td>
+            <td><input type="text" class="form-control form-control-sm col-desc" value="${escapeHtml(description)}"></td>
+            <td class="align-middle text-center">
+            <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
+            <i class="fas fa-trash"></i>Delete
+            </button>
+            </td>
+            </tr>`;
+            $('#tblBody').append(row);
+            }
 
-        // ════════════════════════════════════════════════════════════════════════
-        // HELPER FUNCTIONS
-        // ════════════════════════════════════════════════════════════════════════
+            function addNewRow() {
+            const serial = $('#tblBody tr').length + 1;
+            const row = `
+            <tr data-id="0">
+            <td class="align-middle">${serial}</td>
+            <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
+            <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
+            <td class="align-middle text-center">
+            <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
+            <i class="fas fa-trash"></i>Delete
+            </button>
+            </td>
+            </tr>`;
+            $('#tblBody').append(row);
+            }
 
-        function appendRow(id, code, description) {
-        const serial = $('#tblBody tr').length + 1;
-        const row = `
-        <tr data-id="${id}">
-        <td class="align-middle">${serial}</td>
-        <td><input type="text" class="form-control form-control-sm col-code" value="${escapeHtml(code)}"></td>
-        <td><input type="text" class="form-control form-control-sm col-desc" value="${escapeHtml(description)}"></td>
-        <td class="align-middle text-center">
-        <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>Delete
-        </button>
-        </td>
-        </tr>`;
-        $('#tblBody').append(row);
-        }
+            function addDefaultRow() {
+            $('#tblBody').empty();
+            const row = `
+            <tr data-id="0">
+            <td class="align-middle">1</td>
+            <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
+            <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
+            <td class="align-middle text-center">
+            <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
+            <i class="fas fa-trash"></i>Delete
+            </button>
+            </td>
+            </tr>`;
+            $('#tblBody').append(row);
+            }
 
-        function addNewRow() {
-        const serial = $('#tblBody tr').length + 1;
-        const row = `
-        <tr data-id="0">
-        <td class="align-middle">${serial}</td>
-        <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
-        <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
-        <td class="align-middle text-center">
-        <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>Delete
-        </button>
-        </td>
-        </tr>`;
-        $('#tblBody').append(row);
-        }
+            function reloadRows(stateId) {
+            clearTable();
+            $.ajax({
+            url: `?handler=SenatorialRows&stateId=${stateId}`,
+            type: 'GET',
+            success: function (data) {
+            if (data.length === 0) {
+            addDefaultRow();
+            } else {
+            $.each(data, function (i, row) {
+            appendRow(row.id, row.code, row.description);
+            });
+            addNewRow();
+            }
+            },
+            error: function () {
+            Swal.fire('Error', 'Failed to reload senatorial district records.', 'error');
+            }
+            });
+            }
 
-        function addDefaultRow() {
-        $('#tblBody').empty();
-        const row = `
-        <tr data-id="0">
-        <td class="align-middle">1</td>
-        <td><input type="text" class="form-control form-control-sm col-code" placeholder="Code"></td>
-        <td><input type="text" class="form-control form-control-sm col-desc" placeholder="Description"></td>
-        <td class="align-middle text-center">
-        <button type="button" class="btn btn-danger btn-sm btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>Delete
-        </button>
-        </td>
-        </tr>`;
-        $('#tblBody').append(row);
-        }
+            function clearTable() {
+            $('#tblBody').empty();
+            }
 
-        function reloadRows(stateId) {
-        clearTable();
-        $.ajax({
-        url: `?handler=SenatorialRows&stateId=${stateId}`,
-        type: 'GET',
-        success: function (data) {
-        if (data.length === 0) {
-        addDefaultRow();
-        } else {
-        $.each(data, function (i, row) {
-        appendRow(row.id, row.code, row.description);
-        });
-        addNewRow();
-        }
-        },
-        error: function () {
-        Swal.fire('Error', 'Failed to reload senatorial district records.', 'error');
-        }
-        });
-        }
+            function reNumberRows() {
+            $('#tblBody tr').each(function (index) {
+            $(this).find('td:first').text(index + 1);
+            });
+            }
 
-        function clearTable() {
-        $('#tblBody').empty();
-        }
+            function resetStateDropdown() {
+            const ddl = $('#ddlState');
+            ddl.find('option:not(:first)').remove();
+            ddl.val('').prop('disabled', true).trigger('change.select2');
+            }
 
-        function reNumberRows() {
-        $('#tblBody tr').each(function (index) {
-        $(this).find('td:first').text(index + 1);
-        });
-        }
+            function toggleButtons(enabled) {
+            $('#btnAddRow, #btnSave').prop('disabled', !enabled);
+            }
 
-        function resetStateDropdown() {
-        const ddl = $('#ddlState');
-        ddl.find('option:not(:first)').remove();
-        ddl.val('').prop('disabled', true).trigger('change.select2');
-        }
+            function escapeHtml(str) {
+            if (!str) return '';
+            return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+            }
 
-        function toggleButtons(enabled) {
-        $('#btnAddRow, #btnSave').prop('disabled', !enabled);
-        }
-
-        function escapeHtml(str) {
-        if (!str) return '';
-        return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-        }
-
-        })();
-    </script>
-}
+            })();
+        </script>
+    }
