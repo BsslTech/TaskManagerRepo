@@ -246,11 +246,13 @@
                     let menuRows = [];
         let hasError = false;
         const seenOrderNumbers = new Set();
+        const seenDescriptions = new Set();  // ← ADD THIS
         let hasDuplicate = false;
+        let hasDuplicateDesc = false;        // ← ADD THIS
 
         table.rows().every(function () {
             let row = $(this.node());
-            const description  = row.find('.mainMenuDescription').val().trim();
+            const description = row.find('.mainMenuDescription').val().trim();
             const savedDescription = row.find('.mainMenuDescription').attr('data-saved-description') || description;
             const orderNo = row.find('.orderNumber').val().trim();
 
@@ -259,11 +261,18 @@
                 return;
             }
 
+            // ← ADD: Duplicate description check
+            if (seenDescriptions.has(description.toLowerCase())) {
+                hasDuplicateDesc = true;
+                return false;
+            }
+            seenDescriptions.add(description.toLowerCase());
+
             // Duplicate order number check (only if an order number was entered)
             if (orderNo) {
                 if (seenOrderNumbers.has(orderNo)) {
                     hasDuplicate = true;
-                    return false; // break
+                    return false;
                 }
                 seenOrderNumbers.add(orderNo);
             }
@@ -277,6 +286,12 @@
 
         if (hasError) {
             alert("Please fill in the Main Menu Description for all rows.");
+            return;
+        }
+
+        // ← ADD THIS BLOCK
+        if (hasDuplicateDesc) {
+            Swal.fire('Validation', 'Duplicate descriptions are not allowed. Please ensure each Main Menu Description is unique.', 'warning');
             return;
         }
 
