@@ -24,15 +24,6 @@
             </div>
         </div>
  
-        <!-- Response Message Alert -->
-        @if (!string.IsNullOrEmpty(Model.ResponseMessage.Status))
-        {
-            <div class="alert @(Model.ResponseMessage.Status == "Success" ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert" style="margin: 20px;">
-                <strong>@Model.ResponseMessage.Status!</strong> @Model.ResponseMessage.StatusDescription
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
- 
         <div class="app-content">
             <div class="container-fluid">
                 <div class="row">
