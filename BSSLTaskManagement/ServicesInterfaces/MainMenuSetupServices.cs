@@ -115,6 +115,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                     {
                         existing.Description = item.Description;
                         existing.OrderNo = item.OrderNo;
+                        existing.ModuleSetupId = Convert.ToInt32(main.ModuleSetupId);
                     }
                     else
                     {
@@ -122,6 +123,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         {
                             Description = item.Description,
                             OrderNo = item.OrderNo,
+                            ModuleSetupId = Convert.ToInt32(main.ModuleSetupId),
                         };
 
                         context.MainMenu.Add(newItem);

@@ -1,10 +1,22 @@
-﻿// Edit row - populate single save form
+﻿// ─── GLOBALS ───────────────────────────────────────────────────
+let table; // DataTable instance — accessible by all functions
+
+// ─── CLEAR FORM ────────────────────────────────────────────────
+function clearForm() {
+    document.getElementById('menuId').value = '';
+    document.getElementById('menuCode').value = '';
+    document.getElementById('menuDescription').value = '';
+    document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
+}
+
+// ─── EDIT ROW ──────────────────────────────────────────────────
+// Populate the single-save form when a row's Select button is clicked
 function editRow(index, id, code, description) {
     document.getElementById('menuId').value = id || '';
     document.getElementById('menuCode').value = code || '';
     document.getElementById('menuDescription').value = description || '';
 
-    // Highlight selected row
+    // Highlight the selected row
     document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
     document.getElementById('row_' + index).classList.add('table-info');
 
@@ -42,6 +54,7 @@ function editRow(index, id, code, description) {
 document.getElementById('menuForm').addEventListener('submit', function (e) {
     const code = document.getElementById('menuCode').value.trim();
     const description = document.getElementById('menuDescription').value.trim();
+    const currentId = document.getElementById('menuId').value.trim();
 
     if (!code || !description) {
         e.preventDefault();
@@ -50,8 +63,18 @@ document.getElementById('menuForm').addEventListener('submit', function (e) {
     }
 });
 
+// ─── DOCUMENT READY ────────────────────────────────────────────
+$(document).ready(function() {
 
-$(document).ready(function () {
+    // Initialise DataTable
+    // Before init, add data-search attributes to each input cell so DataTables
+    // can read the plain-text value for search/sort without touching the HTML.
+    $('#menuDataTable tbody tr').each(function() {
+        const code = $(this).find('.menuCode').val() || '';
+        const name = $(this).find('.menuName').val() || '';
+        $(this).find('td:eq(2)').attr('data-search', code).attr('data-order', code);
+        $(this).find('td:eq(3)').attr('data-search', name).attr('data-order', name);
+    });
 
     table = $('#menuDataTable').DataTable({
         responsive: true,
@@ -109,7 +132,7 @@ $(document).ready(function () {
            }
        }
 
-       if (!valid) return;
+    if (!valid) return;
 
        // All good — trigger your actual form submission here
        alert('Form submitted successfully!');

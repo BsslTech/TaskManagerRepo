@@ -1,1 +1,448 @@
-﻿7
+﻿@page
+@model BSSLTaskManagement.Pages.Menu.MenuSetupModel
+@{
+    ViewData["Title"] = "Menu";
+}
+<form method="post">
+    <main class="app-main">
+
+        <div class="app-content-header" style="padding:10px;">
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">Menu Setup</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item" style="padding:5px;"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page" style="padding:5px;">Menu Setup</li>
+                        </ol>
+                    </div>
+                </div>
+                <!--end::Row-->
+            </div>
+        </div>
+
+        <div class="card card-primary card-outline mb-4">
+            <!--begin::Header-->
+            <div class="app-content">
+                <!--begin::Container-->
+                <div class="container-fluid">
+                    <!--end::Header-->
+                    <!--begin::Form-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!--begin::Body-->
+                            <div class="card-body">
+                                <h6 class="spn font-italic"></h6>
+                           
+                                    <div class="row">
+                                        <div class="mb-3 col-4">
+                                            <label for="inputSystemTypeName" class="form-label req">System Type Name</label>
+                                        <select class="form-control form-select border-primary" id="inputSystemTypeName">
+                                                <option value="">--Select System Type--</option>
+                                                @foreach (var item in Model.SystemTypeList)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3 col-4">
+                                            <label for="inputModuleName" class="form-label req">Module Name:</label>
+                                        <select class="form-control form-select border-primary" id="inputModuleName">
+                                                <option value="">--Select Module Name--</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3 col-4">
+                                            <label for="inputMainMenu" class="form-label req">Main-Menu</label>
+                                        <select class="form-control form-select border-primary" id="inputMainMenu">
+                                                <option value="">--Select Main-Menu--</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <!--end::Body-->
+                                    <!--begin::Footer-->
+                                <div class="mt-3" style="margin-bottom:1%">
+                                        <button type="button" class="btn btn-success btnSave">Save</button>
+                                        <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
+                                        <a href="./MenuSetup" class="btn btn-warning">Refresh</a>
+                                    </div>
+                                    <!--begin::Table-->
+                                    <table style="width:100%" class="table table-bordered display" id="MenuSetupTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">S/N</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Code</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Menu Name</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Order No.</th>
+                                                <th style="text-align:center;padding:10px;border:1px solid lightgrey;text-transform:none;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            <tr id="0" role="row">
+                                                <td style="padding:10px; border:1px solid lightgrey; width:20px;">1</td>
+
+                                                <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                                    <input style="width:100px" type="text" class="form-control border-primary menuCode" />
+                                                </td>
+
+                                                <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                                    <input style="width:300px" type="text" class="form-control border-primary menuName" />
+                                                </td>
+
+                                                <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                                <select style="width:200px" class="form-control form-select border-primary orderNumber" id="orderNumber_1">
+                                                    <option value="">--Select Order No--</option>
+                                                    @for (int i = 1; i <= 30; i++)
+                                                    {
+                                                        <option value="@i">Order @i</option>
+                                                    }
+                                                </select>
+                                                </td>
+
+                                                <td style="text-align:center;padding:10px;border:1px solid lightgrey;width:100px">
+                                                  
+                                                    <button type="button" class="btn btn-danger  removeRow">
+                                                        <i class="fa fa-trash"></i> Delete Row
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Hidden template row — cloned when Add New Row is clicked -->
+                                    <table style="display:none">
+                                        <tr id="rowTemplate" style="display:none">
+                                            <td style="padding:10px;border:1px solid lightgrey; width:20px; " class="sn"></td>
+
+                                            <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                                <input style="width:100px" type="text" class="form-control border-primary menuCode" />
+                                            </td>
+
+                                            <td class="col-1" style="text-align:left;padding:10px;border:1px solid lightgrey;">
+                                                <input style="width:300px" type="text" class="form-control border-primary menuName" />
+                                            </td>
+
+                                            <td class="col-1" style="text-align:center;padding:10px;border:1px solid lightgrey;">
+                                            <select style="width:200px" class="form-control form-select border-primary orderNumber" id="orderNumber_1">
+                                                <option value="">--Select Order No--</option>
+                                                @for (int i = 1; i <= 30; i++)
+                                                {
+                                                    <option value="@i">Order @i</option>
+                                                }
+                                            </select>
+                                            </td>
+
+                                            <td style="text-align:center;padding:10px;border:1px solid lightgrey;width:100px">
+                                             <button type="button" class="btn btn-danger removeRow">
+                                                    <i class="fa fa-trash"></i> Delete Row
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                <div class="mt-3" style="margin-bottom:2%">
+                                        <button type="button" class="btn btn-success btnSave">Save</button>
+                                        <button type="button" onclick="AddDropdownRow()" class="btn btn-primary">Add New Row</button>
+                                        <a href="./MenuSetup" class="btn btn-warning">Refresh</a>
+
+                                    </div>
+                                    <!--end::Footer-->
+                                    <!--end::Form-->
+
+
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+        // ─── INITIALIZE DATATABLE ──────────────────────────────────────
+        let table = $('#MenuSetupTable').DataTable({
+            paging: true,
+            pageLength: 10,
+            ordering: false,
+            searching: false,
+            info: true,
+            columnDefs: [{ orderable: false, targets: '_all' }]
+        });
+
+        // ─── CASCADE: System Type → Module Name ───────────────────────
+        $('#inputSystemTypeName').on('change', function () {
+            const systemId = $(this).val();
+            $('#inputModuleName').html('<option value="">--Select Module Name--</option>');
+            $('#inputMainMenu').html('<option value="">--Select Main-Menu--</option>');
+            ClearTable();
+            if (!systemId) return;
+
+            $.getJSON(`?handler=ModulesBySystem&systemId=${systemId}`, function (data) {
+                data.forEach(item => {
+                    $('#inputModuleName').append(`<option value="${item.value}">${item.text}</option>`);
+                });
+            });
+        });
+
+        // ─── CASCADE: Module Name → Main Menu ─────────────────────────
+        $('#inputModuleName').on('change', function () {
+            const moduleId = $(this).val();
+            const systemId = $('#inputSystemTypeName').val();
+            $('#inputMainMenu').html('<option value="">--Select Main-Menu--</option>');
+            ClearTable();
+            if (!moduleId) return;
+
+            $.getJSON(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`, function (data) {
+                data.forEach(item => {
+                    $('#inputMainMenu').append(`<option value="${item.value}">${item.text}</option>`);
+                });
+            });
+        });
+
+        // ─── CASCADE: Main Menu → Load Existing Rows ──────────────────
+        $('#inputMainMenu').on('change', function () {
+            const mainMenuId = $(this).val();
+            ClearTable();
+            if (!mainMenuId) return;
+
+            $.getJSON(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`, function (data) {
+                if (data.length === 0) {
+                    // No saved data — keep the blank starter row
+                    AddDropdownRow();
+                    return;
+                }
+                data.forEach((item, index) => {
+                    let newRow = $("#rowTemplate").clone().removeAttr("id").show();
+                    newRow.find(".sn").text(index + 1);
+                    newRow.find(".menuCode").val(item.menuCode);
+                    newRow.find(".menuName").val(item.menuName);
+                    newRow.find(".menuName").attr("data-saved-name", item.savedName);
+                    newRow.find(".orderNumber").val(item.orderNo);
+                    table.row.add(newRow[0]).draw(false);
+                });
+                table.columns.adjust();
+            });
+        });
+
+        // ─── ADD NEW ROW ───────────────────────────────────────────────
+        function AddDropdownRow() {
+            let rowCount = table.rows().count();
+            let newRow = $("#rowTemplate").clone().removeAttr("id").show();
+            newRow.find(".sn").text(rowCount + 1);
+            newRow.find("input").val("");
+            table.row.add(newRow[0]).draw(false);
+
+            let pageLength = table.page.len();
+            let newPage = Math.floor(table.rows().count() - 1) / pageLength;
+            table.page(Math.floor(newPage)).draw(false);
+            table.columns.adjust();
+        }
+
+        // ─── REMOVE ROW ────────────────────────────────────────────────
+        $(document).on('click', '.removeRow', function () {
+            table.row($(this).closest('tr')).remove().draw(false);
+            ReIndexRows();
+            table.columns.adjust();
+        });
+
+        // ─── RE-INDEX ROWS ─────────────────────────────────────────────
+        function ReIndexRows() {
+            table.rows().every(function (rowIdx) {
+                let row = $(this.node());
+                row.attr("id", rowIdx);
+                row.find("td:first").text(rowIdx + 1);
+            });
+        }
+
+        // ─── CLEAR TABLE ───────────────────────────────────────────────
+        function ClearTable() {
+            table.clear().draw();
+        }
+
+        // ─── SAVE ──────────────────────────────────────────────────────
+        $(document).on('click', '.btnSave', function () {
+            const systemId = $('#inputSystemTypeName').val();
+            const moduleId = $('#inputModuleName').val();
+            const mainMenuId = $('#inputMainMenu').val();
+
+            if (!systemId || !moduleId || !mainMenuId) {
+               Swal.fire('Warning', 'Please select System Type, Module Name, and Main Menu before saving.', 'warning');
+                return;
+            }
+
+                let menuRows = [];
+        let hasError = false;
+        const seenMenuCodes = new Set();
+        const seenMenuNames = new Set();        // ← ADDED
+        const seenOrderNumbers = new Set();
+        let hasDuplicateCode = false;
+        let hasDuplicateName = false;           // ← ADDED
+        let hasDuplicateOrder = false;
+
+        table.rows().every(function () {
+            let row = $(this.node());
+            const menuCode  = row.find('.menuCode').val().trim();
+            const menuName  = row.find('.menuName').val().trim();
+            const savedName = row.find('.menuName').attr('data-saved-name') || menuName;
+            const orderNo   = row.find('.orderNumber').val().trim();
+
+            if (!menuCode || !menuName || !orderNo) {
+            hasError = true;
+            return;
+        }
+
+            // Duplicate menu code check
+            if (seenMenuCodes.has(menuCode.toLowerCase())) {
+                hasDuplicateCode = true;
+                return false;
+            }
+            seenMenuCodes.add(menuCode.toLowerCase());
+
+            // ← ADDED: Duplicate menu name check
+            if (seenMenuNames.has(menuName.toLowerCase())) {
+                hasDuplicateName = true;
+                return false;
+            }
+            seenMenuNames.add(menuName.toLowerCase());
+
+            // Duplicate order number check (only if entered)
+            if (orderNo) {
+                if (seenOrderNumbers.has(orderNo)) {
+                    hasDuplicateOrder = true;
+                    return false;
+                }
+                seenOrderNumbers.add(orderNo);
+            }
+
+            menuRows.push({
+                menuCode:  menuCode,
+                menuName:  menuName,
+                savedName: savedName,
+                orderNo:   orderNo ? parseInt(orderNo) : null
+            });
+        });
+
+        if (hasError) {
+            Swal.fire('Validation', 'Please fill in Menu Code, Menu Name and Order No. for all rows.', 'warning');
+            return;
+        }
+
+        if (hasDuplicateCode) {
+            Swal.fire('Validation', 'Duplicate menu codes are not allowed. Please ensure each Menu Code is unique.', 'warning');
+            return;
+        }
+
+        // ← ADDED
+        if (hasDuplicateName) {
+            Swal.fire('Validation', 'Duplicate menu names are not allowed. Please ensure each Menu Name is unique.', 'warning');
+            return;
+        }
+
+        if (hasDuplicateOrder) {
+            Swal.fire('Validation', 'Duplicate order numbers are not allowed. Please ensure each Order Number is unique.', 'warning');
+            return;
+        }
+
+            if (menuRows.length === 0) {
+                Swal.fire('Validation', 'Please add at least one menu row before saving.', 'warning');
+                return;
+            }
+
+            const payload = {
+                systemTypeTabId:  parseInt(systemId),
+                moduleSetupId:    parseInt(moduleId),
+                mainMenuSetupId:  parseInt(mainMenuId),
+                menuSetup: menuRows
+            };
+
+            $.ajax({
+                url: '?handler=SaveMenuSetup',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+                success: function (response) {
+                            if (response.status === "Success") {
+            Swal.fire('Success', response.statusDescription, 'success') .then(() => {
+                            $(".loadingDiv-parent").fadeIn("fast");
+                            //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
+                            window.location.href = window.location.origin + "/Menu/MenuSetup";
+                        });
+        } else {
+            Swal.fire('Error', response.statusDescription, 'error');
+        }
+                },
+                error: function () {
+                    Swal.fire('Error', 'An error occurred while saving. Please try again.', 'error');
+                }
+            });
+
+                    // ─── REAL-TIME DUPLICATE WARNING ───────────────────────────────
+        $(document).on('input', '.menuCode', function () {
+            const input      = $(this);
+            const val        = input.val().trim();
+            const currentRow = input.closest('tr')[0];
+
+            input.next('.dup-warning').remove();
+
+            if (!val) return;
+
+            let isDuplicate = false;
+            table.rows().every(function () {
+                const row = $(this.node());
+                if (row[0] === currentRow) return;
+                if (row.find('.menuCode').val().trim().toLowerCase() === val.toLowerCase()) {
+                    isDuplicate = true;
+                }
+            });
+
+            if (isDuplicate) {
+                input.after(`<small class="dup-warning text-danger d-block">Duplicate Menu Code</small>`);
+            }
+        });
+
+        $(document).on('input', '.orderNumber', function () {
+            const input      = $(this);
+            const val        = input.val().trim();
+            const currentRow = input.closest('tr')[0];
+
+            input.next('.dup-warning').remove();
+
+            if (!val) return;
+
+            let isDuplicate = false;
+            table.rows().every(function () {
+                const row = $(this.node());
+                if (row[0] === currentRow) return;
+                if (row.find('.orderNumber').val().trim() === val) {
+                    isDuplicate = true;
+                }
+            });
+
+            if (isDuplicate) {
+                input.after(`<small class="dup-warning text-danger d-block">Duplicate Order No.</small>`);
+            }
+        });
+
+                // ─── BLOCK SAVE IF DUPLICATES EXIST ────────────────────────────
+        if ($('.dup-warning').length > 0) {
+            Swal.fire('Validation', 'Please resolve duplicate Menu Code or Order No. before saving.', 'warning');
+            return;
+        }
+
+        });
+
+    </script>
+}
+7
