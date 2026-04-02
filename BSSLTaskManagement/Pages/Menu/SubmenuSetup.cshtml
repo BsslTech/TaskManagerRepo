@@ -172,7 +172,7 @@
                                  
                                         <div class="row row2">
                                             <div class="col-sm-4">
-                                                <label class="form-label">Assign from User Access</label>
+                                                <label class="form-label req">Assign from User Access</label>
                                                 <select class="form-control form-select border-primary" asp-for="SubMenuForm.AccessType">
                                                     <option value="">-Select-</option>
                                                     <option value="R">Read Only</option>
@@ -264,7 +264,7 @@
 
                                     <!-- Filter dropdowns for the list -->
                                     <div class="row g-4 mb-3">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-6">
                                             <label class="form-label">System Type Name</label>
                                             <select class="form-control form-select border-primary" id="listSystemType">
                                                 <option value="">-Select System Name-</option>
@@ -274,19 +274,19 @@
                                                 }
                                             </select>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-6">
                                             <label class="form-label">Module Name</label>
                                             <select class="form-control form-select border-primary" id="listModule" disabled>
                                                 <option value="">-Select Module Name-</option>
                                             </select>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-6">
                                             <label class="form-label">Main Menu Name</label>
                                             <select class="form-control form-select border-primary" id="listMainMenu" disabled>
                                                 <option value="">-Select Main Menu-</option>
                                             </select>
                                         </div>
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-6">
                                             <label class="form-label">Menu Name</label>
                                             <select class="form-control form-select border-primary" id="listMenu" disabled>
                                                 <option value="">-Select Menu Name-</option>
@@ -340,13 +340,10 @@
         const formSection = document.getElementById('formSection');
         const listSection = document.getElementById('listSection');
 
-        // View List / View Form toggle — same buttons, text changes based on current state
         ['viewListBtn-top', 'viewListBtn-bottom'].forEach(id => {
             document.getElementById(id).addEventListener('click', function () {
                 const listIsVisible = listSection.style.display === 'block';
-
                 if (listIsVisible) {
-                    // Currently showing list → switch to form, show the button again
                     listSection.style.display = 'none';
                     formSection.style.display = 'block';
                     document.getElementById('viewListBtn-top').style.display    = 'inline-block';
@@ -354,7 +351,6 @@
                     document.getElementById('viewListBtn-top').textContent      = 'View List';
                     document.getElementById('viewListBtn-bottom').textContent   = 'View List';
                 } else {
-                    // Currently showing form → switch to list, hide the button
                     formSection.style.display = 'none';
                     listSection.style.display = 'block';
                     document.getElementById('viewListBtn-top').style.display    = 'none';
@@ -363,8 +359,6 @@
             });
         });
 
-        // All "Refresh" buttons in the form (header + footer)
-        // → show form, hide list, clear the form, restore + show View List button
         ['refreshBtn-top', 'refreshBtn-bottom'].forEach(id => {
             document.getElementById(id).addEventListener('click', function () {
                 listSection.style.display = 'none';
@@ -377,23 +371,20 @@
             });
         });
 
-        // All "Save" buttons (header + footer) trigger the same save logic
         ['saveBtn-top', 'saveBtn-bottom'].forEach(id => {
             document.getElementById(id).addEventListener('click', async function () {
                 await saveForm();
             });
         });
 
-        // List section Refresh → reset list dropdowns and hide the table
         document.getElementById('listRefreshBtn').addEventListener('click', function () {
-            resetDropdown(listModule, "--Select Module Name--");
+            resetDropdown(listModule,   "--Select Module Name--");
             resetDropdown(listMainMenu, "--Select Main Menu--");
-            resetDropdown(listMenu, "--Select Menu Name--");
+            resetDropdown(listMenu,     "--Select Menu Name--");
             listSystemType.value = '';
             resetListTable();
         });
 
-        // Add New — switch back to form, clear it, restore + show View List button
         document.getElementById('addNewBtn').addEventListener('click', function () {
             listSection.style.display = 'none';
             formSection.style.display = 'block';
@@ -405,11 +396,220 @@
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // SAVE — extracted into a function so both Save buttons can call it
+        // DUPLICATE CHECK HELPERS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        // Returns the current record's Id (0 when creating new)
+        function getCurrentId() {
+            return parseInt(document.getElementById('hiddenId').value || '0', 10);
+        }
+
+        // Calls the server and returns { subMenuCodeTaken, subMenuNameTaken, pageUrlTaken }
+        async function checkDuplicates(subMenuCode, subMenuName, pageUrl) {
+            const excludeId = getCurrentId();
+            const res = await fetch(
+                `?handler=CheckDuplicate` +
+                `&subMenuCode=${encodeURIComponent(subMenuCode)}` +
+                `&subMenuName=${encodeURIComponent(subMenuName)}` +
+                `&pageUrl=${encodeURIComponent(pageUrl)}` +
+                `&excludeId=${excludeId}`
+            );
+            return await res.json();
+        }
+
+        // ── Inline feedback helpers ───────────────────────────────────────────────
+
+        function setFieldError(inputEl, message) {
+            inputEl.classList.add('is-invalid');
+            inputEl.classList.remove('is-valid');
+            let fb = inputEl.nextElementSibling;
+            if (!fb || !fb.classList.contains('invalid-feedback')) {
+                fb = document.createElement('div');
+                fb.className = 'invalid-feedback';
+                inputEl.parentNode.insertBefore(fb, inputEl.nextSibling);
+            }
+            fb.textContent = message;
+        }
+
+        function clearFieldError(inputEl) {
+            inputEl.classList.remove('is-invalid');
+            const fb = inputEl.nextElementSibling;
+            if (fb && fb.classList.contains('invalid-feedback')) fb.remove();
+        }
+
+        // ── Blur listeners — check one field at a time on leave ───────────────────
+
+        const subMenuCodeInput = document.querySelector('[name="SubMenuForm.SubMenuCode"]');
+        const subMenuNameInput = document.querySelector('[name="SubMenuForm.SubMenuName"]');
+        const pageUrlInput     = document.querySelector('[name="SubMenuForm.PageUrl"]');
+
+        subMenuCodeInput.addEventListener('blur', async function () {
+            const val = this.value.trim();
+            if (!val) return;
+            try {
+                const result = await checkDuplicates(val, '', '');
+                if (result.subMenuCodeTaken) {
+                    setFieldError(this, 'This SubMenu Code / FormID is already in use.');
+                } else {
+                    clearFieldError(this);
+                }
+            } catch { /* silent — save-time check will catch it */ }
+        });
+
+        subMenuNameInput.addEventListener('blur', async function () {
+            const val = this.value.trim();
+            if (!val) return;
+            try {
+                const result = await checkDuplicates('', val, '');
+                if (result.subMenuNameTaken) {
+                    setFieldError(this, 'This SubMenu Name is already in use.');
+                } else {
+                    clearFieldError(this);
+                }
+            } catch { /* silent */ }
+        });
+
+        pageUrlInput.addEventListener('blur', async function () {
+            const val = this.value.trim();
+            if (!val) return;
+            try {
+                const result = await checkDuplicates('', '', val);
+                if (result.pageUrlTaken) {
+                    setFieldError(this, 'This Page URL is already in use.');
+                } else {
+                    clearFieldError(this);
+                }
+            } catch { /* silent */ }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // VALIDATION — required fields + duplicate check before save
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        async function validateForm() {
+            const systemId   = document.getElementById('systemTypeId').value;
+            const moduleId   = document.getElementById('moduleName').value;
+            const mainMenuId = document.getElementById('mainMenuName').value;
+            const menuId     = document.getElementById('menuName').value;
+            const subCode    = subMenuCodeInput.value.trim();
+            const subName    = subMenuNameInput.value.trim();
+            const pageUrl    = pageUrlInput.value.trim();
+
+            // ── Required field checks ─────────────────────────────────────────────
+            if (!systemId) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a System Type.' });
+                return false;
+            }
+            if (!moduleId) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Module Name.' });
+                return false;
+            }
+            if (!mainMenuId) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Main Menu Name.' });
+                return false;
+            }
+            if (!menuId) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Menu Name.' });
+                return false;
+            }
+            if (!subCode) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a SubMenu Code / FormID.' });
+                return false;
+            }
+            if (!subName) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a SubMenu Name / Header Name.' });
+                return false;
+            }
+            if (!pageUrl) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a Page URL.' });
+                return false;
+            }
+
+            // ── Duplicate check ───────────────────────────────────────────────────
+            Swal.fire({
+                title: 'Checking...',
+                text: 'Validating your entries.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            let dupeResult;
+            try {
+                dupeResult = await checkDuplicates(subCode, subName, pageUrl);
+            } catch {
+                Swal.close();
+                // Network error — let save proceed rather than block the user
+                return true;
+            }
+
+            Swal.close();
+
+            // Collect all conflicts so user sees everything at once
+            const conflicts = [];
+            if (dupeResult.subMenuCodeTaken) {
+                conflicts.push('• SubMenu Code / FormID is already in use');
+                setFieldError(subMenuCodeInput, 'This SubMenu Code / FormID is already in use.');
+            } else {
+                clearFieldError(subMenuCodeInput);
+            }
+            if (dupeResult.subMenuNameTaken) {
+                conflicts.push('• SubMenu Name is already in use');
+                setFieldError(subMenuNameInput, 'This SubMenu Name is already in use.');
+            } else {
+                clearFieldError(subMenuNameInput);
+            }
+            if (dupeResult.pageUrlTaken) {
+                conflicts.push('• Page URL is already in use');
+                setFieldError(pageUrlInput, 'This Page URL is already in use.');
+            } else {
+                clearFieldError(pageUrlInput);
+            }
+
+            if (conflicts.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate Entries Found',
+                    html: `The following fields already exist in the system:<br><br>
+                           <div style="text-align:left; display:inline-block;">
+                               ${conflicts.join('<br>')}
+                           </div><br><br>
+                           Please use unique values before saving.`,
+                    confirmButtonColor: '#dc3545'
+                });
+                return false;
+            }
+
+            return true;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SAVE
         // ═══════════════════════════════════════════════════════════════════════════
 
         async function saveForm() {
-            const form = document.getElementById('subMenuForm');
+            if (!await validateForm()) return;
+
+            const confirm = await Swal.fire({
+                icon: 'question',
+                title: 'Save Record',
+                text: 'Are you sure you want to save this record?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Save',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            Swal.fire({
+                title: 'Saving...',
+                text: 'Please wait.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const form     = document.getElementById('subMenuForm');
             const formData = new FormData(form);
 
             try {
@@ -421,35 +621,35 @@
 
                 const result = await response.json();
 
-                showAlert(result.status === 'Success' ? 'success' : 'danger', result.statusDescription);
-
                 if (result.status === 'Success') {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Saved!',
+                        text: result.statusDescription || 'Record saved successfully.',
+                        confirmButtonColor: '#198754'
+                    });
                     clearForm();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Save Failed',
+                        text: result.statusDescription || 'An error occurred while saving.',
+                        confirmButtonColor: '#dc3545'
+                    });
                 }
             } catch (err) {
-                showAlert('danger', 'An unexpected error occurred. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unexpected Error',
+                    text: 'An unexpected error occurred. Please try again.',
+                    confirmButtonColor: '#dc3545'
+                });
                 console.error('Save error:', err);
             }
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // HELPER — show a dismissible alert at the top
-        // ═══════════════════════════════════════════════════════════════════════════
-
-        function showAlert(type, message) {
-            const existing = document.getElementById('pageAlert');
-            if (existing) existing.remove();
-
-            const alert = document.createElement('div');
-            alert.id = 'pageAlert';
-            alert.className = `alert alert-${type} alert-dismissible fade show`;
-            alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-
-            document.querySelector('.container.mt-4').prepend(alert);
-        }
-
-        // ═══════════════════════════════════════════════════════════════════════════
-        // HELPER — clear all form fields and reset dropdowns
+        // HELPER — clear all form fields, errors, and reset dropdowns
         // ═══════════════════════════════════════════════════════════════════════════
 
         function clearForm() {
@@ -460,9 +660,12 @@
             document.getElementById('mainMenuHidden').value   = '';
             document.getElementById('menuHidden').value       = '';
 
-            resetDropdown(document.getElementById('moduleName'), "--Select Module Name--");
+            // Clear any lingering inline duplicate errors
+            [subMenuCodeInput, subMenuNameInput, pageUrlInput].forEach(clearFieldError);
+
+            resetDropdown(document.getElementById('moduleName'),   "--Select Module Name--");
             resetDropdown(document.getElementById('mainMenuName'), "--Select Main Menu--");
-            resetDropdown(document.getElementById('menuName'), "--Select Menu Name--");
+            resetDropdown(document.getElementById('menuName'),     "--Select Menu Name--");
             document.getElementById('systemTypeId').value = '';
         }
 
@@ -470,33 +673,33 @@
         // HELPER — reset a dropdown to a placeholder and disable it
         // ═══════════════════════════════════════════════════════════════════════════
 
-        function resetDropdown(selectEl, option) {
-            selectEl.innerHTML = `<option value="">${option}</option>`;
-            selectEl.disabled = true;
+        function resetDropdown(selectEl, placeholder) {
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            selectEl.disabled  = true;
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
         // HELPER — populate a dropdown from a JSON array { value, text }
         // ═══════════════════════════════════════════════════════════════════════════
 
-        function populateDropdown(selectEl, data, option) {
-            if (option === "Menu") {
-                const def = document.createElement('option');
-                def.value = "All";
+        function populateDropdown(selectEl, data, mode) {
+            if (mode === "Menu") {
+                const def       = document.createElement('option');
+                def.value       = "All";
                 def.textContent = "All Menus";
                 selectEl.appendChild(def);
             }
             data.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.value;
-                option.textContent = item.text;
-                selectEl.appendChild(option);
+                const opt       = document.createElement('option');
+                opt.value       = item.value;
+                opt.textContent = item.text;
+                selectEl.appendChild(opt);
             });
             selectEl.disabled = false;
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // HELPER — reset the results table whenever list filters change
+        // HELPER — reset the results table
         // ═══════════════════════════════════════════════════════════════════════════
 
         function resetListTable() {
@@ -505,7 +708,7 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // FORM CASCADE — dropdowns inside the form
+        // FORM CASCADE
         // ═══════════════════════════════════════════════════════════════════════════
 
         const systemTypeSelect = document.getElementById('systemTypeId');
@@ -513,59 +716,58 @@
         const mainMenuSelect   = document.getElementById('mainMenuName');
         const menuSelect       = document.getElementById('menuName');
 
-        // Step 1 — System Type → Modules
         systemTypeSelect.addEventListener('change', async function () {
             const systemId = this.value;
             document.getElementById('systemTypeHidden').value = systemId;
-
-            resetDropdown(moduleSelect, "--Select Module Name--");
+            resetDropdown(moduleSelect,   "--Select Module Name--");
             resetDropdown(mainMenuSelect, "--Select Main Menu--");
-            resetDropdown(menuSelect, "--Select Menu Name--");
-
+            resetDropdown(menuSelect,     "--Select Menu Name--");
             if (!systemId) return;
             try {
                 const res = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
                 populateDropdown(moduleSelect, await res.json(), "");
-            } catch (err) { console.error('Modules fetch failed:', err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load modules.' });
+                console.error(err);
+            }
         });
 
-        // Step 2 — Module → Main Menus
         moduleSelect.addEventListener('change', async function () {
             const moduleId = this.value;
             const systemId = systemTypeSelect.value;
             document.getElementById('moduleHidden').value = moduleId;
-
             resetDropdown(mainMenuSelect, "--Select Main Menu--");
-            resetDropdown(menuSelect, "--Select Menu Name--");
-
+            resetDropdown(menuSelect,     "--Select Menu Name--");
             if (!moduleId) return;
             try {
                 const res = await fetch(`?handler=MainMenusByModule&systemId=${systemId}&moduleId=${moduleId}`);
                 populateDropdown(mainMenuSelect, await res.json(), "");
-            } catch (err) { console.error('Main menus fetch failed:', err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load main menus.' });
+                console.error(err);
+            }
         });
 
-        // Step 3 — Main Menu → Menus
         mainMenuSelect.addEventListener('change', async function () {
             const mainMenuId = this.value;
             document.getElementById('mainMenuHidden').value = mainMenuId;
-
             resetDropdown(menuSelect, "--Select Menu Name--");
-
             if (!mainMenuId) return;
             try {
                 const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${mainMenuId}`);
                 populateDropdown(menuSelect, await res.json(), "");
-            } catch (err) { console.error('Menus fetch failed:', err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load menus.' });
+                console.error(err);
+            }
         });
 
-        // Step 4 — Menu selected → write to hidden
         menuSelect.addEventListener('change', function () {
             document.getElementById('menuHidden').value = this.value;
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // LIST CASCADE — same cascade pattern for the View List dropdowns
+        // LIST CASCADE
         // ═══════════════════════════════════════════════════════════════════════════
 
         const listSystemType = document.getElementById('listSystemType');
@@ -574,47 +776,53 @@
         const listMenu       = document.getElementById('listMenu');
 
         listSystemType.addEventListener('change', async function () {
-            resetDropdown(listModule, "--Select Module Name--");
+            resetDropdown(listModule,   "--Select Module Name--");
             resetDropdown(listMainMenu, "--Select Main Menu--");
-            resetDropdown(listMenu, "--Select Menu Name--");
-            resetListTable(); // table resets when system type changes
-
+            resetDropdown(listMenu,     "--Select Menu Name--");
+            resetListTable();
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=ModulesBySystem&systemId=${this.value}`);
                 populateDropdown(listModule, await res.json(), "");
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load modules.' });
+                console.error(err);
+            }
         });
 
         listModule.addEventListener('change', async function () {
             resetDropdown(listMainMenu, "--Select Main Menu--");
-            resetDropdown(listMenu, "--Select Menu Name--");
-            resetListTable(); // table resets when module changes
-
+            resetDropdown(listMenu,     "--Select Menu Name--");
+            resetListTable();
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=MainMenusByModule&systemId=${listSystemType.value}&moduleId=${this.value}`);
                 populateDropdown(listMainMenu, await res.json(), "");
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load main menus.' });
+                console.error(err);
+            }
         });
 
         listMainMenu.addEventListener('change', async function () {
             resetDropdown(listMenu, "--Select Menu Name--");
-            resetListTable(); // table resets when main menu changes
-
+            resetListTable();
             if (!this.value) return;
             try {
                 const res = await fetch(`?handler=MenusByMainMenu&mainMenuId=${this.value}`);
                 populateDropdown(listMenu, await res.json(), "Menu");
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load menus.' });
+                console.error(err);
+            }
         });
 
         listMenu.addEventListener('change', function () {
-            resetListTable(); // table resets when menu changes — user must click Fetch again
+            resetListTable();
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // FETCH BUTTON — load submenus into the table
+        // FETCH BUTTON
         // ═══════════════════════════════════════════════════════════════════════════
 
         document.getElementById('fetchBtn').addEventListener('click', async function () {
@@ -623,64 +831,54 @@
             const menuId     = listMenu.value;
 
             if (!moduleId || !mainMenuId || !menuId) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Oops...",
-                    text: "Please select all four dropdowns before fetching",
-                });
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select all four dropdowns before fetching.' });
                 return;
             }
+
+            Swal.fire({ title: 'Loading...', text: 'Fetching records, please wait.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 const res  = await fetch(`?handler=SubMenuList&moduleId=${moduleId}&mainMenuId=${mainMenuId}&menuId=${menuId}`);
                 const data = await res.json();
 
-                // Clear DataTable before adding new rows
                 subTable.clear();
 
                 if (data.length === 0) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "No records found",
-                    });
+                    Swal.fire({ icon: 'info', title: 'No Records', text: 'No submenus found for the selected filters.' });
                     return;
-                } else {
-                    data.forEach((item, index) => {
-                        subTable.row.add([
-                            `<button type="button" class="btn btn-sm btn-primary" onclick="selectRecord(${item.id})">Select</button>`,
-                            index + 1,
-                            item.subMenuCode ?? '',
-                            item.subMenuName ?? '',
-                            item.pageUrl ?? ''
-                        ]);
-                    });
                 }
 
-                // Redraw DataTable to reflect changes
+                data.forEach((item, index) => {
+                    subTable.row.add([
+                        `<button type="button" class="btn btn-sm btn-primary" onclick="selectRecord(${item.id})">Select</button>`,
+                        index + 1,
+                        item.subMenuCode ?? '',
+                        item.subMenuName ?? '',
+                        item.pageUrl     ?? ''
+                    ]);
+                });
+
                 subTable.draw();
                 document.getElementById('listTableWrapper').style.display = 'block';
+                Swal.close();
 
             } catch (err) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Failed to load records",
-                });
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load records. Please try again.' });
                 console.error(err);
             }
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // SELECT RECORD — fill the form and switch to form view
+        // SELECT RECORD
         // ═══════════════════════════════════════════════════════════════════════════
 
         async function selectRecord(id) {
+            Swal.fire({ title: 'Loading...', text: 'Fetching record details.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
             try {
                 const res  = await fetch(`?handler=SubMenuById&id=${id}`);
                 const item = await res.json();
 
-                // Switch back to form view, restore + show View List button
                 listSection.style.display = 'none';
                 formSection.style.display = 'block';
                 document.getElementById('viewListBtn-top').style.display    = 'inline-block';
@@ -688,51 +886,52 @@
                 document.getElementById('viewListBtn-top').textContent      = 'View List';
                 document.getElementById('viewListBtn-bottom').textContent   = 'View List';
 
-                // Fill hidden fields
-                document.getElementById('hiddenId').value         = item.id ?? '';
-                document.getElementById('systemTypeHidden').value = item.systemId ?? '';
+                document.getElementById('hiddenId').value         = item.id            ?? '';
+                document.getElementById('systemTypeHidden').value = item.systemId      ?? '';
                 document.getElementById('moduleHidden').value     = item.moduleSetupId ?? '';
-                document.getElementById('mainMenuHidden').value   = item.mainMenuId ?? '';
-                document.getElementById('menuHidden').value       = item.menuId ?? '';
+                document.getElementById('mainMenuHidden').value   = item.mainMenuId    ?? '';
+                document.getElementById('menuHidden').value       = item.menuId        ?? '';
 
-                // Fill text inputs
-                document.querySelector('[name="SubMenuForm.SubMenuCode"]').value    = item.subMenuCode ?? '';
-                document.querySelector('[name="SubMenuForm.SubMenuName"]').value    = item.subMenuName ?? '';
+                subMenuCodeInput.value = item.subMenuCode    ?? '';
+                subMenuNameInput.value = item.subMenuName    ?? '';
+                pageUrlInput.value     = item.pageUrl        ?? '';
+
                 document.querySelector('[name="SubMenuForm.FormNameHeader"]').value = item.formNameHeader ?? '';
-                document.querySelector('[name="SubMenuForm.PageUrl"]').value        = item.pageUrl ?? '';
-                document.querySelector('[name="SubMenuForm.ReportPageUrl"]').value  = item.reportPageUrl ?? '';
-                document.querySelector('[name="SubMenuForm.IconImagename"]').value  = item.iconImagename ?? '';
-                document.querySelector('[name="SubMenuForm.OrderNo"]').value        = item.orderNo ?? '';
-                document.querySelector('[name="SubMenuForm.VideoUrl"]').value       = item.videoUrl ?? '';
-                document.querySelector('[name="SubMenuForm.AccessType"]').value     = item.accessType ?? '';
+                document.querySelector('[name="SubMenuForm.ReportPageUrl"]').value  = item.reportPageUrl  ?? '';
+                document.querySelector('[name="SubMenuForm.IconImagename"]').value  = item.iconImagename  ?? '';
+                document.querySelector('[name="SubMenuForm.OrderNo"]').value        = item.orderNo        ?? '';
+                document.querySelector('[name="SubMenuForm.VideoUrl"]').value       = item.videoUrl       ?? '';
+                document.querySelector('[name="SubMenuForm.AccessType"]').value     = item.accessType     ?? '';
 
-                // Fill checkboxes
                 document.querySelector('[name="SubMenuForm.MakeDashboardMain"]').checked = item.makeDashboardMain ?? false;
-                document.querySelector('[name="SubMenuForm.ShowonDashboard"]').checked   = item.showonDashboard ?? false;
-                document.querySelector('[name="SubMenuForm.IsReport"]').checked          = item.isReport ?? false;
-                document.querySelector('[name="SubMenuForm.Deactivate"]').checked        = item.deactivate ?? false;
-                document.querySelector('[name="SubMenuForm.IsApprform"]').checked        = item.isApprform ?? false;
-                document.querySelector('[name="SubMenuForm.Approval"]').checked          = item.approval ?? false;
+                document.querySelector('[name="SubMenuForm.ShowonDashboard"]').checked   = item.showonDashboard   ?? false;
+                document.querySelector('[name="SubMenuForm.IsReport"]').checked          = item.isReport          ?? false;
+                document.querySelector('[name="SubMenuForm.Deactivate"]').checked        = item.deactivate        ?? false;
+                document.querySelector('[name="SubMenuForm.IsApprform"]').checked        = item.isApprform        ?? false;
+                document.querySelector('[name="SubMenuForm.Approval"]').checked          = item.approval          ?? false;
 
-                // Rebuild the form cascade dropdowns to match the loaded record
+                // Clear any stale inline errors from a previous edit
+                [subMenuCodeInput, subMenuNameInput, pageUrlInput].forEach(clearFieldError);
+
                 await rebuildFormCascade(item.systemId, item.moduleSetupId, item.mainMenuId, item.menuId);
 
+                Swal.close();
+
             } catch (err) {
-                showAlert('danger', 'Failed to load record details.');
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load record details. Please try again.' });
                 console.error(err);
             }
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // REBUILD CASCADE — re-populate form dropdowns when loading a record
+        // REBUILD CASCADE
         // ═══════════════════════════════════════════════════════════════════════════
 
         async function rebuildFormCascade(systemId, moduleId, mainMenuId, menuId) {
             systemTypeSelect.value = systemId ?? '';
-
-            resetDropdown(moduleSelect, "--Select Module Name--");
+            resetDropdown(moduleSelect,   "--Select Module Name--");
             resetDropdown(mainMenuSelect, "--Select Main Menu--");
-            resetDropdown(menuSelect, "--Select Menu Name--");
+            resetDropdown(menuSelect,     "--Select Menu Name--");
 
             if (!systemId) return;
             const modRes = await fetch(`?handler=ModulesBySystem&systemId=${systemId}`);
