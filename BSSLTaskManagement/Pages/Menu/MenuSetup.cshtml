@@ -374,9 +374,11 @@
                 headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
                 success: function (response) {
                             if (response.status === "Success") {
-            Swal.fire('Success', response.statusDescription, 'success').then(() => {
-                $('#inputMainMenu').trigger('change');
-            });
+            Swal.fire('Success', response.statusDescription, 'success') .then(() => {
+                            $(".loadingDiv-parent").fadeIn("fast");
+                            //if (window.Loader) window.Loader.fadeIn(window.Loader.parent, 200);// fast fade in
+                            window.location.href = window.location.origin + "/Menu/MenuSetup";
+                        });
         } else {
             Swal.fire('Error', response.statusDescription, 'error');
         }
