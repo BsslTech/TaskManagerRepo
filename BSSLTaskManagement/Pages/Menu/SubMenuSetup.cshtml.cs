@@ -155,5 +155,34 @@ namespace BSSLTaskManagement.Pages.Menu
             var item = await _mainMenuServices.GetSubMenuSetupSingleAsync(id);
             return new JsonResult(item);
         }
+
+        // ─── AJAX — DUPLICATE CHECK ──────────────────────────────────────────────────
+        // Checks SubMenuCode, SubMenuName, and PageUrl for duplicates.
+        // Excludes the record currently being edited (excludeId = 0 for new records).
+        // Returns a flags object so the client knows exactly which fields conflict.
+        // URL: ?handler=CheckDuplicate&subMenuCode=X&subMenuName=Y&pageUrl=Z&excludeId=0
+        public async Task<IActionResult> OnGetCheckDuplicateAsync(
+    string subMenuCode, string subMenuName, string pageUrl, int excludeId = 0)
+        {
+            // Use the dedicated method — no filter dependencies, always returns all records
+            var others = (await _mainMenuServices.GetAllSubMenusAsync())
+                .Where(x => x.Id != excludeId)
+                .ToList();
+
+            return new JsonResult(new
+            {
+                subMenuCodeTaken = others.Any(x =>
+                    !string.IsNullOrWhiteSpace(subMenuCode) &&
+                    string.Equals(x.SubMenuCode?.Trim(), subMenuCode.Trim(), StringComparison.OrdinalIgnoreCase)),
+
+                subMenuNameTaken = others.Any(x =>
+                    !string.IsNullOrWhiteSpace(subMenuName) &&
+                    string.Equals(x.SubMenuName?.Trim(), subMenuName.Trim(), StringComparison.OrdinalIgnoreCase)),
+
+                pageUrlTaken = others.Any(x =>
+                    !string.IsNullOrWhiteSpace(pageUrl) &&
+                    string.Equals(x.PageUrl?.Trim(), pageUrl.Trim(), StringComparison.OrdinalIgnoreCase))
+            });
+        }
     }
 }

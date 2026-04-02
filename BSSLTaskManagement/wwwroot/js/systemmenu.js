@@ -20,62 +20,45 @@ function editRow(index, id, code, description) {
     document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
     document.getElementById('row_' + index).classList.add('table-info');
 
-    // Scroll the form into view
+    // Scroll to form
     document.getElementById('menuCode').scrollIntoView({ behavior: 'smooth', block: 'center' });
     document.getElementById('menuCode').focus();
 }
 
-// ─── DUPLICATE CHECK ───────────────────────────────────────────
-// Returns true if the given code or description already exists in the table,
-// ignoring the row that is currently being edited (matched by id).
-function isDuplicate(newCode, newDescription, currentId) {
-    const nodes = table.rows().nodes().toArray();
+//// Clear single save form
+//function clearForm() {
+//    document.getElementById('menuId').value = '';
+//    document.getElementById('menuCode').value = '';
+//    document.getElementById('menuDescription').value = '';
 
-    for (const node of nodes) {
-        const rowCode = $(node).find('.menuCode').val().trim().toLowerCase();
-        const rowName = $(node).find('.menuName').val().trim().toLowerCase();
-        const rowId = $(node).find('input[type="hidden"]').val(); // hidden Id field
+//    // Remove highlight
+//    document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
+//}
 
-        // Skip the row we are currently editing
-        if (currentId && rowId && rowId === currentId) continue;
-        // Skip empty rows
-        if (!rowCode && !rowName) continue;
 
-        if (rowCode === newCode.trim().toLowerCase()) {
-            return { duplicate: true, field: 'Menu Code', value: newCode };
-        }
-        if (rowName === newDescription.trim().toLowerCase()) {
-            return { duplicate: true, field: 'Menu Name', value: newDescription };
-        }
-    }
-    return { duplicate: false };
-}
 
-// ─── FORM SUBMIT (single save) ─────────────────────────────────
-document.getElementById('menuForm').addEventListener('submit', function(e) {
+//// Enable editing on double click in table
+//document.querySelectorAll('.menu-code-input, .menu-desc-input').forEach(input => {
+//    input.addEventListener('dblclick', function () {
+//        this.removeAttribute('readonly');
+//        this.classList.add('bg-warning');
+//    });
+
+//    input.addEventListener('blur', function () {
+//        this.setAttribute('readonly', 'readonly');
+//        this.classList.remove('bg-warning');
+//    });
+//});
+
+// Form validation
+document.getElementById('menuForm').addEventListener('submit', function (e) {
     const code = document.getElementById('menuCode').value.trim();
     const description = document.getElementById('menuDescription').value.trim();
     const currentId = document.getElementById('menuId').value.trim();
 
     if (!code || !description) {
         e.preventDefault();
-        Swal.fire({
-            icon: 'warning',
-            title: 'Validation Error',
-            text: 'Please enter both Menu Code and Menu Name.'
-        });
-        return false;
-    }
-
-    // Client-side duplicate guard
-    const check = isDuplicate(code, description, currentId);
-    if (check.duplicate) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'error',
-            title: 'Duplicate Entry',
-            text: `A record with this ${check.field} ("${check.value}") already exists.`
-        });
+        alert('Please enter both menu code and description');
         return false;
     }
 });
@@ -101,83 +84,56 @@ $(document).ready(function() {
             { orderable: false, targets: 0 }
         ]
     });
-
-    // ── Show SweetAlert for server-side response, then clear the form ──
     const status = document.getElementById('status').value;
     const statusDescription = document.getElementById('statusDescription').value;
-
-    if (status && status.trim() !== '') {
-        if (status.trim().toLowerCase() === 'success') {
+    if (status) {
+        if (status.toString().trim().toLowerCase() === 'success') {
             Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: statusDescription
-            }).then(() => clearForm()); // clear form when user clicks OK
+                title: "Success!",
+                text: statusDescription,
+                icon: "success"
+            });
+            return;
         } else {
             Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: statusDescription
-            }).then(() => clearForm()); // clear form even on error so user can retry fresh
+                icon: "error",
+                title: "Oops...",
+                text: statusDescription,
+            });
+            return;
         }
     }
 });
 
-// ─── SUBMIT TABLE (batch save) ─────────────────────────────────
-function submitTable() {
-    let valid = true;
+// ─── SUBMIT ────────────────────────────────────────────────────
+   function submitTable() {
 
-    const nodes = table.rows().nodes().toArray();
-    const seenCodes = [];
-    const seenNames = [];
+       let valid = true;
 
-    for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        const menuCode = $(node).find('.menuCode').val().trim();
-        const menuName = $(node).find('.menuName').val().trim();
+       // Loop through every row in the DataTable (including rows on other pages)
+       const nodes = table.rows().nodes().toArray();
 
-        if (!menuCode && !menuName) continue; // skip truly empty rows
+       for (let i = 0; i < nodes.length; i++) {
+           const node = nodes[i];
+           const menuCode = $(node).find('.menuCode').val();
+           const menuName = $(node).find('.menuName').val();
 
-        // Code filled → name required
-        if (menuCode && !menuName) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: `Menu Name is required for Menu Code: ${menuCode}`
-            });
-            valid = false;
-            break;
-        }
-
-        // Check for duplicates within the batch itself
-        const codeLower = menuCode.toLowerCase();
-        const nameLower = menuName.toLowerCase();
-
-        if (seenCodes.includes(codeLower)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Duplicate Entry',
-                text: `Menu Code "${menuCode}" appears more than once in the table.`
-            });
-            valid = false;
-            break;
-        }
-        if (seenNames.includes(nameLower)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Duplicate Entry',
-                text: `Menu Name "${menuName}" appears more than once in the table.`
-            });
-            valid = false;
-            break;
-        }
-
-        seenCodes.push(codeLower);
-        seenNames.push(nameLower);
-    }
+           // If a code is filled in, a name must also be filled in
+           if (menuCode && menuCode.trim() !== '') {
+               if (!menuName || menuName.trim() === '') {
+                   Swal.fire({
+                       icon: "error",
+                       title: "Oops...",
+                       text: `Menu Name is required for Menu Code: ${menuCode}`
+                   });
+                   valid = false;
+                   break;
+               }
+           }
+       }
 
     if (!valid) return;
 
-    // All good — trigger actual form submission
-    document.getElementById('menuForm').submit();
-} 
+       // All good — trigger your actual form submission here
+       alert('Form submitted successfully!');
+}

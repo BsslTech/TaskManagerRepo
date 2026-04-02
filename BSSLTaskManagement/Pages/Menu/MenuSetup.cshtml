@@ -277,15 +277,17 @@
             const mainMenuId = $('#inputMainMenu').val();
 
             if (!systemId || !moduleId || !mainMenuId) {
-                alert("Please select System Type, Module Name, and Main Menu before saving.");
+               Swal.fire('Warning', 'Please select System Type, Module Name, and Main Menu before saving.', 'warning');
                 return;
             }
 
-                   let menuRows = [];
+                let menuRows = [];
         let hasError = false;
         const seenMenuCodes = new Set();
+        const seenMenuNames = new Set();        // ← ADDED
         const seenOrderNumbers = new Set();
         let hasDuplicateCode = false;
+        let hasDuplicateName = false;           // ← ADDED
         let hasDuplicateOrder = false;
 
         table.rows().every(function () {
@@ -303,15 +305,22 @@
             // Duplicate menu code check
             if (seenMenuCodes.has(menuCode.toLowerCase())) {
                 hasDuplicateCode = true;
-                return false; // break
+                return false;
             }
             seenMenuCodes.add(menuCode.toLowerCase());
+
+            // ← ADDED: Duplicate menu name check
+            if (seenMenuNames.has(menuName.toLowerCase())) {
+                hasDuplicateName = true;
+                return false;
+            }
+            seenMenuNames.add(menuName.toLowerCase());
 
             // Duplicate order number check (only if entered)
             if (orderNo) {
                 if (seenOrderNumbers.has(orderNo)) {
                     hasDuplicateOrder = true;
-                    return false; // break
+                    return false;
                 }
                 seenOrderNumbers.add(orderNo);
             }
@@ -325,12 +334,18 @@
         });
 
         if (hasError) {
-            alert("Please fill in Menu Code and Menu Name for all rows.");
+            Swal.fire('Validation', 'Please fill in Menu Code and Menu Name for all rows.', 'warning');
             return;
         }
 
         if (hasDuplicateCode) {
             Swal.fire('Validation', 'Duplicate menu codes are not allowed. Please ensure each Menu Code is unique.', 'warning');
+            return;
+        }
+
+        // ← ADDED
+        if (hasDuplicateName) {
+            Swal.fire('Validation', 'Duplicate menu names are not allowed. Please ensure each Menu Name is unique.', 'warning');
             return;
         }
 
@@ -340,7 +355,7 @@
         }
 
             if (menuRows.length === 0) {
-                alert("Please add at least one menu row before saving.");
+                Swal.fire('Validation', 'Please add at least one menu row before saving.', 'warning');
                 return;
             }
 
@@ -358,14 +373,16 @@
                 data: JSON.stringify(payload),
                 headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
                 success: function (response) {
-                    alert(response.statusDescription);
-                    if (response.status === "Success") {
-                        // Reload the table with fresh data from DB
-                        $('#inputMainMenu').trigger('change');
-                    }
+                            if (response.status === "Success") {
+            Swal.fire('Success', response.statusDescription, 'success').then(() => {
+                $('#inputMainMenu').trigger('change');
+            });
+        } else {
+            Swal.fire('Error', response.statusDescription, 'error');
+        }
                 },
                 error: function () {
-                    alert("An error occurred while saving. Please try again.");
+                    Swal.fire('Error', 'An error occurred while saving. Please try again.', 'error');
                 }
             });
 
@@ -418,7 +435,7 @@
 
                 // ─── BLOCK SAVE IF DUPLICATES EXIST ────────────────────────────
         if ($('.dup-warning').length > 0) {
-            alert("Please resolve duplicate Menu Code or Order No. before saving.");
+            Swal.fire('Validation', 'Please resolve duplicate Menu Code or Order No. before saving.', 'warning');
             return;
         }
 
