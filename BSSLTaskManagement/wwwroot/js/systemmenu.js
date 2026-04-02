@@ -8,46 +8,54 @@ function editRow(index, id, code, description) {
     document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
     document.getElementById('row_' + index).classList.add('table-info');
 
+    // Toast notification
+    Swal.fire({
+        icon: 'info',
+        title: 'Record Loaded',
+        text: `"${description}" is ready to edit.`,
+        timer: 1500,
+        showConfirmButton: false,
+        position: 'top-end',
+        toast: true
+    });
+
     // Scroll to form
     document.getElementById('menuCode').scrollIntoView({ behavior: 'smooth', block: 'center' });
     document.getElementById('menuCode').focus();
 }
 
-//// Clear single save form
-//function clearForm() {
-//    document.getElementById('menuId').value = '';
-//    document.getElementById('menuCode').value = '';
-//    document.getElementById('menuDescription').value = '';
 
-//    // Remove highlight
-//    document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('table-info'));
-//}
-
-
-
-//// Enable editing on double click in table
-//document.querySelectorAll('.menu-code-input, .menu-desc-input').forEach(input => {
-//    input.addEventListener('dblclick', function () {
-//        this.removeAttribute('readonly');
-//        this.classList.add('bg-warning');
-//    });
-
-//    input.addEventListener('blur', function () {
-//        this.setAttribute('readonly', 'readonly');
-//        this.classList.remove('bg-warning');
-//    });
-//});
-
-// Form validation
+// Form validation + SweetAlert confirm on submit
 document.getElementById('menuForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const form = this;
     const code = document.getElementById('menuCode').value.trim();
     const description = document.getElementById('menuDescription').value.trim();
 
     if (!code || !description) {
-        e.preventDefault();
-        alert('Please enter both menu code and description');
-        return false;
+        Swal.fire({
+            icon: 'warning',
+            title: 'Missing Fields',
+            text: 'Please enter both Menu Code and Menu Name before submitting.',
+            confirmButtonColor: '#ffc107'
+        });
+        return;
     }
+
+    Swal.fire({
+        title: 'Save Menu?',
+        text: `Save "${description}" (${code})?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Save it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
 });
 
 
@@ -61,56 +69,70 @@ $(document).ready(function () {
             { orderable: false, targets: 0 }
         ]
     });
+
     const status = document.getElementById('status').value;
     const statusDescription = document.getElementById('statusDescription').value;
+
     if (status) {
         if (status.toString().trim().toLowerCase() === 'success') {
             Swal.fire({
-                title: "Success!",
+                icon: 'success',
+                title: 'Success!',
                 text: statusDescription,
-                icon: "success"
+                confirmButtonColor: '#198754'
             });
-            return;
         } else {
             Swal.fire({
-                icon: "error",
-                title: "Oops...",
+                icon: 'error',
+                title: 'Oops...',
                 text: statusDescription,
+                confirmButtonColor: '#dc3545'
             });
-            return;
         }
     }
 });
 
-// ─── SUBMIT ────────────────────────────────────────────────────
-   function submitTable() {
 
-       let valid = true;
+// ─── SUBMIT TABLE (batch) ──────────────────────────────────────
+function submitTable() {
 
-       // Loop through every row in the DataTable (including rows on other pages)
-       const nodes = table.rows().nodes().toArray();
+    let valid = true;
 
-       for (let i = 0; i < nodes.length; i++) {
-           const node = nodes[i];
-           const menuCode = $(node).find('.menuCode').val();
-           const menuName = $(node).find('.menuName').val();
+    const nodes = table.rows().nodes().toArray();
 
-           // If a code is filled in, a name must also be filled in
-           if (menuCode && menuCode.trim() !== '') {
-               if (!menuName || menuName.trim() === '') {
-                   Swal.fire({
-                       icon: "error",
-                       title: "Oops...",
-                       text: `Menu Name is required for Menu Code: ${menuCode}`
-                   });
-                   valid = false;
-                   break;
-               }
-           }
-       }
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const menuCode = $(node).find('.menuCode').val();
+        const menuName = $(node).find('.menuName').val();
 
-       if (!valid) return;
+        if (menuCode && menuCode.trim() !== '') {
+            if (!menuName || menuName.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: `Menu Name is required for Menu Code: ${menuCode}`,
+                    confirmButtonColor: '#dc3545'
+                });
+                valid = false;
+                break;
+            }
+        }
+    }
 
-       // All good — trigger your actual form submission here
-       alert('Form submitted successfully!');
+    if (!valid) return;
+
+    Swal.fire({
+        title: 'Submit All?',
+        text: 'Are you sure you want to save all menu records?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Submit!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Trigger actual form submission here
+            document.getElementById('menuForm').submit();
+        }
+    });
 }
