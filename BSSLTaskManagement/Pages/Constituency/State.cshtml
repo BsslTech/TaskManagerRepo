@@ -97,11 +97,11 @@
                                 </table>
                                 <div class="mt-3" style="margin-bottom:2%">
 
-                                    <button type="button" class="btn btn-success btnSave" id="btnSave" disabled>
+                                    <button type="button" class="btn btn-success btnSave" disabled>
                                         <i class="fas fa-save"></i> Save
                                     </button>
                                     <a href="./State" class="btn btn-warning">Refresh</a>
-                                    <button type="button" class="btn btn-primary" id="btnAddRow" disabled>
+                                    <button type="button" class="btn btn-primary btnAddRow" disabled>
                                         <i class="fas fa-plus"></i> Add Row
                                     </button>
                                 </div>
@@ -248,7 +248,7 @@
         // ════════════════════════════════════════════════════════════════════════
         // ADD ROW BUTTON
         // ════════════════════════════════════════════════════════════════════════
-        $('#btnAddRow').on('click', function() {
+        $('.btnAddRow').on('click', function() {
         if (selectedStateId <= 0) {
         Swal.fire('Warning', 'Please select a state first.', 'warning');
         return;
@@ -257,38 +257,100 @@
         });
 
         // ════════════════════════════════════════════════════════════════════════
-        // SAVE BUTTON: Collect all rows and POST to server
+        // DUPLICATE CODE CHECK
+        // ── blur: checks a single code input against the DB for the current state
+        // ── checkAllCodesUnique: checks across all rows in the table before save
         // ════════════════════════════════════════════════════════════════════════
-        $('#btnSave').on('click', function() {
+
+        // Blur — fires when user leaves a Code cell
+        $('#tblBody').on('blur', '.col-code', async function () {
+        const input = $(this);
+        const code  = input.val().trim();
+        const rowId = parseInt(input.closest('tr').data('id') || 0);
+
+        if (!code || selectedStateId <= 0) return;
+
+        try {
+        const result = await $.get(`?handler=CheckDuplicateCode&stateId=${selectedStateId}&code=${encodeURIComponent(code)}&excludeId=${rowId}`);
+        if (result.codeTaken) {
+        setCodeError(input, 'This code is already used in this state.');
+        } else {
+        clearCodeError(input);
+        }
+        } catch {
+        // Silent — save-time check will catch it
+        }
+        });
+
+        // Pre-save: check all codes in the table are unique among themselves
+        // (catches duplicates the user typed into two rows before either lost focus)
+        function checkAllCodesUnique() {
+        const seen  = {};
+        let conflict = null;
+
+        $('#tblBody tr').each(function () {
+        const input = $(this).find('.col-code');
+        const code  = input.val().trim().toLowerCase();
+        if (!code) return; // skip empty rows
+
+        if (seen[code]) {
+        conflict = input.val().trim();
+        return false; // break
+        }
+        seen[code] = true;
+        });
+
+        return conflict; // null = all unique, otherwise the duplicate code string
+        }
+
+
+  // ════════════════════════════════════════════════════════════════════════
+        // SAVE BUTTON
+        // ════════════════════════════════════════════════════════════════════════
+        $('.btnSave').on('click', async function () {
         if (selectedStateId <= 0) {
         Swal.fire('Warning', 'Please select a state first.', 'warning');
         return;
         }
 
+        // ── 1. Check for duplicate codes within the table rows ────────────
+        const dupCode = checkAllCodesUnique();
+        if (dupCode) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Duplicate Code',
+        text: `The code "${dupCode}" appears more than once. Each code must be unique within the state.`,
+        confirmButtonColor: '#dc3545'
+        });
+        return;
+        }
+
+        // ── 2. Check for any inline code errors still showing ─────────────
+        if ($('#tblBody .col-code.is-invalid').length > 0) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Duplicate Codes Found',
+        text: 'One or more codes are already in use for this state. Please fix them before saving.',
+        confirmButtonColor: '#dc3545'
+        });
+        return;
+        }
+
+        // ── 3. Collect and validate rows ──────────────────────────────────
         const rows = [];
         let hasError = false;
-        const seenCodes = new Set();
-        let hasDuplicate = false;
 
-        $('#tblBody tr').each(function() {
-        const id = parseInt($(this).data('id') || 0);
+        $('#tblBody tr').each(function () {
+        const id   = parseInt($(this).data('id') || 0);
         const code = $(this).find('.col-code').val().trim();
         const desc = $(this).find('.col-desc').val().trim();
 
-        // Skip completely empty rows (user left the blank row untouched)
-        if (!code && !desc) return;
+        if (!code && !desc) return; // skip blank rows
 
         if (!code || !desc) {
         hasError = true;
         return false; // break
         }
-
-        // Duplicate code check
-        if (seenCodes.has(code.toLowerCase())) {
-            hasDuplicate = true;
-            return false; //break
-        }
-        seenCodes.add(code.toLowerCase());
 
         rows.push({ id, code, description: desc });
         });
@@ -298,25 +360,33 @@
         return;
         }
 
-        if (hasDuplicate) {
-            Swal.fire('Validation', 'Duplicate codes are not allowed. Please ensure each code is unique', 'warning');
-            return;
-        }
-
         if (rows.length === 0) {
         Swal.fire('Validation', 'No rows to save.', 'warning');
         return;
         }
 
-        const payload = { stateId: selectedStateId, rows: rows };
+         // ── 4. Confirm then POST ──────────────────────────────────────────
+        const confirm = await Swal.fire({
+        title: 'Save Records?',
+        text: `Save ${rows.length} federal constituency record(s)?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Save'
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         $.ajax({
         url: '?handler=SaveState',
         type: 'POST',
         contentType: 'application/json',
         headers: { 'RequestVerificationToken': antiForgeryToken },
-        data: JSON.stringify(payload),
-        success: function(result) {
+        data: JSON.stringify({ stateId: selectedStateId, rows }),
+        success: function (result) {
         if (result.success) {
         Swal.fire('Success', result.message, 'success').then(() => {
         reloadRows(selectedStateId);
@@ -325,7 +395,7 @@
         Swal.fire('Error', result.message, 'error');
         }
         },
-        error: function() {
+        error: function () {
         Swal.fire('Error', 'An unexpected error occurred while saving.', 'error');
         }
         });
@@ -378,6 +448,26 @@
         });
         });
 
+
+        // ════════════════════════════════════════════════════════════════════════
+        // INLINE ERROR HELPERS
+        // ════════════════════════════════════════════════════════════════════════
+
+        function setCodeError(inputEl, message) {
+        inputEl.addClass('is-invalid').removeClass('is-valid');
+        let fb = inputEl.next('.invalid-feedback');
+        if (fb.length === 0) {
+        fb = $(`<div class="invalid-feedback"></div>`);
+        inputEl.after(fb);
+        }
+        fb.text(message);
+        }
+
+        function clearCodeError(inputEl) {
+        inputEl.removeClass('is-invalid');
+        inputEl.next('.invalid-feedback').remove();
+        }
+
         // ════════════════════════════════════════════════════════════════════════
         // HELPER FUNCTIONS
         // ════════════════════════════════════════════════════════════════════════
@@ -385,7 +475,7 @@
         // Append a row that already exists in the DB
         function appendRow(id, code, description) {
         const serial = $('#tblBody tr').length + 1;
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="${id}">
          <td style="padding:10px; border:1px solid lightgrey; width:20px;">${serial}</td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" value="${escapeHtml(code)}"></td>
@@ -395,14 +485,13 @@
         <i class="fas fa-trash"></i>Delete
         </button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
         // Append a blank row for new entry
         function addNewRow() {
         const serial = $('#tblBody tr').length + 1;
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="0">
         <td style="padding:10px; border:1px solid lightgrey; width:20px;">${serial}</td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
@@ -412,14 +501,13 @@
         <i class="fas fa-trash"></i>Delete
         </button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
         // The default single blank row shown on page load and when table is empty
         function addDefaultRow() {
         $('#tblBody').empty();
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="0">
         <td style="padding:10px; border:1px solid lightgrey; width:20px;">1</td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
@@ -429,8 +517,7 @@
         <i class="fas fa-trash"></i>Delete
         </button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
         // Reload all rows from DB after a successful save
@@ -476,7 +563,7 @@
 
         // Enable/disable Add Row and Save buttons
         function toggleButtons(enabled) {
-        $('#btnAddRow, #btnSave').prop('disabled', !enabled);
+        $('.btnAddRow, .btnSave').prop('disabled', !enabled);
         }
 
         // Escape HTML to prevent XSS when rendering saved values into inputs

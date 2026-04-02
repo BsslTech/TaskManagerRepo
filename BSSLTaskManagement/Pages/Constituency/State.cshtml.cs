@@ -74,5 +74,21 @@ namespace BSSLTaskManagement.Pages.Constituency
             var result = await _constituencyService.DeleteStateConstituencyAsync(id);
             return new JsonResult(result);
         }
+
+        public async Task<IActionResult> OnGetCheckDuplicateAsync(
+    int stateId, string code, int excludeId = 0)
+        {
+            // Use the dedicated method — no filter dependencies, always returns all records
+            if (stateId <= 0 || string.IsNullOrWhiteSpace(code))
+                return new JsonResult(new { codeTaken = false });
+
+            var existing = await _constituencyService.GetStateConstituenciesAsync(stateId);
+
+            bool codeTaken = existing.Any(x =>
+                x.Id != excludeId &&
+                string.Equals(x.Code?.Trim(), code.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            return new JsonResult(new { codeTaken });
+        }
     }
 }
