@@ -238,10 +238,10 @@
             const systemId = $('#inputSystemTypeName').val();
             const moduleId = $('#inputModuleName').val();
 
-            if (!systemId || !moduleId) {
-                alert("Please select System Type and Module Name before saving.");
-                return;
-            }
+                  if (!systemId || !moduleId) {
+            Swal.fire('Warning', 'Please select System Type and Module Name before saving.', 'warning');
+            return;
+        }
 
                     let menuRows = [];
         let hasError = false;
@@ -256,10 +256,10 @@
             const savedDescription = row.find('.mainMenuDescription').attr('data-saved-description') || description;
             const orderNo = row.find('.orderNumber').val().trim();
 
-            if (!description) {
-                hasError = true;
-                return;
-            }
+             if (!description || !orderNo) {
+            hasError = true;
+            return;
+        }
 
             // ← ADD: Duplicate description check
             if (seenDescriptions.has(description.toLowerCase())) {
@@ -284,8 +284,8 @@
             });
         });
 
-        if (hasError) {
-            alert("Please fill in the Main Menu Description for all rows.");
+          if (hasError) {
+            Swal.fire('Validation', 'Please fill in the Main Menu Description and Order No. for all rows.', 'warning');
             return;
         }
 
@@ -300,10 +300,10 @@
             return;
         }
 
-            if (menuRows.length === 0) {
-                alert("Please add at least one row before saving.");
-                return;
-            }
+                    if (menuRows.length === 0) {
+            Swal.fire('Validation', 'Please add at least one row before saving.', 'warning');
+            return;
+        }
 
             const payload = {
                 systemTypeTabId: parseInt(systemId),
