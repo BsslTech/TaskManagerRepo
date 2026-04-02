@@ -297,10 +297,10 @@
             const savedName = row.find('.menuName').attr('data-saved-name') || menuName;
             const orderNo   = row.find('.orderNumber').val().trim();
 
-            if (!menuCode || !menuName) {
-                hasError = true;
-                return;
-            }
+            if (!menuCode || !menuName || !orderNo) {
+            hasError = true;
+            return;
+        }
 
             // Duplicate menu code check
             if (seenMenuCodes.has(menuCode.toLowerCase())) {
@@ -334,7 +334,7 @@
         });
 
         if (hasError) {
-            Swal.fire('Validation', 'Please fill in Menu Code and Menu Name for all rows.', 'warning');
+            Swal.fire('Validation', 'Please fill in Menu Code, Menu Name and Order No. for all rows.', 'warning');
             return;
         }
 
