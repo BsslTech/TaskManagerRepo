@@ -26,7 +26,7 @@ namespace BSSLTaskManagement.Services
                 .Select(c => new CountryDropdownVm
                 {
                     Id          = c.Id,
-                    Code        = c.Code,
+                    //Code        = c.Code,
                     Description = c.Description
                 })
                 .ToListAsync();
@@ -58,7 +58,7 @@ namespace BSSLTaskManagement.Services
                 .Select(f => new FederalConstituencyRowVm
                 {
                     Id          = f.Id,
-                    Code        = f.Code,
+                    //Code        = f.Code,
                     Description = f.Description
                 })
                 .ToListAsync();
