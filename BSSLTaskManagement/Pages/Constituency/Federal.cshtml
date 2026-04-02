@@ -11,9 +11,8 @@
 <form method="post">
     <main class="app-main">
 
-        <div class="app-content-header" style="padding:10px;">
+        <div class="app-content-header mb-2" style="padding:10px;">
             <div class="container-fluid">
-                <!--begin::Row-->
                 <div class="row">
                     <div class="col-sm-6">
                         <h3 class="mb-0">Federal Constituency Setup</h3>
@@ -25,20 +24,14 @@
                         </ol>
                     </div>
                 </div>
-                <!--end::Row-->
             </div>
         </div>
 
         <div class="card card-primary card-outline mb-4">
-            <!--begin::Header-->
             <div class="app-content">
-                <!--begin::Container-->
                 <div class="container-fluid">
-                    <!--end::Header-->
-                    <!--begin::Form-->
                     <div class="row">
                         <div class="col-md-12">
-                            <!--begin::Body-->
                             <div class="card-body">
                                 <h6 class="spn font-italic"></h6>
                                 <div class="row">
@@ -56,21 +49,15 @@
                                     </div>
                                 </div>
 
-
-
-                                @* Card Footer: Add Row + Save buttons *@
                                 <div class="mt-3" style="margin-bottom:1%">
-
-                                    <button type="button" class="btn btn-success btnSave" id="btnSave" disabled>
+                                    <button type="button" class="btn btn-success btnSave" disabled>
                                         <i class="fas fa-save"></i> Save
                                     </button>
                                     <a href="./Federal" class="btn btn-warning">Refresh</a>
-                                    <button type="button" class="btn btn-primary" id="btnAddRow" disabled>
+                                    <button type="button" class="btn btn-primary btnAddRow" disabled>
                                         <i class="fas fa-plus"></i> Add Row
                                     </button>
                                 </div>
-
-
 
                                 <table style="width:100%" class="table table-bordered display nowrap" id="tblFederal">
                                     <thead>
@@ -82,7 +69,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tblBody">
-                                        @* Default empty row visible on page load  *@
+                                        @* Default empty row visible on page load *@
                                         <tr data-id="0">
                                             <td style="padding:10px; border:1px solid lightgrey; width:20px;">1</td>
                                             <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
@@ -95,13 +82,13 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div class="mt-3" style="margin-bottom:2%">
 
-                                    <button type="button" class="btn btn-success btnSave" id="btnSave" disabled>
+                                <div class="mt-3" style="margin-bottom:2%">
+                                    <button type="button" class="btn btn-success btnSave" disabled>
                                         <i class="fas fa-save"></i> Save
                                     </button>
                                     <a href="./Federal" class="btn btn-warning">Refresh</a>
-                                    <button type="button" class="btn btn-primary" id="btnAddRow" disabled>
+                                    <button type="button" class="btn btn-primary btnAddRow" disabled>
                                         <i class="fas fa-plus"></i> Add Row
                                     </button>
                                 </div>
@@ -113,8 +100,8 @@
         </div>
     </main>
 </form>
+
 @section Scripts {
-    @* {{-- Select2 JS --}} *@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
@@ -123,28 +110,17 @@
         // ── State tracking ───────────────────────────────────────────────────────
         let selectedStateId = 0;
 
-        // ── Antiforgery token (needed for POST requests) ─────────────────────────
+        // ── Antiforgery token ────────────────────────────────────────────────────
         const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
 
         // ════════════════════════════════════════════════════════════════════════
-        // INITIALIZE Select2 on both dropdowns
+        // INITIALIZE Select2
         // ════════════════════════════════════════════════════════════════════════
-        $('#ddlCountry').select2({
-        theme: 'bootstrap-5',
-        placeholder: '--Select Country--',
-        allowClear: true,
-        width: '100%'
-        });
-
-        $('#ddlState').select2({
-        theme: 'bootstrap-5',
-        placeholder: '--Select State--',
-        allowClear: true,
-        width: '100%'
-        });
+        $('#ddlCountry').select2({ theme: 'bootstrap-5', placeholder: '--Select Country--', allowClear: true, width: '100%' });
+        $('#ddlState').select2({   theme: 'bootstrap-5', placeholder: '--Select State--',   allowClear: true, width: '100%' });
 
         // ════════════════════════════════════════════════════════════════════════
-        // ON PAGE LOAD: Populate Country dropdown
+        // PAGE LOAD: Populate Country dropdown
         // ════════════════════════════════════════════════════════════════════════
         loadCountries();
 
@@ -156,9 +132,8 @@
         const ddl = $('#ddlCountry');
         ddl.find('option:not(:first)').remove();
         $.each(data, function (i, item) {
-        ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
+        ddl.append(`<option value="${item.id}">${item.description}</option>`);
         });
-        // Refresh Select2 after options are added
         ddl.trigger('change.select2');
         },
         error: function () {
@@ -169,18 +144,14 @@
 
         // ════════════════════════════════════════════════════════════════════════
         // COUNTRY CHANGE: Load matching states
-        // Select2 fires the native 'change' event so this works as-is
         // ════════════════════════════════════════════════════════════════════════
         $('#ddlCountry').on('change', function () {
         const countryId = $(this).val();
-
-        // Reset state dropdown and table
         resetStateDropdown();
         clearTable();
-        addDefaultRow(); // restore the default empty row
+        addDefaultRow();
         selectedStateId = 0;
         toggleButtons(false);
-
         if (!countryId) return;
 
         $.ajax({
@@ -189,17 +160,14 @@
         success: function (data) {
         const ddl = $('#ddlState');
         ddl.find('option:not(:first)').remove();
-
         if (data.length === 0) {
         Swal.fire('Info', 'No states found for the selected country.', 'info');
         ddl.trigger('change.select2');
         return;
         }
-
         $.each(data, function (i, item) {
-        ddl.append(`<option value="${item.id}">${item.description} (${item.code})</option>`);
+        ddl.append(`<option value="${item.id}">${item.description}</option>`);
         });
-
         ddl.prop('disabled', false).trigger('change.select2');
         },
         error: function () {
@@ -218,7 +186,7 @@
 
         if (!stateId) {
         toggleButtons(false);
-        addDefaultRow(); // restore default empty row when state is cleared
+        addDefaultRow();
         return;
         }
 
@@ -229,10 +197,8 @@
         type: 'GET',
         success: function (data) {
         if (data.length === 0) {
-        // No existing records — just show the default empty row
         addDefaultRow();
         } else {
-        // Load existing records then add one blank row at the bottom
         $.each(data, function (i, row) {
         appendRow(row.id, row.code, row.description);
         });
@@ -248,7 +214,7 @@
         // ════════════════════════════════════════════════════════════════════════
         // ADD ROW BUTTON
         // ════════════════════════════════════════════════════════════════════════
-        $('#btnAddRow').on('click', function () {
+        $('.btnAddRow').on('click', function () {
         if (selectedStateId <= 0) {
         Swal.fire('Warning', 'Please select a state first.', 'warning');
         return;
@@ -257,14 +223,85 @@
         });
 
         // ════════════════════════════════════════════════════════════════════════
-        // SAVE BUTTON: Collect all rows and POST to server
+        // DUPLICATE CODE CHECK
+        // ── blur: checks a single code input against the DB for the current state
+        // ── checkAllCodesUnique: checks across all rows in the table before save
         // ════════════════════════════════════════════════════════════════════════
-        $('#btnSave').on('click', function () {
+
+        // Blur — fires when user leaves a Code cell
+        $('#tblBody').on('blur', '.col-code', async function () {
+        const input = $(this);
+        const code  = input.val().trim();
+        const rowId = parseInt(input.closest('tr').data('id') || 0);
+
+        if (!code || selectedStateId <= 0) return;
+
+        try {
+        const result = await $.get(`?handler=CheckDuplicateCode&stateId=${selectedStateId}&code=${encodeURIComponent(code)}&excludeId=${rowId}`);
+        if (result.codeTaken) {
+        setCodeError(input, 'This code is already used in this state.');
+        } else {
+        clearCodeError(input);
+        }
+        } catch {
+        // Silent — save-time check will catch it
+        }
+        });
+
+        // Pre-save: check all codes in the table are unique among themselves
+        // (catches duplicates the user typed into two rows before either lost focus)
+        function checkAllCodesUnique() {
+        const seen  = {};
+        let conflict = null;
+
+        $('#tblBody tr').each(function () {
+        const input = $(this).find('.col-code');
+        const code  = input.val().trim().toLowerCase();
+        if (!code) return; // skip empty rows
+
+        if (seen[code]) {
+        conflict = input.val().trim();
+        return false; // break
+        }
+        seen[code] = true;
+        });
+
+        return conflict; // null = all unique, otherwise the duplicate code string
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
+        // SAVE BUTTON
+        // ════════════════════════════════════════════════════════════════════════
+        $('.btnSave').on('click', async function () {
         if (selectedStateId <= 0) {
         Swal.fire('Warning', 'Please select a state first.', 'warning');
         return;
         }
 
+        // ── 1. Check for duplicate codes within the table rows ────────────
+        const dupCode = checkAllCodesUnique();
+        if (dupCode) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Duplicate Code',
+        text: `The code "${dupCode}" appears more than once. Each code must be unique within the state.`,
+        confirmButtonColor: '#dc3545'
+        });
+        return;
+        }
+
+        // ── 2. Check for any inline code errors still showing ─────────────
+        if ($('#tblBody .col-code.is-invalid').length > 0) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Duplicate Codes Found',
+        text: 'One or more codes are already in use for this state. Please fix them before saving.',
+        confirmButtonColor: '#dc3545'
+        });
+        return;
+        }
+
+        // ── 3. Collect and validate rows ──────────────────────────────────
         const rows = [];
         let hasError = false;
 
@@ -273,8 +310,7 @@
         const code = $(this).find('.col-code').val().trim();
         const desc = $(this).find('.col-desc').val().trim();
 
-        // Skip completely empty rows (user left the blank row untouched)
-        if (!code && !desc) return;
+        if (!code && !desc) return; // skip blank rows
 
         if (!code || !desc) {
         hasError = true;
@@ -294,14 +330,27 @@
         return;
         }
 
-        const payload = { stateId: selectedStateId, rows: rows };
+        // ── 4. Confirm then POST ──────────────────────────────────────────
+        const confirm = await Swal.fire({
+        title: 'Save Records?',
+        text: `Save ${rows.length} federal constituency record(s)?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Save'
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         $.ajax({
         url: '?handler=SaveFederal',
         type: 'POST',
         contentType: 'application/json',
         headers: { 'RequestVerificationToken': antiForgeryToken },
-        data: JSON.stringify(payload),
+        data: JSON.stringify({ stateId: selectedStateId, rows }),
         success: function (result) {
         if (result.success) {
         Swal.fire('Success', result.message, 'success').then(() => {
@@ -318,17 +367,15 @@
         });
 
         // ════════════════════════════════════════════════════════════════════════
-        // DELETE ROW (delegated — works on dynamically added rows)
+        // DELETE ROW
         // ════════════════════════════════════════════════════════════════════════
         $('#tblBody').on('click', '.btn-delete-row', function () {
         const row = $(this).closest('tr');
         const id  = parseInt(row.data('id') || 0);
 
         if (id === 0) {
-        // Unsaved row — remove from DOM only
         row.remove();
         reNumberRows();
-        // If table is empty restore the default blank row
         if ($('#tblBody tr').length === 0) addDefaultRow();
         return;
         }
@@ -365,61 +412,67 @@
         });
 
         // ════════════════════════════════════════════════════════════════════════
+        // INLINE ERROR HELPERS
+        // ════════════════════════════════════════════════════════════════════════
+
+        function setCodeError(inputEl, message) {
+        inputEl.addClass('is-invalid').removeClass('is-valid');
+        let fb = inputEl.next('.invalid-feedback');
+        if (fb.length === 0) {
+        fb = $(`<div class="invalid-feedback"></div>`);
+        inputEl.after(fb);
+        }
+        fb.text(message);
+        }
+
+        function clearCodeError(inputEl) {
+        inputEl.removeClass('is-invalid');
+        inputEl.next('.invalid-feedback').remove();
+        }
+
+        // ════════════════════════════════════════════════════════════════════════
         // HELPER FUNCTIONS
         // ════════════════════════════════════════════════════════════════════════
 
-        // Append a row that already exists in the DB
         function appendRow(id, code, description) {
         const serial = $('#tblBody tr').length + 1;
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="${id}">
-         <td style="padding:10px; border:1px solid lightgrey; width:20px;">${serial}</td>
+        <td style="padding:10px; border:1px solid lightgrey; width:20px;">${serial}</td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" value="${escapeHtml(code)}"></td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-desc" value="${escapeHtml(description)}"></td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-        <button type="button" class="btn btn-danger btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>Delete
-        </button>
+        <button type="button" class="btn btn-danger btn-delete-row" title="Delete"><i class="fas fa-trash"></i> Delete</button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
-        // Append a blank row for new entry
         function addNewRow() {
         const serial = $('#tblBody tr').length + 1;
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="0">
         <td style="padding:10px; border:1px solid lightgrey; width:20px;">${serial}</td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-desc" placeholder="Description"></td>
         <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-        <button type="button" class="btn btn-danger btn-delete-row" title="Delete">
-        <i class="fas fa-trash"></i>Delete
-        </button>
+        <button type="button" class="btn btn-danger btn-delete-row" title="Delete"><i class="fas fa-trash"></i> Delete</button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
-        // The default single blank row shown on page load and when table is empty
         function addDefaultRow() {
         $('#tblBody').empty();
-        const row = `
+        $('#tblBody').append(`
         <tr data-id="0">
         <td style="padding:10px; border:1px solid lightgrey; width:20px;">1</td>
-         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
-         <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-desc" placeholder="Description"></td>
-         <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
-         <button type="button" class="btn btn-danger btn-delete-row" title="Delete">
-         <i class="fas fa-trash"></i>Delete
-         </button>
+        <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-code" placeholder="Code"></td>
+        <td style="text-align:left;padding:10px;border:1px solid lightgrey;"><input type="text" class="form-control border-primary col-desc" placeholder="Description"></td>
+        <td style="text-align:left;padding:10px;border:1px solid lightgrey;">
+        <button type="button" class="btn btn-danger btn-delete-row" title="Delete"><i class="fas fa-trash"></i> Delete</button>
         </td>
-        </tr>`;
-        $('#tblBody').append(row);
+        </tr>`);
         }
 
-        // Reload all rows from DB after a successful save
         function reloadRows(stateId) {
         clearTable();
         $.ajax({
@@ -438,31 +491,24 @@
         });
         }
 
-        // Wipe the table body
-        function clearTable() {
-        $('#tblBody').empty();
-        }
+        function clearTable()    { $('#tblBody').empty(); }
 
-        // Re-number S/N column after a row is deleted
         function reNumberRows() {
         $('#tblBody tr').each(function (index) {
         $(this).find('td:first').text(index + 1);
         });
         }
 
-        // Reset state dropdown back to default disabled state
         function resetStateDropdown() {
         const ddl = $('#ddlState');
         ddl.find('option:not(:first)').remove();
         ddl.val('').prop('disabled', true).trigger('change.select2');
         }
 
-        // Enable/disable Add Row and Save buttons
         function toggleButtons(enabled) {
-        $('#btnAddRow, #btnSave').prop('disabled', !enabled);
+        $('.btnAddRow, .btnSave').prop('disabled', !enabled);
         }
 
-        // Escape HTML to prevent XSS when rendering saved values into inputs
         function escapeHtml(str) {
         if (!str) return '';
         return str

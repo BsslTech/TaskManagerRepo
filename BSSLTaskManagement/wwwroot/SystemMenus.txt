@@ -32,4 +32,3 @@ Id: 36, Code: SWO662, Description: Stock Write Off
 Id: 37, Code: RETSTO, Description: Return to Store
 Id: 42, Code: OnlineProc, Description: 0725
 Id: 43, Code: OnlineProc, Description: Online Payment
-Id: 44, Code: CHA, Description: Chart of Accounts

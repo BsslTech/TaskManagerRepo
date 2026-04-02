@@ -74,5 +74,23 @@ namespace BSSLTaskManagement.Pages.Constituency
             var result = await _constituencyService.DeleteFederalConstituencyAsync(id);
             return new JsonResult(result);
         }
+
+        // ── AJAX: Duplicate code check ───────────────────────────────────────────
+        // Checks whether a given code already exists within the same state.
+        // excludeId = the row's own Id (0 for new rows) so a row doesn't flag itself.
+        // URL: ?handler=CheckDuplicateCode&stateId=1&code=FC001&excludeId=0
+        public async Task<IActionResult> OnGetCheckDuplicateCodeAsync(int stateId, string code, int excludeId = 0)
+        {
+            if (stateId <= 0 || string.IsNullOrWhiteSpace(code))
+                return new JsonResult(new { codeTaken = false });
+
+            var existing = await _constituencyService.GetFederalConstituenciesAsync(stateId);
+
+            bool codeTaken = existing.Any(x =>
+                x.Id != excludeId &&
+                string.Equals(x.Code?.Trim(), code.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            return new JsonResult(new { codeTaken });
+        }
     }
 }
