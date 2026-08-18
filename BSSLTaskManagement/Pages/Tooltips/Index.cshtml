@@ -1,0 +1,958 @@
+﻿@page "/Tooltips"
+@model BSSLTaskManagement.Pages.Tooltips.IndexModel
+
+<style>
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .badge-success {
+        color: #166534;
+        background-color: #dcfce7;
+    }
+
+    .badge-warning {
+        color: #92400e;
+        background-color: #fef3c7;
+    }
+
+    .badge-secondary {
+        color: #4b5563;
+        background-color: #f3f4f6;
+    }
+
+    /* Modal Design */
+    /* =========================
+           Tooltip Edit Modal
+           ========================= */
+
+    .tooltip-modal {
+        border: none;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    }
+
+
+    /* Header */
+
+    .tooltip-modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #edf0f3;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tooltip-modal-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .tooltip-modal-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #eef4ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+    }
+
+    .tooltip-modal-header .modal-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .tooltip-modal-header small {
+        display: block;
+        margin-top: 3px;
+        color: #8a94a6;
+        font-size: 12px;
+    }
+
+    .tooltip-close {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        color: #6b7280;
+        opacity: 1;
+        transition: all 0.2s ease;
+    }
+
+        .tooltip-close:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+
+    /* Body */
+
+    .tooltip-modal-body {
+        padding: 25px 28px;
+        background: #ffffff;
+    }
+
+        .tooltip-modal-body .form-group {
+            margin-bottom: 22px;
+        }
+
+        .tooltip-modal-body label {
+            display: block;
+            margin-bottom: 7px;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+    .tooltip-required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+
+    /* Field display */
+
+    .tooltip-field-display {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+        .tooltip-field-display > i {
+            position: absolute;
+            left: 13px;
+            color: #9ca3af;
+            z-index: 2;
+        }
+
+        .tooltip-field-display .form-control {
+            padding-left: 38px;
+            padding-right: 90px;
+            background: #f8fafc;
+            border-color: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+    .tooltip-readonly-badge {
+        position: absolute;
+        right: 10px;
+        padding: 4px 8px;
+        border-radius: 5px;
+        background: #eef2f7;
+        color: #7b8494;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    /* Inputs */
+
+    .tooltip-input {
+        min-height: 44px;
+        border: 1px solid #dfe3e8;
+        border-radius: 7px;
+        color: #1f2937;
+        font-size: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .tooltip-input:focus {
+            border-color: #4f8df7;
+            box-shadow: 0 0 0 3px rgba(79, 141, 247, 0.12);
+        }
+
+    .tooltip-message {
+        min-height: 150px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .tooltip-input::placeholder {
+        color: #a5adb8;
+    }
+
+
+    /* Message label */
+
+    .tooltip-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .tooltip-label-row label {
+            margin-bottom: 7px;
+        }
+
+    .tooltip-hint {
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+
+    /* Status */
+
+    .tooltip-status-box {
+        margin-top: 8px;
+        padding: 16px 18px;
+        border: 1px solid #e5e9ef;
+        border-radius: 9px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tooltip-status-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .tooltip-status-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #e8f5ee;
+        color: #16a34a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tooltip-status-title {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .tooltip-status-description {
+        margin-top: 2px;
+        color: #8a94a6;
+        font-size: 11px;
+    }
+
+
+    /* Switch */
+
+    .tooltip-switch {
+        margin: 0;
+    }
+
+        .tooltip-switch .custom-control-label::before {
+            width: 38px;
+            height: 20px;
+            border-radius: 20px;
+            top: 0;
+        }
+
+        .tooltip-switch .custom-control-label::after {
+            width: 16px;
+            height: 16px;
+            top: 2px;
+        }
+
+        .tooltip-switch .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
+
+
+    /* Footer */
+
+    .tooltip-modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #edf0f3;
+        background: #fafbfc;
+    }
+
+    .tooltip-btn-cancel {
+        padding: 9px 18px;
+        border: 1px solid #dfe3e8;
+        border-radius: 7px;
+        background: #ffffff;
+        color: #5f6875;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .tooltip-btn-cancel:hover {
+            background: #f3f4f6;
+        }
+
+    .tooltip-btn-save {
+        padding: 9px 20px;
+        border: none;
+        border-radius: 7px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+        transition: all 0.2s ease;
+    }
+
+        .tooltip-btn-save:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(37, 99, 235, 0.25);
+        }
+
+</style>
+
+<div class="app-content-header" style="padding:10px;">
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-sm-6">
+                <h3 class="mb-0">
+                    Tooltip Management
+                </h3>
+            </div>
+
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+
+                    <li class="breadcrumb-item" style="padding:5px;">
+                        <a href="/Index">Home</a>
+                    </li>
+
+                    <li class="breadcrumb-item active"
+                        aria-current="page"
+                        style="padding:5px;">
+                        Tooltip Management
+                    </li>
+
+                </ol>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@if (Model.SelectedForm == null)
+{
+    <!-- ============================= -->
+    <!-- FORM LIST -->
+    <!-- ============================= -->
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4 class="card-title">
+                Forms
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+                    <input type="text"
+                           id="formSearch"
+                           class="form-control"
+                           placeholder="Search form code or name..." />
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover"
+                       id="formsTable">
+
+                    <thead>
+                        <tr>
+                            <th>Form Code</th>
+                            <th>Form Name</th>
+                            <th width="100">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var form in Model.Forms)
+                        {
+                            <tr>
+
+                                <td>
+                                    @form.FormCode
+                                </td>
+
+                                <td>
+                                    @form.FormName
+                                </td>
+
+                                <td>
+                                    <a href="?formCode=@Uri.EscapeDataString(form.FormCode)"
+                                       class="btn btn-sm btn-primary">
+
+                                        <i class="fa fa-eye"></i>
+                                        View
+
+                                    </a>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+else
+{
+    <!-- ============================= -->
+    <!-- FIELD LIST -->
+    <!-- ============================= -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h4 class="card-title mb-0" style="margin-right:5px;">
+                        @Model.SelectedForm.FormName
+                    </h4>
+
+                    <small class="text-muted">
+                        (@Model.SelectedForm.FormCode)
+                    </small>
+                </div>
+
+                <a href="/Tooltips"
+                   class="btn btn-secondary">
+
+                    <i class="fa fa-arrow-left"></i>
+                    Back to Forms
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row mb-2">
+
+                <div class="col-md-6">
+
+                    <input type="text"
+                           id="fieldSearch"
+                           class="form-control"
+                           placeholder="Search fields..." />
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover"
+                       id="fieldsTable">
+
+                    <thead>
+
+                        <tr>
+                            <th>Field</th>
+                            <th>Code</th>
+                            <th>Tooltip</th>
+                            <th width="100">Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var field in Model.SelectedForm.Fields)
+                        {
+                            var tooltip =
+                                Model.SelectedContent?
+                                    .Fields?
+                                    .FirstOrDefault(
+                                        x => x.Code.Equals(
+                                            field.Code,
+                                            StringComparison.OrdinalIgnoreCase));
+
+                            <tr>
+
+                                <td>
+                                    @field.Label
+                                </td>
+
+                                <td>
+                                    <code>
+                                        @field.Code
+                                    </code>
+                                </td>
+
+                                <td>
+
+                                    @if (tooltip?.IsActive == true)
+                                    {
+                                        <span class="badge badge-success">
+                                            Active
+                                        </span>
+                                    }
+                                    else if (tooltip != null)
+                                    {
+                                        <span class="badge badge-warning">
+                                            Inactive
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">
+                                            Not Configured
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary tooltip-edit-btn"
+                                            data-code="@field.Code"
+                                            data-label="@field.Label"
+                                            data-message="@tooltip?.Message"
+                                            data-active="@(tooltip?.IsActive == true ? "true" : "false")">
+
+                                        <i class="fa fa-pencil"></i>
+                                        Edit
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            @if (Model.SelectedForm != null)
+            {
+                <div class="modal fade"
+                     id="tooltipEditModal"
+                     tabindex="-1"
+                     role="dialog"
+                     aria-labelledby="tooltipEditModalLabel"
+                     aria-hidden="true">
+
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+
+                        <div class="modal-content tooltip-modal">
+
+                            <!-- Header -->
+                            <div class="modal-header tooltip-modal-header">
+
+                                <div class="tooltip-modal-title-wrapper">
+                                    <div class="tooltip-modal-icon">
+                                        <i class="fa fa-comment-alt"></i>
+                                    </div>
+
+                                    <div>
+                                        <h5 class="modal-title" id="tooltipEditModalLabel">
+                                            Edit Tooltip
+                                        </h5>
+
+                                        <small>
+                                            Customize the information shown to users.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <button type="button"
+                                        class="close tooltip-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+
+                            </div>
+
+
+                            <!-- Body -->
+                            <div class="modal-body tooltip-modal-body">
+
+                                <input type="hidden" id="tooltipFieldCode" />
+
+                                <!-- Field -->
+                                <div class="form-group tooltip-field-group">
+
+                                    <label for="tooltipFieldLabel">
+                                        Field
+                                    </label>
+
+                                    <div class="tooltip-field-display">
+                                        <i class="fa fa-tag"></i>
+
+                                        <input type="text"
+                                               id="tooltipFieldLabel"
+                                               class="form-control"
+                                               readonly />
+
+                                        <span class="tooltip-readonly-badge">
+                                            Read only
+                                        </span>
+                                    </div>
+
+                                </div>
+
+
+                                @* <!-- Title -->
+                                    <div class="form-group">
+
+                                        <label for="tooltipTitle">
+                                            Tooltip Title
+                                            <span class="tooltip-required">*</span>
+                                        </label>
+
+                                        <input type="text"
+                                               id="tooltipTitle"
+                                               class="form-control tooltip-input"
+                                               placeholder="Enter a short heading..." />
+
+                                    </div> *@
+
+
+                                <!-- Message -->
+                                <div class="form-group">
+
+                                    <div class="tooltip-label-row">
+
+                                        <label for="tooltipMessage">
+                                            Message
+                                            <span class="tooltip-required">*</span>
+                                        </label>
+
+                                        <span class="tooltip-hint">
+                                            Helpful information for the user
+                                        </span>
+
+                                    </div>
+
+                                    <textarea id="tooltipMessage"
+                                              class="form-control tooltip-input tooltip-message"
+                                              rows="7"
+                                              placeholder="Enter the tooltip information..."></textarea>
+
+                                </div>
+
+
+                                <!-- Status -->
+                                <div class="tooltip-status-box">
+
+                                    <div class="tooltip-status-content">
+
+                                        <div class="tooltip-status-icon">
+                                            <i class="fa fa-eye"></i>
+                                        </div>
+
+                                        <div>
+                                            <div class="tooltip-status-title">
+                                                Tooltip visibility
+                                            </div>
+
+                                            <div class="tooltip-status-description">
+                                                Control whether this tooltip is shown to users.
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="custom-control custom-switch tooltip-switch">
+
+                                        <input type="checkbox"
+                                               class="custom-control-input"
+                                               id="tooltipIsActive" />
+
+                                        <label class="custom-control-label"
+                                               for="tooltipIsActive">
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Footer -->
+                            <div class="modal-footer tooltip-modal-footer">
+
+                                <button type="button"
+                                        class="btn tooltip-btn-cancel"
+                                        data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+
+                                <button type="button"
+                                        class="btn tooltip-btn-save"
+                                        id="saveTooltipBtn">
+
+                                    <i class="fa fa-save mr-1"></i>
+                                    Save Tooltip
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+}
+</div>
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            initializeFormSearch();
+            initializeFieldSearch();
+            initializeTooltipEditing();
+            initializeTooltipSaving();
+
+        });
+
+
+        // ============================================
+        // FORM SEARCH
+        // ============================================
+
+        function initializeFormSearch() {
+
+            const search = document.getElementById("formSearch");
+
+            if (!search) {
+                return;
+            }
+
+            search.addEventListener("input", function() {
+
+                const value = search.value.toLowerCase().trim();
+
+                document
+                    .querySelectorAll("#formsTable tbody tr")
+                    .forEach(function(row) {
+
+                        const text = row.textContent.toLowerCase();
+
+                        row.style.display =
+                            text.includes(value) ? "" : "none";
+
+                    });
+            });
+        }
+
+
+        // ============================================
+        // FIELD SEARCH
+        // ============================================
+
+        function initializeFieldSearch() {
+
+            const search = document.getElementById("fieldSearch");
+
+            if (!search) {
+                return;
+            }
+
+            search.addEventListener("input", function() {
+
+                const value = search.value.toLowerCase().trim();
+
+                document
+                    .querySelectorAll("#fieldsTable tbody tr")
+                    .forEach(function(row) {
+
+                        const text = row.textContent.toLowerCase();
+
+                        row.style.display =
+                            text.includes(value) ? "" : "none";
+
+                    });
+            });
+        }
+
+
+        // ============================================
+        // EDIT TOOLTIP
+        // ============================================
+
+        function initializeTooltipEditing() {
+
+            document
+                .querySelectorAll(".tooltip-edit-btn")
+                .forEach(function(button) {
+
+                    button.addEventListener("click", function() {
+
+                        document.getElementById("tooltipFieldCode").value =
+                            button.dataset.code || "";
+
+                        document.getElementById("tooltipFieldLabel").value =
+                            button.dataset.label || "";
+
+                        // document.getElementById("tooltipTitle").value =
+                        //     button.dataset.title || "";
+
+                        document.getElementById("tooltipMessage").value =
+                            button.dataset.message || "";
+
+                        document.getElementById("tooltipIsActive").checked =
+                            button.dataset.active === "true";
+
+                        $("#tooltipEditModal").modal("show");
+
+                    });
+
+                });
+        }
+
+
+        // ============================================
+        // SAVE TOOLTIP
+        // ============================================
+
+        function initializeTooltipSaving() {
+
+            const saveButton =
+                document.getElementById("saveTooltipBtn");
+
+            if (!saveButton) {
+                return;
+            }
+
+            saveButton.addEventListener("click", async function() {
+
+                const formCode = getFormCode();
+
+                const fieldCode =
+                    document.getElementById("tooltipFieldCode").value;
+
+                const fieldLabel =
+                    document.getElementById("tooltipFieldLabel").value;
+
+                // const title =
+                //     document.getElementById("tooltipTitle").value;
+
+                const message =
+                    document.getElementById("tooltipMessage").value;
+
+                const isActive =
+                    document.getElementById("tooltipIsActive").checked;
+
+
+                const payload = {
+                    Code: fieldCode,
+                    Label: fieldLabel,
+                    Message: message,
+                    IsActive: isActive
+                };
+
+
+                try {
+
+                    saveButton.disabled = true;
+
+                    const response = await fetch(
+                        `/api/tooltips/content/${encodeURIComponent(formCode)}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(payload)
+                        }
+                    );
+
+                   
+                    if (!response.ok) {
+                        throw new Error(
+                            `Save failed: ${response.status}`
+                        );
+                    }
+
+
+                    $("#tooltipEditModal").modal("hide");
+
+                    window.location.reload();
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Failed to save tooltip:",
+                        error
+                    );
+
+                    alert("Failed to save tooltip.");
+
+                }
+                finally {
+
+                    saveButton.disabled = false;
+
+                }
+
+            });
+        }
+
+
+        // ============================================
+        // GET FORM CODE
+        // ============================================
+
+        function getFormCode() {
+
+            const params =
+                new URLSearchParams(window.location.search);
+
+            return params.get("formCode") || "";
+        }
+
+    </script>
+}
