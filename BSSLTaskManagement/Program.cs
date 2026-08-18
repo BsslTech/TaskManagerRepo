@@ -7,7 +7,7 @@ using static TaskManagement.IdentityLib;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("taskConString") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("SysTaskConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<TaskDbContext>(options =>
     options.UseSqlServer(connectionString));
 const int commandTimeoutInSeconds = 100;
@@ -37,21 +37,33 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ERP", policy =>
+    {
+        policy
+            .WithOrigins("https://localhost:7199")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddScoped<ISystemSerivces, SystemSerivces>();
 builder.Services.AddScoped<IMainMenuSetupServices, MainMenuSetupServices>();
 builder.Services.AddScoped<IUserManagementServices, UserManagementServices>();
 builder.Services.AddScoped<IConstituencyService, ConstituencyService>();
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.AuthorizeFolder("/"); // protect everything
-    options.Conventions.AllowAnonymousToFolder("/Identity"); // allow login
-});
+    options.Conventions.AuthorizeFolder("/");
+    options.Conventions.AllowAnonymousToFolder("/Identity");
+})
+.AddRazorRuntimeCompilation();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -67,9 +79,11 @@ else
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
-app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("ERP");
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
