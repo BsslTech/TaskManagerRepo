@@ -161,8 +161,8 @@ namespace BSSLTaskManagement.Pages.Menu
         // Excludes the record currently being edited (excludeId = 0 for new records).
         // Returns a flags object so the client knows exactly which fields conflict.
         // URL: ?handler=CheckDuplicate&subMenuCode=X&subMenuName=Y&pageUrl=Z&excludeId=0
-        public async Task<IActionResult> OnGetCheckDuplicateAsync(
-    string subMenuCode, string subMenuName, string pageUrl, int excludeId = 0)
+        public async Task<IActionResult> OnGetCheckDuplicatessAsync(
+         string subMenuCode, string subMenuName, string pageUrl, int excludeId = 0)
         {
             // Use the dedicated method — no filter dependencies, always returns all records
             var others = (await _mainMenuServices.GetAllSubMenusAsync())
@@ -182,6 +182,67 @@ namespace BSSLTaskManagement.Pages.Menu
                 pageUrlTaken = others.Any(x =>
                     !string.IsNullOrWhiteSpace(pageUrl) &&
                     string.Equals(x.PageUrl?.Trim(), pageUrl.Trim(), StringComparison.OrdinalIgnoreCase))
+            });
+        }
+
+        public async Task<IActionResult> OnGetCheckDuplicateAsync(
+    string? subMenuCode,
+    string? subMenuName,
+    string? pageUrl,
+    int excludeId = 0)
+        {
+            var others = (await _mainMenuServices.GetAllSubMenusAsync())
+                .Where(x => x.Id != excludeId)
+                .ToList();
+
+            var code = subMenuCode?.Trim();
+            var name = subMenuName?.Trim();
+            var url = pageUrl?.Trim();
+
+            var subMenuCodeTaken =
+                !string.IsNullOrWhiteSpace(code) &&
+                others.Any(x =>
+                    string.Equals(
+                        x.SubMenuCode?.Trim(),
+                        code,
+                        StringComparison.OrdinalIgnoreCase));
+
+            var subMenuNameTaken =
+                !string.IsNullOrWhiteSpace(code) &&
+                !string.IsNullOrWhiteSpace(name) &&
+                others.Any(x =>
+                    string.Equals(
+                        x.SubMenuCode?.Trim(),
+                        code,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(
+                        x.SubMenuName?.Trim(),
+                        name,
+                        StringComparison.OrdinalIgnoreCase));
+
+            var pageUrlTaken =
+                !string.IsNullOrWhiteSpace(code) &&
+                !string.IsNullOrWhiteSpace(name) &&
+                !string.IsNullOrWhiteSpace(url) &&
+                others.Any(x =>
+                    string.Equals(
+                        x.SubMenuCode?.Trim(),
+                        code,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(
+                        x.SubMenuName?.Trim(),
+                        name,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(
+                        x.PageUrl?.Trim(),
+                        url,
+                        StringComparison.OrdinalIgnoreCase));
+
+            return new JsonResult(new
+            {
+                subMenuCodeTaken,
+                subMenuNameTaken,
+                pageUrlTaken
             });
         }
     }

@@ -123,29 +123,29 @@
                                             <input type="text" class="form-control border-primary" asp-for="SubMenuForm.SubMenuCode" />
                                         </div>
                                         <div class="col-sm-4">
-                                            <label class="form-label req">SubMenu Name/Header Name</label>
+                                            <label class="form-label req">SubMenu Name</label>
                                             <input type="text" class="form-control border-primary" asp-for="SubMenuForm.SubMenuName" />
-                                        </div>
-                                        <div class="col-sm-4" style="display:none">
-                                            <label class="form-label">Form Header Name</label>
-                                            <input type="text" class="form-control border-primary" asp-for="SubMenuForm.FormNameHeader" />
-                                        </div>
+                                        </div>                                      
                                     </div>
 
 
                                     <!-- ROW 3: Page URL, Report Page URL, Icon Image Name -->
                                     <div class="row row2">
                                         <div class="col-sm-4">
+                                            <label class="form-label req">Form Header Name</label>
+                                            <input type="text" id="formNameHeader" class="form-control border-primary" asp-for="SubMenuForm.FormNameHeader" />
+                                        </div>
+                                        <div class="col-sm-6">
                                             <label class="form-label req">Page URL</label>
                                             <input type="text" class="form-control border-primary" asp-for="SubMenuForm.PageUrl" />
                                         </div>
-                                        <div class="col-sm-4">
-                                            <label class="form-label">Report Page URL</label>
-                                            <input type="text" class="form-control border-primary" asp-for="SubMenuForm.ReportPageUrl" />
-                                        </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-2">
                                             <label class="form-label">Icon Image Name</label>
                                             <input type="text" class="form-control border-primary" asp-for="SubMenuForm.IconImagename" />
+                                        </div>
+                                        <div class="col-sm-4" style="display:none">
+                                            <label class="form-label">Report Page URL</label>
+                                            <input type="text" class="form-control border-primary" asp-for="SubMenuForm.ReportPageUrl" />
                                         </div>
                                     </div>
 
@@ -153,6 +153,7 @@
                                     <!-- ROW 4: Upload Icon Image, Upload Help File -->
                                    
                                         <div class="row row2">
+                                        
                                             <div class="col-sm-6">
                                                 <label class="col-auto col-form-label">Upload Icon Image</label>
                                                 <div class="col-auto">
@@ -460,7 +461,7 @@
             const val = this.value.trim();
             if (!val) return;
             try {
-                const result = await checkDuplicates('', val, '');
+                const result = await checkDuplicates(subMenuCodeInput.value, val, '');
                 if (result.subMenuNameTaken) {
                     setFieldError(this, 'This SubMenu Name is already in use.');
                 } else {
@@ -473,7 +474,7 @@
             const val = this.value.trim();
             if (!val) return;
             try {
-                const result = await checkDuplicates('', '', val);
+                const result = await checkDuplicates(subMenuCodeInput.value, subMenuNameInput.value, val);
                 if (result.pageUrlTaken) {
                     setFieldError(this, 'This Page URL is already in use.');
                 } else {
@@ -491,6 +492,7 @@
             const moduleId   = document.getElementById('moduleName').value;
             const mainMenuId = document.getElementById('mainMenuName').value;
             const menuId     = document.getElementById('menuName').value;
+            const formNameHeader     = document.getElementById('formNameHeader').value;
             const subCode    = subMenuCodeInput.value.trim();
             const subName    = subMenuNameInput.value.trim();
             const pageUrl    = pageUrlInput.value.trim();
@@ -517,7 +519,11 @@
                 return false;
             }
             if (!subName) {
-                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a SubMenu Name / Header Name.' });
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a SubMenu Name.' });
+                return false;
+            }
+            if (!formNameHeader) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please enter a SubMenu Header Name.' });
                 return false;
             }
             if (!pageUrl) {

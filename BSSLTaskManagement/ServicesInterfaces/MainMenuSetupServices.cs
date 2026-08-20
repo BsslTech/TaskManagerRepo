@@ -360,7 +360,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                         SubMenuName = p.SubMenuName,
                         //FormId = p.FormId,
                         PageUrl = p.PageUrl,
-                        FormNameHeader = p.FormNameHeader,
+                        FormNameHeader = string.IsNullOrWhiteSpace(p.FormNameHeader) ? p.SubMenuName : p.FormNameHeader,
                         OrderNo = p.OrderNo,
                         ReportPageUrl = p.ReportPageUrl,
                         IsApprform = p.IsApprform,
@@ -517,7 +517,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 dbSubmenu.SubMenuName = p.SubMenuName;
                 dbSubmenu.FormId = p.SubMenuCode;
                 dbSubmenu.PageUrl = p.PageUrl;
-                dbSubmenu.FormNameHeader = p.SubMenuName;
+                dbSubmenu.FormNameHeader = p.FormNameHeader;
                 dbSubmenu.OrderNo = p.OrderNo;
                 dbSubmenu.ReportPageUrl = p.ReportPageUrl;
                 dbSubmenu.IsApprform = p.IsApprform;
