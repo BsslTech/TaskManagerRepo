@@ -524,7 +524,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 dbSubmenu.IsReport = p.IsReport;
                 dbSubmenu.AccessType = p.AccessType;
                 dbSubmenu.Approval = p.Approval;
-                dbSubmenu.CompPrefix = p.CompPrefix;
+                dbSubmenu.CompPrefix = string.IsNullOrWhiteSpace(p.CompPrefix) ? "ALL" : p.CompPrefix;
                 dbSubmenu.Deactivate = p.Deactivate;
                 dbSubmenu.FileName = p.FileName;
                 dbSubmenu.FolderPath = p.FolderPath;
