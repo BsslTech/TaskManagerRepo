@@ -1,6 +1,6 @@
-﻿function AddTwoFactor() {
+﻿function AddTwoFactorSetup() {
     const useType = document.getElementById('useType').value;
-    const inputMaxNumber = document.getElementById('inputMaxNumber').value;
+    const inputMaxNumber = document.getElementById('inputMaxNumber');
     if (useType.toString().trim().toLowerCase() === '') {
         Swal.fire({
             title: "Warning!",
@@ -9,7 +9,8 @@
         });
         return;
     }
-    if (inputMaxNumber.toString().trim().toLowerCase() === '') {
+    if (inputMaxNumber.value.toString().trim().toLowerCase() === '') {
+        inputMaxNumber.focus();
         Swal.fire({
             title: "Warning!",
             text: " Enter maximum period",
@@ -97,6 +98,26 @@ $(document).on('click', '.removeRow', async function () {
 $(document).on('click', '.btnSave', function () {
     let valid = true;
     const nodes = table.rows().nodes().toArray();
+    const useType = document.getElementById('useType').value;
+    const inputMaxNumber = document.getElementById('inputMaxNumber');
+    if (useType.toString().trim().toLowerCase() === '') {
+        Swal.fire({
+            title: "Warning!",
+            text: " Select user type",
+            icon: "warning"
+        });
+        return;
+    }
+    if (inputMaxNumber.value.toString().trim().toLowerCase() === '') {
+        inputMaxNumber.focus();
+        Swal.fire({
+            title: "Warning!",
+            text: " Enter maximum period",
+            icon: "warning"
+        });
+        return;
+    }
+
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
         const twoFactorCode = $(node).find('.twoFactorCode').val();
@@ -146,11 +167,9 @@ function ReIndexRows() {
 
 }
 async function TwoFactorChange(option) {
-
-    $(".loadingDiv-parent").fadeIn("fast");
     const useType = document.getElementById('useType').value;
-    const inputMaxNumber = document.getElementById('inputMaxNumber').value;
-    const inputSeconds = document.getElementById('inputSeconds').value;
+    let inputMaxNumber = document.getElementById('inputMaxNumber');
+    let inputSeconds = document.getElementById('inputSeconds');
     if (option == 1) {
         inputMaxNumber.value = ""; inputSeconds.value = "";
     }
@@ -165,24 +184,69 @@ async function TwoFactorChange(option) {
             return;
         }
         inputSeconds.value = "";
+
+        let secondsInAday;
+        if (useType.toString().trim().toLowerCase() === 'hours') {
+            secondsInAday = Number(inputMaxNumber.value) * 60 * 60; // hours to seconds
+        } else if (useType.toString().trim().toLowerCase() === 'days') {
+            secondsInAday = Number(inputMaxNumber.value) * (24 * 60 * 60); // days to seconds
+        }
+        inputSeconds.value = secondsInAday;
     }
-    let secondsInAday;
-    if (useType.toString().trim().toLowerCase() === 'hours') {
-        secondsInAday = Number(inputMaxNumber) * 60 * 60; // hours to seconds
-    } else if (useType.toString().trim().toLowerCase() === 'days') {
-        secondsInAday = Number(inputMaxNumber) * (24 * 60 * 60); // days to seconds
-    }
-    inputSeconds.value = secondsInAday;
+    
 }
 async function UpdateTextFile(element, option, todo) {
+    let row = $(element).closest("tr");
+    let uniqno = row.find(".code").val();
+    let twoFactorCode = row.find(".twoFactorCode").val();
 
+    let twoFactorDescription = row.find(".twoFactorDescription").val();
+    const useType = document.getElementById('useType').value;
+    const inputMaxNumber = document.getElementById('inputMaxNumber');
+    if (useType.toString().trim().toLowerCase() === '') {
+        if (option === 1) {
+            row.find(".twoFactorCode").val(''); row.find(".twoFactorDescription").val('');
+        }
+        else
+            row.find(".twoFactorDescription").val('');
+
+        Swal.fire({
+            title: "Warning!",
+            text: " Select user type",
+            icon: "warning"
+        });
+        return;
+    }
+    if (inputMaxNumber.value.toString().trim().toLowerCase() === '') {
+        if (option === 1) {
+            row.find(".twoFactorCode").val(''); row.find(".twoFactorDescription").val('');
+        }
+        else
+            row.find(".twoFactorDescription").val('');
+
+        inputMaxNumber.focus();
+        Swal.fire({
+            title: "Warning!",
+            text: " Enter maximum period",
+            icon: "warning"
+        });
+        return;
+    }
+    
+
+    if (option === 2) {
+        if (twoFactorCode.toString().trim().toLowerCase() === '') {
+            row.find(".twoFactorDescription").val('');
+            row.find(".twoFactorCode").focus();
+            Swal.fire({
+                title: "Warning!",
+                text: " Enter two-factor authentication code",
+                icon: "warning"
+            });
+            return;
+        }
+    }
     try {
-
-        let row = $(element).closest("tr");
-        let uniqno = row.find(".code").val();
-        let twoFactorCode = row.find(".twoFactorCode").val();
-
-        let twoFactorDescription = row.find(".twoFactorDescription").val();
 
         let value = [];
 
@@ -270,7 +334,7 @@ async function UpdateTextFile(element, option, todo) {
             },
             body: JSON.stringify({
                 uniqno: uniqno,
-                uniqueUpdated: moduleCode,
+                uniqueUpdated: twoFactorCode,
                 todo: todo,
                 value: value
             })
@@ -312,7 +376,7 @@ async function UpdateTextFile(element, option, todo) {
             }
 
             if (uniqno === '')
-                row.find(".code").val(moduleCode);
+                row.find(".code").val(twoFactorCode);
             $(".loadingDiv-parent").fadeOut("slow");
             //if (window.Loader) window.Loader.fadeOut(window.Loader.parent, 600);// fast fade in
         }

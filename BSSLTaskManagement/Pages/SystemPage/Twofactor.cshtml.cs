@@ -20,7 +20,7 @@ namespace BSSLTaskManagement.Pages.SystemPage
         private async Task LoadTwoFactorAsync()
         {
             TwoFactor = await _system.GetTwoFactorAuthenticationAsync();
-            if (TwoFactor == null)
+            if (TwoFactor.UseType == null)
             {
                 TwoFactor = new TwoFactorVM
                 {
@@ -29,7 +29,7 @@ namespace BSSLTaskManagement.Pages.SystemPage
                     Seconds = null,
                     TwoFactorDetails = [],
                 };
-                for (int i = 0; i <= 3; i++)
+                for (int i = 0; i <= 2; i++)
                 {
                     TwoFactor.TwoFactorDetails
                     .Add(new TwoFactorSetupVM
@@ -38,8 +38,15 @@ namespace BSSLTaskManagement.Pages.SystemPage
                         Description = ""
                     });
                 }
+                await ReadTextFile("TwoFactors.txt", 1);
             }
-
+            else
+            {
+                if (TwoFactor.TwoFactorDetails.Any())
+                {
+                    await CreateTextFile(TwoFactor.TwoFactorDetails);
+                }
+            }
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -146,6 +153,17 @@ namespace BSSLTaskManagement.Pages.SystemPage
                         if (twoFactor != null)
                             twoFactors.Remove(twoFactor);
                     }
+                    await CreateTextFile(twoFactors);
+
+                    result = new JsonResult(new { status = "Success", statusDescription = "Updated successfully" });
+                }
+                else
+                {
+                    twoFactors.Add(new TwoFactorSetupVM
+                    {
+                        Code = string.IsNullOrWhiteSpace(uniqno) ? code : uniqno,
+                        Description = "",
+                    });
                     await CreateTextFile(twoFactors);
 
                     result = new JsonResult(new { status = "Success", statusDescription = "Updated successfully" });
