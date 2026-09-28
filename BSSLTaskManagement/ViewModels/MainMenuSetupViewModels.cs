@@ -107,5 +107,21 @@ namespace BSSLTaskManagement.ViewModels
 
             public int? OrderNo { get; set; }
         }
+        public class SubMenubyEntitySetupListVM
+        {
+            public int Id { get; set; }
+            public int SubMenuId { get; set; }
+            public bool IsActive { get; set; }
+            public string SubMenuName { get; set; }
+        }
+        public class SubMenubyEntitySetupVM
+        {
+            public string EntityCode { get; set; }
+            public string ModuleCode { get; set; }
+            public string SubSystemCode { get; set; }
+            public List<SubMenubyEntitySetupListVM> SubMenus { get; set; } = new List<SubMenubyEntitySetupListVM>();
+
+
+        }
     }
 }

@@ -53,5 +53,30 @@ public class SubMenusetupTab
 
     public virtual MenusetupTab? Menu { get; set; }
 
+    public virtual ModuleSetup? ModuleSetup { get; set; }
+
     public virtual ICollection<MenuAccessTab> MenuAccessTabs { get; set; } = new List<MenuAccessTab>();
+}
+public class SubMenusetupByEntityTab
+{
+    public int Id { get; set; }
+    public int SubMenusetupTabId { get; set; }
+    public bool IsActive { get; set; } =false;
+    public String ClientCode { get; set; }
+    public SubMenusetupTab SubMenusetupTab { get; set; }
+
+}
+public class ClientListTab
+{
+    public int Id { get; set; }
+    public String ClientCode { get; set; }
+    public String ClientName { get; set; }
+
+}
+public class SubsystemListTab
+{
+    public int Id { get; set; }
+    public String SubsystemCode { get; set; }
+    public String SubsystemName  { get; set; }
+
 }

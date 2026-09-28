@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using TaskManagement;
 using TaskManagement.Models;
 using static BSSLTaskManagement.ViewModels.MainMenuSetupViewModels;
@@ -19,6 +20,10 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<SubMenuSetupVM> GetSubMenuSetupSingleAsync(int? id);
         Task<ResponseVM> SaveSubMenuSetupAsync(SubMenuSetupVM submenu);
         Task<List<SubMenuSetupVM>> GetAllSubMenusAsync();
+        Task<List<SubMenubyEntitySetupListVM>> GetAllSubMenusAsync(string Subsystem, int ModuleCode, String ClientCode);
+        Task<List<ClientTab>> GetallClient();
+        Task<List<SystemTypeTab>> GetallSubsystem();
+        Task<ResponseVM> SaveClientFormsAllocation(SubMenubyEntitySetupVM vm);
     }
     public class MainMenuSetupServices(ISystemSerivces system, TaskDbContext context) : IMainMenuSetupServices
     {
@@ -555,5 +560,136 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 };
             }
         }
+        public async Task<List<SubMenubyEntitySetupListVM>> GetAllSubMenusAsync(string Subsystem, int ModuleCode, String ClientCode)
+        {
+            var result =  new List<SubMenubyEntitySetupListVM>();
+            try
+            {
+
+                result = await context.SubMenusetupTab
+                    .Where(m => m.ModuleSetup.SystemType.Trim() == Subsystem 
+                    && m.ModuleSetupId == ModuleCode  )
+                    .Select(x => new SubMenubyEntitySetupListVM
+                    {
+                        Id = x.Id,
+                        SubMenuId = x.Id,
+                        IsActive = false,
+                        SubMenuName = x.SubMenuName
+                    }).AsNoTracking().ToListAsync();
+
+              var getsaved=   await context.SubMenusetupByEntityTab
+                    .Where(m=>m.ClientCode.Trim()== ClientCode
+                    && m.SubMenusetupTab.ModuleSetupId == ModuleCode
+                    && m.SubMenusetupTab.ModuleSetup.SystemType.Trim() == Subsystem )
+                    .AsNoTracking().ToListAsync();
+                if(getsaved != null && getsaved.Count > 0)
+                {
+                    foreach (var item in result)
+                    {
+                        if (getsaved.Any(x => x.SubMenusetupTabId == item.SubMenuId))
+                        {
+                            item.IsActive = true;
+                        }
+                    }
+                }   
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message.ToString();
+                result = new List<SubMenubyEntitySetupListVM>();
+            }
+            return result;
+        }
+        public async Task<List<ClientTab>> GetallClient()
+        {
+            return await context.ClientTab
+                .Select(x => new ClientTab
+                {
+                    Id = x.Id,
+                    ClientCode = x.ClientCode,
+                    ClientName = x.ClientName
+                }).AsNoTracking().ToListAsync();
+        }
+        public async Task<List<SystemTypeTab>> GetallSubsystem()
+        {
+            return await context.SystemTypeTab
+                .Select(x => new SystemTypeTab  
+                {
+                    Id = x.Id,
+                    SystemType = x.SystemType,
+                    Description = x.Description
+                }).AsNoTracking() .ToListAsync();
+        }
+        public async Task<List<ModuleSetup>> GetallModulesBysubSystem(string subSystemCode)
+        {
+            return await context.ModuleSetup
+                .Where(x => x.SystemType == subSystemCode)
+                .Select(x => new ModuleSetup
+                {
+                    Id = x.Id,
+                    ModuleCode = x.ModuleCode,
+                    Description = x.Description
+                }).AsNoTracking().ToListAsync();
+        }
+       // C#
+       public async Task<ResponseVM> SaveClientFormsAllocation(SubMenubyEntitySetupVM vm)
+            {
+                if (vm == null)
+                {
+                    return new ResponseVM { Status = "Error", StatusDescription = "Payload missing" };
+                }
+                if (string.IsNullOrWhiteSpace(vm.EntityCode))
+                {
+                    return new ResponseVM { Status = "Error", StatusDescription = "EntityCode required" };
+                }
+
+                try
+                {
+                    var clientCode = vm.EntityCode.Trim();
+                    var incoming = vm.SubMenus ?? new List<SubMenubyEntitySetupListVM>();
+                    var incomingSubMenuIds = incoming.Select(s => s.SubMenuId).ToList();
+
+                    // Load existing allocations for this client
+                    var existing = await context.Set<SubMenusetupByEntityTab>()
+                        .Where(x => x.ClientCode == clientCode
+                        && x.SubMenusetupTab.ModuleSetup.SystemType == vm.SubSystemCode
+                        && x.SubMenusetupTab.ModuleSetup.ModuleCode == vm.ModuleCode)
+                        .ToListAsync();
+
+                    var existingBySubMenu = existing.ToDictionary(x => x.SubMenusetupTabId);
+
+                    // Upsert incoming items
+                    foreach (var item in incoming)
+                    {
+                        if (existingBySubMenu.TryGetValue(item.SubMenuId, out var ex))
+                        {
+                            ex.IsActive = item.IsActive;
+                        }
+                        else
+                        {
+                            var newEnt = new SubMenusetupByEntityTab
+                            {
+                                SubMenusetupTabId = item.SubMenuId,
+                                IsActive = item.IsActive,
+                                ClientCode = clientCode
+                            };
+                            context.Set<SubMenusetupByEntityTab>().Add(newEnt);
+                        }
+                    }
+
+                    // Remove allocations for this client that are not present in incoming list
+                    var toRemove = existing.Where(e => !incomingSubMenuIds.Contains(e.SubMenusetupTabId)).ToList();
+                    if (toRemove.Any())
+                        context.Set<SubMenusetupByEntityTab>().RemoveRange(toRemove);
+
+                    await context.SaveChangesAsync();
+
+                    return new ResponseVM { Status = "Success", StatusDescription = "Client form allocations saved" };
+                }
+                catch (Exception ex)
+                {
+                    return new ResponseVM { Status = "Error", StatusDescription = $"Save failed: {ex.Message}" };
+                }
+            }
     }
 }

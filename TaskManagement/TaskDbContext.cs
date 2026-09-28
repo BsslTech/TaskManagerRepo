@@ -61,6 +61,9 @@ namespace TaskManagement
         public  DbSet<CountryTab> CountryTab { get; set; }
         public  DbSet<StateTab> StateTab { get; set; }
         public  DbSet<LgaTab> LgaTab { get; set; }
+        public DbSet<SubMenusetupByEntityTab> SubMenusetupByEntityTab { get; set; }
+
+
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
