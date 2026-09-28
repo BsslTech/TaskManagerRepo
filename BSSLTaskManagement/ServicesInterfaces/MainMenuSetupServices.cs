@@ -23,6 +23,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<List<SubMenubyEntitySetupListVM>> GetAllSubMenusAsync(string Subsystem, int ModuleCode, String ClientCode);
         Task<List<ClientTab>> GetallClient();
         Task<List<SystemTypeTab>> GetallSubsystem();
+        Task<List<ModuleSetup>> GetallModulesBysubSystem(string subSystemCode);
         Task<ResponseVM> SaveClientFormsAllocation(SubMenubyEntitySetupVM vm);
     }
     public class MainMenuSetupServices(ISystemSerivces system, TaskDbContext context) : IMainMenuSetupServices
