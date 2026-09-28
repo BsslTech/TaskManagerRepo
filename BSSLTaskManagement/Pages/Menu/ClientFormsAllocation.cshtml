@@ -1,0 +1,330 @@
+@page
+@model BSSLTaskManagement.Pages.Menu.ClientFormsAllocationModel
+@{
+    ViewData["Title"] = "Client Forms Allocation";
+}
+<form id="clientFormsAllocationForm" method="post">
+    @Html.AntiForgeryToken()
+
+    <main class="app-main">
+
+        <div class="app-content-header" style="padding:10px;">
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">Client Forms Allocation</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item" style="padding:5px;"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page" style="padding:5px;">Client Forms Allocation</li>
+                        </ol>
+                    </div>
+                </div>
+                <!--end::Row-->
+            </div>
+        </div>
+
+        <div class="card card-primary card-outline mb-4">
+            <!--begin::Header-->
+            <div class="app-content">
+                <!--begin::Container-->
+                <div class="container-fluid">
+                    <!--end::Header-->
+                    <!--begin::Form-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!--begin::Body-->
+                            <div class="card-body">
+                                <h6 class="spn font-italic"></h6>
+                                @if (TempData["Success"] != null)
+                                {
+                                    <div class="container">
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            @TempData["Success"]
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (TempData["Error"] != null)
+                                {
+                                    <div class="container">
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            @TempData["Error"]
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- ROW 1: The 3 dropdowns -->
+                                <div class="row row2">
+
+                                    <!-- DROPDOWN 1: Client — loaded on page load -->
+                                    <div class="col-sm-4">
+                                        <label for="clientId" class="form-label req">Client</label>
+                                        <select class="form-control form-select border-primary" id="clientId">
+                                            <option value="">--Select Client--</option>
+                                            @foreach (var item in Model.ClientList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- DROPDOWN 2: Subsystem — loaded on page load -->
+                                    <div class="col-sm-4">
+                                        <label for="subsystemId" class="form-label req">Subsystem</label>
+                                        <select class="form-control form-select border-primary" id="subsystemId">
+                                            <option value="">--Select Subsystem--</option>
+                                            @foreach (var item in Model.SubsystemList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- DROPDOWN 3: Module — AJAX populated once Subsystem is selected -->
+                                    <div class="col-sm-4">
+                                        <label for="moduleId" class="form-label req">Module</label>
+                                        <select class="form-control form-select border-primary" id="moduleId" disabled>
+                                            <option value="">--Select Module--</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- SUB-MENU ALLOCATION TABLE — populated once all 3 dropdowns are selected -->
+                                <div class="row row2 mt-4" id="subMenuTableWrapper" style="display:none;">
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered display nowrap" id="subMenuTable" style="width:100%">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none; width:80px;">SN</th>
+                                                    <th style="text-align:left;padding:10px; border:1px solid lightgrey; text-transform:none;">Sub Menus</th>
+                                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none; width:120px;">Active</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="subMenuTableBody">
+                                                <!-- Rows injected by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="noSubMenusMsg" class="alert alert-info" style="display:none;">
+                                    No sub-menus found for the selected Subsystem / Module.
+                                </div>
+
+                                <!-- footer BUTTON -->
+                                <div class="mt-3" style="margin-bottom:2%">
+                                    <button type="button" class="btn btn-success text-light" id="saveBtn" disabled>Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</form>
+@section Scripts {
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // ELEMENTS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        const clientSelect     = document.getElementById('clientId');
+        const subsystemSelect  = document.getElementById('subsystemId');
+        const moduleSelect     = document.getElementById('moduleId');
+        const tableWrapper     = document.getElementById('subMenuTableWrapper');
+        const tableBody        = document.getElementById('subMenuTableBody');
+        const noSubMenusMsg    = document.getElementById('noSubMenusMsg');
+        const saveBtn          = document.getElementById('saveBtn');
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // HELPERS
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        function resetDropdown(selectEl, placeholder) {
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            selectEl.disabled  = true;
+        }
+
+        function clearSubMenuTable() {
+            tableBody.innerHTML = '';
+            tableWrapper.style.display  = 'none';
+            noSubMenusMsg.style.display = 'none';
+            saveBtn.disabled = true;
+        }
+
+        function getSelectedModuleCode() {
+            const opt = moduleSelect.options[moduleSelect.selectedIndex];
+            return opt ? (opt.getAttribute('data-code') || '') : '';
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CASCADE: Subsystem → Module
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        subsystemSelect.addEventListener('change', async function () {
+            const subsystemCode = this.value;
+            resetDropdown(moduleSelect, "--Select Module--");
+            clearSubMenuTable();
+            if (!subsystemCode) return;
+
+            try {
+                const res  = await fetch(`?handler=ModulesBySubsystem&subsystemCode=${encodeURIComponent(subsystemCode)}`);
+                const data = await res.json();
+
+                moduleSelect.innerHTML = '<option value="">--Select Module--</option>';
+                data.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.value;
+                    opt.textContent = item.text;
+                    opt.setAttribute('data-code', item.code ?? '');
+                    moduleSelect.appendChild(opt);
+                });
+                moduleSelect.disabled = false;
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load modules.' });
+                console.error(err);
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // TRIGGERS FOR RE-LOADING THE SUB-MENU TABLE
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        clientSelect.addEventListener('change', maybeLoadSubMenus);
+        moduleSelect.addEventListener('change', maybeLoadSubMenus);
+
+        async function maybeLoadSubMenus() {
+            const clientCode    = clientSelect.value;
+            const subsystemCode = subsystemSelect.value;
+            const moduleId      = moduleSelect.value;
+
+            if (!clientCode || !subsystemCode || !moduleId) {
+                clearSubMenuTable();
+                return;
+            }
+
+            Swal.fire({ title: 'Loading...', text: 'Fetching sub-menus, please wait.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res  = await fetch(`?handler=SubMenus&subsystemCode=${encodeURIComponent(subsystemCode)}&moduleId=${moduleId}&clientCode=${encodeURIComponent(clientCode)}`);
+                const data = await res.json();
+
+                tableBody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tableWrapper.style.display  = 'none';
+                    noSubMenusMsg.style.display = 'block';
+                    saveBtn.disabled = true;
+                    Swal.close();
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align:center;padding:10px; border:1px solid lightgrey;">${index + 1}</td>
+                        <td style="text-align:left;padding:10px; border:1px solid lightgrey;">${item.subMenuName ?? ''}</td>
+                        <td style="text-align:center;padding:10px; border:1px solid lightgrey;">
+                            <input type="checkbox" class="form-check-input subMenuActive" data-submenu-id="${item.subMenuId}" ${item.isActive ? 'checked' : ''} />
+                        </td>`;
+                    tableBody.appendChild(tr);
+                });
+
+                tableWrapper.style.display  = 'block';
+                noSubMenusMsg.style.display = 'none';
+                saveBtn.disabled = false;
+                Swal.close();
+
+            } catch (err) {
+                Swal.close();
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load sub-menus.' });
+                console.error(err);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SAVE
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        saveBtn.addEventListener('click', async function () {
+            const clientCode    = clientSelect.value;
+            const subsystemCode = subsystemSelect.value;
+            const moduleCode    = getSelectedModuleCode();
+
+            if (!clientCode || !subsystemCode || !moduleSelect.value) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select Client, Subsystem and Module before saving.' });
+                return;
+            }
+
+            const subMenus = Array.from(document.querySelectorAll('.subMenuActive')).map(cb => ({
+                subMenuId: parseInt(cb.getAttribute('data-submenu-id'), 10),
+                isActive: cb.checked
+            }));
+
+            const confirm = await Swal.fire({
+                icon: 'question',
+                title: 'Save Allocation',
+                text: 'Are you sure you want to save this allocation?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Save',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            Swal.fire({ title: 'Saving...', text: 'Please wait.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const payload = {
+                entityCode: clientCode,
+                subSystemCode: subsystemCode,
+                moduleCode: moduleCode,
+                subMenus: subMenus
+            };
+
+            try {
+                const response = await fetch('?handler=Save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'Success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved!',
+                        text: result.statusDescription || 'Allocation saved successfully.',
+                        confirmButtonColor: '#198754'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Save Failed',
+                        text: result.statusDescription || 'An error occurred while saving.',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unexpected Error',
+                    text: 'An unexpected error occurred. Please try again.',
+                    confirmButtonColor: '#dc3545'
+                });
+                console.error('Save error:', err);
+            }
+        });
+    </script>
+}
