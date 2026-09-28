@@ -43,5 +43,18 @@ namespace BSSLTaskManagement.ViewModels
             public string? HelperFileName { get; set; } = "";
             public string? YouTubeHash { get; set; } = "";
         }
+
+        public class TwoFactorVM
+        {
+            public string UseType { get; set; }
+            public int? MaxNumber { get; set; }
+            public int? Seconds { get; set; }
+            public List<TwoFactorSetupVM> TwoFactorDetails { get; set; } = [];
+        }
+        public class TwoFactorSetupVM
+        {
+            public string? Code { get; set; } = "";
+            public string? Description { get; set; } = "";
+        }
     }
 }

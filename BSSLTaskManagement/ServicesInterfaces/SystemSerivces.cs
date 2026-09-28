@@ -19,6 +19,9 @@ namespace BSSLTaskManagement.ServicesInterfaces
         Task<ResponseVM> SaveSystemMenusAsync(GeneralCodesVM menu);
         Task<List<GeneralCodesVM>> GetClientsAsync();
         Task<ResponseVM> SaveClientAsync(GeneralCodesVM menu);
+
+        Task<TwoFactorVM> GetTwoFactorAuthenticationAsync();
+        Task<ResponseVM> SaveTwoFactorAuthenticationAsync(TwoFactorVM twoFactor);
     }
     public class SystemSerivces(TaskDbContext context, IWebHostEnvironment environment) : ISystemSerivces
     {
@@ -516,6 +519,150 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 {
                     Status = "Error",
                     StatusDescription = $"Client name not successfully saved: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<TwoFactorVM> GetTwoFactorAuthenticationAsync()
+        {
+            try
+            {
+                var records = await _context.TwoFactorTab
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                if (records.Count == 0)
+                    return new TwoFactorVM();
+
+                var first = records.First();
+
+                return new TwoFactorVM
+                {
+                    UseType = first.UseType,
+                    MaxNumber = first.MaxNumber,
+                    Seconds = first.Seconds,
+
+                    TwoFactorDetails = [.. records
+                        .Select(tf => new TwoFactorSetupVM
+                        {
+                            Code = tf.Code,
+                            Description = tf.Description
+                        })]
+                };
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(
+                //     ex,
+                //     "Error retrieving two-factor authentication settings.");
+
+                return new TwoFactorVM();
+            }
+        }
+        public async Task<ResponseVM> SaveTwoFactorAuthenticationAsync(TwoFactorVM twoFactor)
+        {
+            if (twoFactor == null)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription =
+                        "Two-factor authentication data is missing."
+                };
+            }
+            if (twoFactor.UseType == "")
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription =
+                        "Select use type."
+                };
+            }
+            if (twoFactor.MaxNumber == null || twoFactor.MaxNumber == 0)
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription =
+                        "Enter max number."
+                };
+            }
+            if (twoFactor.TwoFactorDetails == null ||
+                !twoFactor.TwoFactorDetails.Any())
+            {
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription =
+                        "At least one two-factor authentication method is required."
+                };
+            }
+
+            try
+            {
+                await using var transaction =
+                    await _context.Database.BeginTransactionAsync();
+
+                // Remove existing records
+                var existingRecords =
+                    await _context.TwoFactorTab.ToListAsync();
+
+                if (existingRecords.Any())
+                {
+                    _context.TwoFactorTab.RemoveRange(existingRecords);
+                }
+
+                // Add new records
+                var newRecords = twoFactor.TwoFactorDetails
+                    .Select(tf => new TwoFactorTab
+                    {
+                        UseType = twoFactor.UseType,
+                        MaxNumber = twoFactor.MaxNumber,
+                        Seconds = twoFactor.Seconds,
+                        Code = tf.Code,
+                        Description = tf.Description
+                    })
+                    .ToList();
+
+                _context.TwoFactorTab.AddRange(newRecords);
+
+                var succeeded =
+                    await _context.SaveChangesAsync();
+
+                if (succeeded <= 0)
+                {
+                    await transaction.RollbackAsync();
+
+                    return new ResponseVM
+                    {
+                        Status = "Failed",
+                        StatusDescription =
+                            "Two-factor authentication settings were not saved."
+                    };
+                }
+
+                await transaction.CommitAsync();
+
+                return new ResponseVM
+                {
+                    Status = "Success",
+                    StatusDescription =
+                        "Two-factor authentication settings successfully saved."
+                };
+            }
+            catch (Exception ex)
+            {
+                // Log ex here
+                // _logger.LogError(
+                //     ex,
+                //     "Error saving two-factor authentication settings.");
+
+                return new ResponseVM
+                {
+                    Status = "Error",
+                    StatusDescription =
+                        "An error occurred while saving the two-factor authentication settings."
                 };
             }
         }
