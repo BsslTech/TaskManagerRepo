@@ -589,7 +589,8 @@ namespace BSSLTaskManagement.ServicesInterfaces
                 {
                     foreach (var item in result)
                     {
-                        if (getsaved.Any(x => x.SubMenusetupTabId == item.SubMenuId))
+                        if (getsaved.Any(x => x.SubMenusetupTabId == item.SubMenuId
+                        && x.IsActive ==true))
                         {
                             item.IsActive = true;
                         }
@@ -636,7 +637,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
         }
        // C#
        public async Task<ResponseVM> SaveClientFormsAllocation(SubMenubyEntitySetupVM vm)
-            {
+       {
                 if (vm == null)
                 {
                     return new ResponseVM { Status = "Error", StatusDescription = "Payload missing" };
