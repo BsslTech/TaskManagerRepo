@@ -37,6 +37,7 @@ namespace BSSLTaskManagement.Pages.Menu
         {
             var clients = await _mainMenuServices.GetallClient();
             ClientList = clients
+                .OrderBy(x => x.ClientName, StringComparer.OrdinalIgnoreCase)
                 .Select(x => new SelectListItem
                 {
                     Value = x.ClientCode,
@@ -52,7 +53,9 @@ namespace BSSLTaskManagement.Pages.Menu
                 {
                     Value = x.SystemType,
                     Text = string.IsNullOrWhiteSpace(x.Description) ? x.SystemType : x.Description
-                }).ToList();
+                })
+                .OrderBy(x => x.Text, StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
 
         // ─── AJAX — CASCADE: Subsystem → Modules ─────────────────────────────────
@@ -63,12 +66,14 @@ namespace BSSLTaskManagement.Pages.Menu
         {
             var modules = await _mainMenuServices.GetallModulesBysubSystem(subsystemCode);
 
-            var result = modules.Select(x => new
-            {
-                value = x.Id,
-                text = x.Description,
-                code = x.ModuleCode
-            });
+            var result = modules
+                .OrderBy(x => x.Description, StringComparer.OrdinalIgnoreCase)
+                .Select(x => new
+                {
+                    value = x.Id,
+                    text = x.Description,
+                    code = x.ModuleCode
+                });
 
             return new JsonResult(result);
         }
@@ -81,12 +86,14 @@ namespace BSSLTaskManagement.Pages.Menu
         {
             var subMenus = await _mainMenuServices.GetAllSubMenusAsync(subsystemCode, moduleId, clientCode);
 
-            var result = subMenus.Select(x => new
-            {
-                subMenuId = x.SubMenuId,
-                subMenuName = x.SubMenuName,
-                isActive = x.IsActive
-            });
+            var result = subMenus
+                .OrderBy(x => x.SubMenuName, StringComparer.OrdinalIgnoreCase)
+                .Select(x => new
+                {
+                    subMenuId = x.SubMenuId,
+                    subMenuName = x.SubMenuName,
+                    isActive = x.IsActive
+                });
 
             return new JsonResult(result);
         }

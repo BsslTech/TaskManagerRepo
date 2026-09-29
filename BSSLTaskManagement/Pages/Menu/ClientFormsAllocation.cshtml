@@ -57,6 +57,11 @@
                                     </div>
                                 }
 
+                                <!-- top SAVE button — mirrors the footer button so users don't have to scroll -->
+                                <div class="mt-3 mb-2">
+                                    <button type="button" class="btn btn-success text-light" id="saveBtn-top" disabled>Save</button>
+                                </div>
+
                                 <!-- ROW 1: The 3 dropdowns -->
                                 <div class="row row2">
 
@@ -101,7 +106,10 @@
                                                 <tr>
                                                     <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none; width:80px;">SN</th>
                                                     <th style="text-align:left;padding:10px; border:1px solid lightgrey; text-transform:none;">Sub Menus</th>
-                                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none; width:120px;">Active</th>
+                                                    <th style="text-align:center;padding:10px; border:1px solid lightgrey; text-transform:none; width:120px;">
+                                                        Active
+                                                        <input type="checkbox" class="form-check-input ms-2" id="selectAllSubMenus" title="Check/uncheck all" />
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody id="subMenuTableBody">
@@ -117,7 +125,7 @@
 
                                 <!-- footer BUTTON -->
                                 <div class="mt-3" style="margin-bottom:2%">
-                                    <button type="button" class="btn btn-success text-light" id="saveBtn" disabled>Save</button>
+                                    <button type="button" class="btn btn-success text-light" id="saveBtn-bottom" disabled>Save</button>
                                 </div>
 
                             </div>
@@ -140,7 +148,12 @@
         const tableWrapper     = document.getElementById('subMenuTableWrapper');
         const tableBody        = document.getElementById('subMenuTableBody');
         const noSubMenusMsg    = document.getElementById('noSubMenusMsg');
-        const saveBtn          = document.getElementById('saveBtn');
+        const saveButtons       = document.querySelectorAll('#saveBtn-top, #saveBtn-bottom');
+        const selectAllCheckbox = document.getElementById('selectAllSubMenus');
+
+        function setSaveButtonsDisabled(disabled) {
+            saveButtons.forEach(btn => btn.disabled = disabled);
+        }
 
         // ═══════════════════════════════════════════════════════════════════════════
         // HELPERS
@@ -155,7 +168,13 @@
             tableBody.innerHTML = '';
             tableWrapper.style.display  = 'none';
             noSubMenusMsg.style.display = 'none';
-            saveBtn.disabled = true;
+            setSaveButtonsDisabled(true);
+            selectAllCheckbox.checked = false;
+        }
+
+        function refreshSelectAllState() {
+            const boxes = Array.from(document.querySelectorAll('.subMenuActive'));
+            selectAllCheckbox.checked = boxes.length > 0 && boxes.every(cb => cb.checked);
         }
 
         function getSelectedModuleCode() {
@@ -220,7 +239,7 @@
                 if (!data || data.length === 0) {
                     tableWrapper.style.display  = 'none';
                     noSubMenusMsg.style.display = 'block';
-                    saveBtn.disabled = true;
+                    setSaveButtonsDisabled(true);
                     Swal.close();
                     return;
                 }
@@ -238,7 +257,8 @@
 
                 tableWrapper.style.display  = 'block';
                 noSubMenusMsg.style.display = 'none';
-                saveBtn.disabled = false;
+                setSaveButtonsDisabled(false);
+                refreshSelectAllState();
                 Swal.close();
 
             } catch (err) {
@@ -249,10 +269,25 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
+        // SELECT ALL / UNSELECT ALL
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        selectAllCheckbox.addEventListener('change', function () {
+            const checked = this.checked;
+            document.querySelectorAll('.subMenuActive').forEach(cb => cb.checked = checked);
+        });
+
+        tableBody.addEventListener('change', function (e) {
+            if (e.target.classList.contains('subMenuActive')) {
+                refreshSelectAllState();
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
         // SAVE
         // ═══════════════════════════════════════════════════════════════════════════
 
-        saveBtn.addEventListener('click', async function () {
+        saveButtons.forEach(btn => btn.addEventListener('click', async function () {
             const clientCode    = clientSelect.value;
             const subsystemCode = subsystemSelect.value;
             const moduleCode    = getSelectedModuleCode();
@@ -325,6 +360,6 @@
                 });
                 console.error('Save error:', err);
             }
-        });
+        }));
     </script>
 }
