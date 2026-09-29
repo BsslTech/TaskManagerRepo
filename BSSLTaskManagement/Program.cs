@@ -52,16 +52,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthorization();
-
-// AJAX saves across the app post the antiforgery token via the
-// "RequestVerificationToken" header (JSON bodies have no form field for it to
-// live in). Without this, Razor Pages' automatic antiforgery validation only
-// ever looks at form fields and ignores the header entirely.
-builder.Services.AddAntiforgery(options =>
-{
-    options.HeaderName = "RequestVerificationToken";
-});
-
 builder.Services.AddControllers();
 builder.Services.AddScoped<ISystemSerivces, SystemSerivces>();
 builder.Services.AddScoped<IMainMenuSetupServices, MainMenuSetupServices>();
