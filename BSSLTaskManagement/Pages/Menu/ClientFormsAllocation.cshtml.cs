@@ -2,7 +2,6 @@ using BSSLTaskManagement.ServicesInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Text.Json;
 using static BSSLTaskManagement.ViewModels.MainMenuSetupViewModels;
 
 #nullable disable
@@ -24,10 +23,15 @@ namespace BSSLTaskManagement.Pages.Menu
         // Powers the Subsystem dropdown on page load
         public List<SelectListItem> SubsystemList { get; set; } = [];
 
+        // Client/Subsystem/Module + sub-menu checkbox rows post straight into this
+        // via standard model binding — Save is a plain <form method="post">, no JS/fetch.
+        [BindProperty]
+        public SubMenubyEntitySetupVM AllocationForm { get; set; } = new();
+
         // ─── PAGE LOAD ───────────────────────────────────────────────────────────
 
         // Runs on first GET — Client and Subsystem load up-front.
-        // Modules load via AJAX once a Subsystem is picked.
+        // Modules and the sub-menu table load via read-only AJAX GETs as the user picks.
         public async Task OnGetAsync()
         {
             await LoadClientsAsync();
@@ -61,7 +65,7 @@ namespace BSSLTaskManagement.Pages.Menu
 
         // ─── AJAX — CASCADE: Subsystem → Modules ─────────────────────────────────
 
-        // Called by JS when user selects a Subsystem
+        // Called by JS when user selects a Subsystem. Read-only — no save concerns here.
         // URL pattern: ?handler=ModulesBySubsystem&subsystemCode=X
         public async Task<IActionResult> OnGetModulesBySubsystemAsync(string subsystemCode)
         {
@@ -81,7 +85,7 @@ namespace BSSLTaskManagement.Pages.Menu
 
         // ─── AJAX — SUB-MENU LIST FOR THE SELECTED CLIENT/SUBSYSTEM/MODULE ───────
 
-        // Called by JS once Client, Subsystem and Module are all selected
+        // Called by JS once Client, Subsystem and Module are all selected. Read-only.
         // URL pattern: ?handler=SubMenus&subsystemCode=X&moduleId=2&clientCode=Y
         public async Task<IActionResult> OnGetSubMenusAsync(string subsystemCode, int moduleId, string clientCode)
         {
@@ -99,37 +103,22 @@ namespace BSSLTaskManagement.Pages.Menu
             return new JsonResult(result);
         }
 
-        // ─── AJAX — SAVE ALLOCATIONS ──────────────────────────────────────────────
+        // ─── POST — SAVE ──────────────────────────────────────────────────────────
 
-        // Reads and deserializes the body manually instead of relying on
-        // [FromBody] content-type negotiation. Some client machines/proxies
-        // strip or rewrite the "Content-Type: application/json" header on the
-        // way in, which makes MVC's JSON input formatter silently skip
-        // binding — the handler then runs with a null payload. Parsing the
-        // raw body ourselves avoids that failure mode entirely.
-        public async Task<IActionResult> OnPostSaveAsync()
+        // Plain form submit. AllocationForm is populated by the model binder straight
+        // from the posted form fields (client/subsystem selects, the hidden module
+        // code field, and the SubMenus[i].SubMenuId / SubMenus[i].IsActive rows) —
+        // no JS, no fetch, no manual JSON parsing.
+        public async Task<IActionResult> OnPostAsync()
         {
-            SubMenubyEntitySetupVM payload;
-            try
-            {
-                using var reader = new StreamReader(Request.Body);
-                var body = await reader.ReadToEndAsync();
-                payload = JsonSerializer.Deserialize<SubMenubyEntitySetupVM>(
-                    body,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            }
-            catch (JsonException)
-            {
-                return new JsonResult(new { status = "Error", statusDescription = "Could not read the submitted data. Please try saving again." });
-            }
+            var result = await _mainMenuServices.SaveClientFormsAllocation(AllocationForm);
 
-            var result = await _mainMenuServices.SaveClientFormsAllocation(payload);
+            if (result.Status == "Success")
+                TempData["Success"] = result.StatusDescription;
+            else
+                TempData["Error"] = result.StatusDescription;
 
-            return new JsonResult(new
-            {
-                status = result.Status,
-                statusDescription = result.StatusDescription
-            });
+            return RedirectToPage();
         }
     }
 }

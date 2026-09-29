@@ -58,6 +58,7 @@
                                 }
 
                                 <!-- top SAVE button — mirrors the footer button so users don't have to scroll -->
+                                <!-- type="button": JS validates + confirms, then clicks the real (hidden) submit button below -->
                                 <div class="mt-3 mb-2">
                                     <button type="button" class="btn btn-success text-light" id="saveBtn-top" disabled>Save</button>
                                 </div>
@@ -65,10 +66,10 @@
                                 <!-- ROW 1: The 3 dropdowns -->
                                 <div class="row row2">
 
-                                    <!-- DROPDOWN 1: Client — loaded on page load -->
+                                    <!-- DROPDOWN 1: Client — loaded on page load. name binds straight to AllocationForm.EntityCode -->
                                     <div class="col-sm-4">
                                         <label for="clientId" class="form-label req">Client</label>
-                                        <select class="form-control form-select border-primary" id="clientId">
+                                        <select name="AllocationForm.EntityCode" class="form-control form-select border-primary" id="clientId">
                                             <option value="">--Select Client--</option>
                                             @foreach (var item in Model.ClientList)
                                             {
@@ -77,10 +78,10 @@
                                         </select>
                                     </div>
 
-                                    <!-- DROPDOWN 2: Subsystem — loaded on page load -->
+                                    <!-- DROPDOWN 2: Subsystem — loaded on page load. name binds straight to AllocationForm.SubSystemCode -->
                                     <div class="col-sm-4">
                                         <label for="subsystemId" class="form-label req">Subsystem</label>
-                                        <select class="form-control form-select border-primary" id="subsystemId">
+                                        <select name="AllocationForm.SubSystemCode" class="form-control form-select border-primary" id="subsystemId">
                                             <option value="">--Select Subsystem--</option>
                                             @foreach (var item in Model.SubsystemList)
                                             {
@@ -89,12 +90,15 @@
                                         </select>
                                     </div>
 
-                                    <!-- DROPDOWN 3: Module — AJAX populated once Subsystem is selected -->
+                                    <!-- DROPDOWN 3: Module — AJAX populated once Subsystem is selected. -->
+                                    <!-- The visible select carries the ModuleSetup Id (needed to fetch the sub-menu list); -->
+                                    <!-- the hidden field carries the ModuleCode string that SaveClientFormsAllocation actually needs. -->
                                     <div class="col-sm-4">
                                         <label for="moduleId" class="form-label req">Module</label>
                                         <select class="form-control form-select border-primary" id="moduleId" disabled>
                                             <option value="">--Select Module--</option>
                                         </select>
+                                        <input type="hidden" name="AllocationForm.ModuleCode" id="moduleCodeHidden" />
                                     </div>
                                 </div>
 
@@ -113,7 +117,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="subMenuTableBody">
-                                                <!-- Rows injected by JS -->
+                                                <!-- Rows injected by JS, each with real name="AllocationForm.SubMenus[i]..." fields -->
                                             </tbody>
                                         </table>
                                     </div>
@@ -127,6 +131,10 @@
                                 <div class="mt-3" style="margin-bottom:2%">
                                     <button type="button" class="btn btn-success text-light" id="saveBtn-bottom" disabled>Save</button>
                                 </div>
+
+                                <!-- The real submit button. Hidden from view — JS clicks it after validation/confirmation -->
+                                <!-- passes, which triggers a genuine form POST straight to OnPostAsync. -->
+                                <button type="submit" id="submitBtn" style="display:none;" aria-hidden="true" tabindex="-1"></button>
 
                             </div>
                         </div>
@@ -142,14 +150,16 @@
         // ELEMENTS
         // ═══════════════════════════════════════════════════════════════════════════
 
-        const clientSelect     = document.getElementById('clientId');
-        const subsystemSelect  = document.getElementById('subsystemId');
-        const moduleSelect     = document.getElementById('moduleId');
-        const tableWrapper     = document.getElementById('subMenuTableWrapper');
-        const tableBody        = document.getElementById('subMenuTableBody');
-        const noSubMenusMsg    = document.getElementById('noSubMenusMsg');
+        const clientSelect      = document.getElementById('clientId');
+        const subsystemSelect   = document.getElementById('subsystemId');
+        const moduleSelect      = document.getElementById('moduleId');
+        const moduleCodeHidden  = document.getElementById('moduleCodeHidden');
+        const tableWrapper      = document.getElementById('subMenuTableWrapper');
+        const tableBody         = document.getElementById('subMenuTableBody');
+        const noSubMenusMsg     = document.getElementById('noSubMenusMsg');
         const saveButtons       = document.querySelectorAll('#saveBtn-top, #saveBtn-bottom');
         const selectAllCheckbox = document.getElementById('selectAllSubMenus');
+        const submitBtn         = document.getElementById('submitBtn');
 
         function setSaveButtonsDisabled(disabled) {
             saveButtons.forEach(btn => btn.disabled = disabled);
@@ -177,11 +187,6 @@
             selectAllCheckbox.checked = boxes.length > 0 && boxes.every(cb => cb.checked);
         }
 
-        function getSelectedModuleCode() {
-            const opt = moduleSelect.options[moduleSelect.selectedIndex];
-            return opt ? (opt.getAttribute('data-code') || '') : '';
-        }
-
         // ═══════════════════════════════════════════════════════════════════════════
         // CASCADE: Subsystem → Module
         // ═══════════════════════════════════════════════════════════════════════════
@@ -189,6 +194,7 @@
         subsystemSelect.addEventListener('change', async function () {
             const subsystemCode = this.value;
             resetDropdown(moduleSelect, "--Select Module--");
+            moduleCodeHidden.value = '';
             clearSubMenuTable();
             if (!subsystemCode) return;
 
@@ -209,6 +215,11 @@
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load modules.' });
                 console.error(err);
             }
+        });
+
+        moduleSelect.addEventListener('change', function () {
+            const opt = moduleSelect.options[moduleSelect.selectedIndex];
+            moduleCodeHidden.value = opt ? (opt.getAttribute('data-code') || '') : '';
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
@@ -248,9 +259,12 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="text-align:center;padding:10px; border:1px solid lightgrey;">${index + 1}</td>
-                        <td style="text-align:left;padding:10px; border:1px solid lightgrey;">${item.subMenuName ?? ''}</td>
+                        <td style="text-align:left;padding:10px; border:1px solid lightgrey;">
+                            ${item.subMenuName ?? ''}
+                            <input type="hidden" name="AllocationForm.SubMenus[${index}].SubMenuId" value="${item.subMenuId}" />
+                        </td>
                         <td style="text-align:center;padding:10px; border:1px solid lightgrey;">
-                            <input type="checkbox" class="form-check-input subMenuActive" data-submenu-id="${item.subMenuId}" ${item.isActive ? 'checked' : ''} />
+                            <input type="checkbox" class="form-check-input subMenuActive" name="AllocationForm.SubMenus[${index}].IsActive" value="true" ${item.isActive ? 'checked' : ''} />
                         </td>`;
                     tableBody.appendChild(tr);
                 });
@@ -269,7 +283,7 @@
         }
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // SELECT ALL / UNSELECT ALL
+        // SELECT ALL / UNSELECT ALL — purely client-side convenience, not bound/posted
         // ═══════════════════════════════════════════════════════════════════════════
 
         selectAllCheckbox.addEventListener('change', function () {
@@ -284,23 +298,28 @@
         });
 
         // ═══════════════════════════════════════════════════════════════════════════
-        // SAVE
+        // SAVE — validate + confirm, then trigger the real (hidden) submit button.
+        // The actual save is still a genuine form POST to OnPostAsync (model-bound,
+        // no fetch/JSON) — this just gives us a validation + confirmation step first.
         // ═══════════════════════════════════════════════════════════════════════════
 
         saveButtons.forEach(btn => btn.addEventListener('click', async function () {
-            const clientCode    = clientSelect.value;
-            const subsystemCode = subsystemSelect.value;
-            const moduleCode    = getSelectedModuleCode();
-
-            if (!clientCode || !subsystemCode || !moduleSelect.value) {
-                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select Client, Subsystem and Module before saving.' });
+            if (!clientSelect.value) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Client.' });
                 return;
             }
-
-            const subMenus = Array.from(document.querySelectorAll('.subMenuActive')).map(cb => ({
-                subMenuId: parseInt(cb.getAttribute('data-submenu-id'), 10),
-                isActive: cb.checked
-            }));
+            if (!subsystemSelect.value) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Subsystem.' });
+                return;
+            }
+            if (!moduleSelect.value) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'Please select a Module.' });
+                return;
+            }
+            if (document.querySelectorAll('.subMenuActive').length === 0) {
+                Swal.fire({ icon: 'warning', title: 'Validation', text: 'No sub-menus to save for this selection.' });
+                return;
+            }
 
             const confirm = await Swal.fire({
                 icon: 'question',
@@ -315,51 +334,7 @@
 
             if (!confirm.isConfirmed) return;
 
-            Swal.fire({ title: 'Saving...', text: 'Please wait.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            const payload = {
-                entityCode: clientCode,
-                subSystemCode: subsystemCode,
-                moduleCode: moduleCode,
-                subMenus: subMenus
-            };
-
-            try {
-                const response = await fetch('?handler=Save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (result.status === 'Success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Saved!',
-                        text: result.statusDescription || 'Allocation saved successfully.',
-                        confirmButtonColor: '#198754'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Save Failed',
-                        text: result.statusDescription || 'An error occurred while saving.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                }
-            } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Unexpected Error',
-                    text: 'An unexpected error occurred. Please try again.',
-                    confirmButtonColor: '#dc3545'
-                });
-                console.error('Save error:', err);
-            }
+            submitBtn.click();
         }));
     </script>
 }
