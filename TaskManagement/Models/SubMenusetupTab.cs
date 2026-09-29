@@ -53,8 +53,6 @@ public class SubMenusetupTab
 
     public virtual MenusetupTab? Menu { get; set; }
 
-    public virtual ModuleSetup? ModuleSetup { get; set; }
-
     public virtual ICollection<MenuAccessTab> MenuAccessTabs { get; set; } = new List<MenuAccessTab>();
 }
 public class SubMenusetupByEntityTab
