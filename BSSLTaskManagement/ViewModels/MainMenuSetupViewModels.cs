@@ -117,7 +117,7 @@ namespace BSSLTaskManagement.ViewModels
         public class SubMenubyEntitySetupVM
         {
             public string EntityCode { get; set; }
-            public string ModuleCode { get; set; }
+            public int ModuleCode { get; set; }
             public string SubSystemCode { get; set; }
             public List<SubMenubyEntitySetupListVM> SubMenus { get; set; } = new List<SubMenubyEntitySetupListVM>();
 

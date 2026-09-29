@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 using TaskManagement;
 using TaskManagement.Models;
 using static BSSLTaskManagement.ViewModels.MainMenuSetupViewModels;
@@ -566,10 +567,12 @@ namespace BSSLTaskManagement.ServicesInterfaces
             var result =  new List<SubMenubyEntitySetupListVM>();
             try
             {
+                var getmodule = await context.ModuleSetup
+                    .Where(m => m.SystemType.Trim() == Subsystem && m.Id == ModuleCode)
+                    .AsNoTracking().FirstOrDefaultAsync();  
 
                 result = await context.SubMenusetupTab
-                    .Where(m => m.ModuleSetup.SystemType.Trim() == Subsystem 
-                    && m.ModuleSetupId == ModuleCode  )
+                    .Where(m => m.ModuleSetupId == ModuleCode  )
                     .Select(x => new SubMenubyEntitySetupListVM
                     {
                         Id = x.Id,
@@ -580,8 +583,7 @@ namespace BSSLTaskManagement.ServicesInterfaces
 
               var getsaved=   await context.SubMenusetupByEntityTab
                     .Where(m=>m.ClientCode.Trim()== ClientCode
-                    && m.SubMenusetupTab.ModuleSetupId == ModuleCode
-                    && m.SubMenusetupTab.ModuleSetup.SystemType.Trim() == Subsystem )
+                    && m.SubMenusetupTab.ModuleSetupId == ModuleCode )
                     .AsNoTracking().ToListAsync();
                 if(getsaved != null && getsaved.Count > 0)
                 {
@@ -646,15 +648,17 @@ namespace BSSLTaskManagement.ServicesInterfaces
 
                 try
                 {
-                    var clientCode = vm.EntityCode.Trim();
+                var getmodule = await context.ModuleSetup
+                 .Where(m => m.SystemType.Trim() == vm.SubSystemCode && m.Id == vm.ModuleCode)
+                 .AsNoTracking().FirstOrDefaultAsync();
+                var clientCode = vm.EntityCode.Trim();
                     var incoming = vm.SubMenus ?? new List<SubMenubyEntitySetupListVM>();
                     var incomingSubMenuIds = incoming.Select(s => s.SubMenuId).ToList();
 
                     // Load existing allocations for this client
                     var existing = await context.Set<SubMenusetupByEntityTab>()
                         .Where(x => x.ClientCode == clientCode
-                        && x.SubMenusetupTab.ModuleSetup.SystemType == vm.SubSystemCode
-                        && x.SubMenusetupTab.ModuleSetup.ModuleCode == vm.ModuleCode)
+                        && x.SubMenusetupTabId == vm.ModuleCode)
                         .ToListAsync();
 
                     var existingBySubMenu = existing.ToDictionary(x => x.SubMenusetupTabId);
